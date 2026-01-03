@@ -1,0 +1,19 @@
+{
+  "main": [
+    {
+      "name": "linkedin",
+      "icon": "fab fa-linkedin",
+      "link": "https://www.linkedin.com/company/ng-workshop/"
+    },
+    {
+      "name": "facebook",
+      "icon": "fab fa-facebook",
+      "link": "https://www.facebook.com/ngworkshop"
+    },
+    {
+      "name": "whatsapp",
+      "icon": "fab fa-whatsapp",
+      "link": "https://wa.me/97248232535"
+    }
+  ]
+}

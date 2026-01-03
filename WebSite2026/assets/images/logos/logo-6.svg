@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 50" fill="#64748b">
+  <rect x="5" y="10" width="14" height="14" rx="3" fill="#06b6d4"/>
+  <rect x="21" y="10" width="14" height="14" rx="3" fill="#0891b2"/>
+  <rect x="5" y="26" width="14" height="14" rx="3" fill="#0e7490"/>
+  <rect x="21" y="26" width="14" height="14" rx="3" fill="#155e75"/>
+  <text x="45" y="32" font-family="system-ui, sans-serif" font-size="18" font-weight="600" fill="#1e293b">GridBox</text>
+</svg>

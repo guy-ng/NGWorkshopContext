@@ -1,0 +1,18 @@
+{{/*
+  Chat Comparison Wrapper Shortcode
+  Places two chat components side by side on desktop
+
+  Usage:
+  {{< chat-compare >}}
+  {{< chat type="chatbot" title="Chatbot" >}}
+  ...
+  {{< /chat >}}
+  {{< chat type="agent" title="AI Agent" >}}
+  ...
+  {{< /chat >}}
+  {{< /chat-compare >}}
+*/}}
+
+<div class="chat-compare-wrapper">
+  {{ .Inner }}
+</div>

@@ -1,0 +1,68 @@
+############# Hebrew navigation ##############
+
+# main menu
+[[main]]
+name = "בית"
+url = "/he/"
+weight = 1
+
+[[main]]
+name = "שירותים"
+weight = 2
+
+[[main]]
+parent = "שירותים"
+name = "Camunda"
+url = "/he/services/camunda/"
+
+[[main]]
+parent = "שירותים"
+name = "בינה מלאכותית"
+url = "/he/services/ai/"
+
+[[main]]
+parent = "שירותים"
+name = "פיתוח"
+url = "/he/services/development/"
+
+[[main]]
+parent = "שירותים"
+name = "BPM"
+url = "/he/services/bpm/"
+
+[[main]]
+name = "בלוג"
+url = "/he/blog/"
+weight = 3
+
+[[main]]
+name = "אודות"
+url = "/he/about/"
+weight = 4
+
+[[main]]
+name = "צרו קשר"
+url = "/he/contact/"
+weight = 5
+
+
+# footer menu
+[[footer]]
+name = "אודות"
+url = "/he/about/"
+weight = 1
+
+[[footer]]
+name = "שירותים"
+url = "/he/services/"
+weight = 2
+
+[[footer]]
+name = "מדיניות פרטיות"
+url = "/he/privacy-policy/"
+weight = 3
+
+[[footer]]
+name = "הצהרת נגישות"
+url = "/he/accessibility/"
+weight = 4

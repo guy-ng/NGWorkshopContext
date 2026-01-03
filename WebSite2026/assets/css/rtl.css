@@ -1,0 +1,244 @@
+/* RTL (Right-to-Left) Support for Hebrew and other RTL languages */
+
+/* Base RTL Direction */
+@layer base {
+  [dir="rtl"] {
+    direction: rtl;
+    text-align: start;
+  }
+}
+
+/* Typography Alignment */
+@layer base {
+  [dir="rtl"] h1,
+  [dir="rtl"] h2,
+  [dir="rtl"] h3,
+  [dir="rtl"] h4,
+  [dir="rtl"] h5,
+  [dir="rtl"] h6,
+  [dir="rtl"] p {
+    text-align: start;
+  }
+}
+
+/* Component-specific RTL Adjustments */
+@layer components {
+  /* Lists */
+  [dir="rtl"] ul,
+  [dir="rtl"] ol {
+    padding-inline-start: 1.5rem;
+    padding-inline-end: 0;
+  }
+
+  [dir="rtl"] li {
+    text-align: start;
+  }
+
+  /* Forms */
+  [dir="rtl"] .form-check {
+    padding-inline-start: 0;
+    padding-inline-end: 1.5rem;
+  }
+
+  /* Buttons with Icons */
+  [dir="rtl"] .btn > i,
+  [dir="rtl"] .btn > svg {
+    margin-inline-end: 0.5rem;
+    margin-inline-start: 0;
+  }
+
+  /* Cards */
+  [dir="rtl"] .card {
+    text-align: start;
+  }
+
+  /* Dropdowns */
+  [dir="rtl"] .dropdown-menu {
+    text-align: start;
+    right: auto;
+    left: 0;
+  }
+
+  /* Pagination */
+  [dir="rtl"] .pagination {
+    flex-direction: row-reverse;
+  }
+
+  /* Tables */
+  [dir="rtl"] table,
+  [dir="rtl"] th,
+  [dir="rtl"] td {
+    text-align: start;
+  }
+}
+
+/* Icon Mirroring for Directional Icons */
+@layer utilities {
+  [dir="rtl"] .fa-chevron-right,
+  [dir="rtl"] .fa-chevron-left,
+  [dir="rtl"] .fa-arrow-right,
+  [dir="rtl"] .fa-arrow-left,
+  [dir="rtl"] .fa-angle-right,
+  [dir="rtl"] .fa-angle-left {
+    transform: scaleX(-1);
+  }
+
+  /* Mirror pagination SVG arrows */
+  [dir="rtl"] nav[aria-label="Pagination"] svg {
+    transform: scaleX(-1);
+  }
+}
+
+/* Typography Fixes for Hebrew */
+@layer base {
+  [dir="rtl"] {
+    line-height: 1.8;
+  }
+
+  [dir="rtl"] .prose {
+    text-align: start;
+  }
+}
+
+/* Blog Content RTL Fixes */
+@layer components {
+  /* Main content wrapper */
+  [dir="rtl"] .content {
+    direction: rtl;
+    text-align: right;
+  }
+
+  [dir="rtl"] .content h1,
+  [dir="rtl"] .content h2,
+  [dir="rtl"] .content h3,
+  [dir="rtl"] .content h4,
+  [dir="rtl"] .content h5,
+  [dir="rtl"] .content h6 {
+    text-align: right;
+  }
+
+  [dir="rtl"] .content p {
+    text-align: right;
+    direction: rtl;
+  }
+
+  [dir="rtl"] .content ul,
+  [dir="rtl"] .content ol {
+    direction: rtl;
+    text-align: right;
+    padding-right: 1.5rem;
+    padding-left: 0;
+    margin-right: 0;
+    list-style-position: inside;
+  }
+
+  [dir="rtl"] .content li {
+    text-align: right;
+    direction: rtl;
+  }
+
+  /* Blockquotes */
+  [dir="rtl"] .content blockquote {
+    direction: rtl;
+    text-align: right;
+    border-right: 4px solid;
+    border-left: none;
+    padding-right: 1rem;
+    padding-left: 0;
+    margin-right: 0;
+  }
+
+  /* Tables - keep structure but RTL text */
+  [dir="rtl"] .content table {
+    direction: rtl;
+    width: 100%;
+  }
+
+  [dir="rtl"] .content th,
+  [dir="rtl"] .content td {
+    text-align: right;
+    direction: rtl;
+  }
+
+  /* Code blocks - force LTR for code */
+  [dir="rtl"] .content pre,
+  [dir="rtl"] .content pre code,
+  [dir="rtl"] .prose pre,
+  [dir="rtl"] .prose pre code {
+    direction: ltr !important;
+    text-align: left !important;
+    unicode-bidi: plaintext !important;
+  }
+
+  /* Inline code - keep LTR */
+  [dir="rtl"] .content code:not(pre code),
+  [dir="rtl"] .prose code:not(pre code) {
+    direction: ltr !important;
+    unicode-bidi: embed !important;
+  }
+
+  /* Strong and emphasis */
+  [dir="rtl"] .content strong,
+  [dir="rtl"] .content em {
+    direction: inherit;
+  }
+
+  /* Task lists (checkboxes) */
+  [dir="rtl"] .content ul li input[type="checkbox"] {
+    margin-left: 0.5rem;
+    margin-right: 0;
+  }
+
+  /* Horizontal rules */
+  [dir="rtl"] .content hr {
+    direction: ltr;
+  }
+
+  /* Links */
+  [dir="rtl"] .content a {
+    direction: inherit;
+  }
+
+  /* Images and figures */
+  [dir="rtl"] .content figure {
+    direction: rtl;
+    text-align: center;
+  }
+
+  [dir="rtl"] .content figcaption {
+    text-align: center;
+    direction: rtl;
+  }
+
+  /* Definition lists */
+  [dir="rtl"] .content dl {
+    direction: rtl;
+    text-align: right;
+  }
+
+  [dir="rtl"] .content dt,
+  [dir="rtl"] .content dd {
+    text-align: right;
+  }
+}
+
+/* Fix for embedded content */
+@layer components {
+  [dir="rtl"] iframe,
+  [dir="rtl"] video {
+    direction: ltr;
+  }
+}
+
+/* Special handling for mixed LTR content in RTL context */
+@layer utilities {
+  [dir="rtl"] .ltr {
+    direction: ltr;
+    text-align: left;
+  }
+
+  [dir="rtl"] .content .ltr {
+    direction: ltr;
+    text-align: left;
+  }
+}

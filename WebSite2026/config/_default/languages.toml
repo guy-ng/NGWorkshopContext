@@ -1,0 +1,14 @@
+################ Hebrew language ##################
+[he]
+languageName = "עברית"
+languageCode = "he-IL"
+languageDirection = "rtl"
+contentDir = "content/hebrew"
+weight = 1
+
+################ English language ##################
+[en]
+languageName = "En"
+languageCode = "en-us"
+contentDir = "content/english"
+weight = 2

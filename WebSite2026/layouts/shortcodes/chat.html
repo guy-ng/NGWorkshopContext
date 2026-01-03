@@ -1,0 +1,107 @@
+{{/*
+  Chat Conversation Shortcode
+  Usage:
+  {{< chat >}}
+  user: Message from user
+  bot: Response from bot/AI
+  agent: Response from AI agent (same as bot)
+  system: System notification
+  {{< /chat >}}
+
+  Optional parameters:
+  - title: Title for the chat window (default: none)
+  - type: "chatbot" (gray/neutral) or "agent" (green/smart) - affects bot message colors
+  - rtl: Set to "true" for RTL languages (auto-detected from page)
+*/}}
+
+{{ $title := .Get "title" | default "" }}
+{{ $type := .Get "type" | default "agent" }}
+{{ $rtlParam := .Get "rtl" }}
+{{ $isRTL := or (eq $rtlParam "true") (eq $.Page.Language.Lang "he") (eq $.Page.Language.Lang "ar") }}
+
+<div class="chat-container chat-type-{{ $type }}{{ if $isRTL }} chat-rtl{{ end }}">
+  {{ if $title }}
+  <div class="chat-header">
+    <span class="chat-header-icon">{{ if eq $type "chatbot" }}🤖{{ else }}✨{{ end }}</span>
+    <span class="chat-header-title">{{ $title }}</span>
+  </div>
+  {{ end }}
+  <div class="chat-messages">
+    {{ $lines := split .Inner "\n" }}
+    {{ range $lines }}
+      {{ $line := trim . " \t\r" }}
+      {{ if $line }}
+        {{ if hasPrefix $line "user:" }}
+          {{ $msg := trim (strings.TrimPrefix "user:" $line) " " }}
+          <div class="chat-message chat-message-user">
+            <div class="chat-bubble chat-bubble-user">
+              <span class="chat-sender">👤</span>
+              <span class="chat-text">{{ $msg | markdownify }}</span>
+            </div>
+          </div>
+        {{ else if hasPrefix $line "לקוח:" }}
+          {{ $msg := trim (strings.TrimPrefix "לקוח:" $line) " " }}
+          <div class="chat-message chat-message-user">
+            <div class="chat-bubble chat-bubble-user">
+              <span class="chat-sender">👤</span>
+              <span class="chat-text">{{ $msg | markdownify }}</span>
+            </div>
+          </div>
+        {{ else if or (hasPrefix $line "bot:") (hasPrefix $line "agent:") (hasPrefix $line "ai:") }}
+          {{ $msg := $line }}
+          {{ if hasPrefix $line "bot:" }}
+            {{ $msg = trim (strings.TrimPrefix "bot:" $line) " " }}
+          {{ else if hasPrefix $line "agent:" }}
+            {{ $msg = trim (strings.TrimPrefix "agent:" $line) " " }}
+          {{ else if hasPrefix $line "ai:" }}
+            {{ $msg = trim (strings.TrimPrefix "ai:" $line) " " }}
+          {{ end }}
+          <div class="chat-message chat-message-bot">
+            <div class="chat-bubble chat-bubble-bot">
+              <span class="chat-sender">{{ if eq $type "chatbot" }}🤖{{ else }}✨{{ end }}</span>
+              <span class="chat-text">{{ $msg | markdownify }}</span>
+            </div>
+          </div>
+        {{ else if or (hasPrefix $line "בוט:") (hasPrefix $line "סוכן:") }}
+          {{ $msg := $line }}
+          {{ if hasPrefix $line "בוט:" }}
+            {{ $msg = trim (strings.TrimPrefix "בוט:" $line) " " }}
+          {{ else if hasPrefix $line "סוכן:" }}
+            {{ $msg = trim (strings.TrimPrefix "סוכן:" $line) " " }}
+          {{ end }}
+          <div class="chat-message chat-message-bot">
+            <div class="chat-bubble chat-bubble-bot">
+              <span class="chat-sender">{{ if eq $type "chatbot" }}🤖{{ else }}✨{{ end }}</span>
+              <span class="chat-text">{{ $msg | markdownify }}</span>
+            </div>
+          </div>
+        {{ else if or (hasPrefix $line "system:") (hasPrefix $line "מערכת:") }}
+          {{ $msg := $line }}
+          {{ if hasPrefix $line "system:" }}
+            {{ $msg = trim (strings.TrimPrefix "system:" $line) " " }}
+          {{ else }}
+            {{ $msg = trim (strings.TrimPrefix "מערכת:" $line) " " }}
+          {{ end }}
+          <div class="chat-message chat-message-system">
+            <div class="chat-bubble chat-bubble-system">
+              <span class="chat-text">{{ $msg | markdownify }}</span>
+            </div>
+          </div>
+        {{ else if or (hasPrefix $line "action:") (hasPrefix $line "פעולה:") }}
+          {{ $msg := $line }}
+          {{ if hasPrefix $line "action:" }}
+            {{ $msg = trim (strings.TrimPrefix "action:" $line) " " }}
+          {{ else }}
+            {{ $msg = trim (strings.TrimPrefix "פעולה:" $line) " " }}
+          {{ end }}
+          <div class="chat-message chat-message-action">
+            <div class="chat-bubble chat-bubble-action">
+              <span class="chat-sender">⚡</span>
+              <span class="chat-text">{{ $msg | markdownify }}</span>
+            </div>
+          </div>
+        {{ end }}
+      {{ end }}
+    {{ end }}
+  </div>
+</div>

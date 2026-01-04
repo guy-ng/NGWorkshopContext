@@ -1,0 +1,207 @@
+{
+  "main": {
+    "id": "7bdc26097c36df91",
+    "type": "split",
+    "children": [
+      {
+        "id": "07f15d6f305732d5",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "55f4d4bc6e00f102",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Camunda/VideoSeries2026/scripts/מטייס משנה לטייס אוטומטי.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "מטייס משנה לטייס אוטומטי"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "b82b343af95bd81a",
+    "type": "split",
+    "children": [
+      {
+        "id": "964de2ba975ed293",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "436d0c8c97925315",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "9a20775c28ea5baa",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "f86c205d964166e4",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "478a7b82243e2193",
+    "type": "split",
+    "children": [
+      {
+        "id": "79fcbabee26a6d81",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e55d78395e641b4b",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Camunda/VideoSeries2026/scripts/מטייס משנה לטייס אוטומטי.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for מטייס משנה לטייס אוטומטי"
+            }
+          },
+          {
+            "id": "b6ac1be45b48f8bc",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Camunda/VideoSeries2026/scripts/מטייס משנה לטייס אוטומטי.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from מטייס משנה לטייס אוטומטי"
+            }
+          },
+          {
+            "id": "7926057d1e46535e",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "3b300247a214da6e",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Camunda/VideoSeries2026/scripts/מטייס משנה לטייס אוטומטי.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of מטייס משנה לטייס אוטומטי"
+            }
+          },
+          {
+            "id": "e0e066f5af0ea51a",
+            "type": "leaf",
+            "state": {
+              "type": "agent-client-chat-view",
+              "state": {},
+              "icon": "bot-message-square",
+              "title": "Agent client"
+            }
+          }
+        ],
+        "currentTab": 4
+      }
+    ],
+    "direction": "horizontal",
+    "width": 486.5
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false,
+      "obsidian42-brat:BRAT": false,
+      "agent-client:Open agent client": false
+    }
+  },
+  "active": "55f4d4bc6e00f102",
+  "lastOpenFiles": [
+    "Camunda/VideoSeries2026/scripts/מטייס משנה לטייס אוטומטי.md",
+    "Camunda/2026-Banking-Financial-Services-Solution-Brief.pdf",
+    "Camunda/VideoSeries2026/scripts/drafts/video_03_attended_vs_unattended.md",
+    "Camunda/VideoSeries2026/VideoFormat.rtl.md",
+    "AI/the-state-of-ai-in-2025.pdf",
+    "AI",
+    "Camunda/VideoSeries2026/scripts/drafts/video_04_workflow_vs_business_process.md",
+    "Camunda/VideoSeries2026/scripts/drafts/video_01_what_is_ai_agent.md",
+    "Camunda/VideoSeries2026/scripts/drafts/video_13_machine_colleagues_orchestration.md",
+    "Camunda/VideoSeries2026/scripts/drafts",
+    "Camunda/VideoSeries2026/scripts/drafts/video_12_agentic_ai_action_plan.md",
+    "Camunda/VideoSeries2026/scripts/drafts/video_11_ai_agents_for_process_improvement.md",
+    "Camunda/VideoSeries2026/scripts/drafts/video_10_future_of_work.md",
+    "Camunda/VideoSeries2026/scripts/drafts/video_09_ai_governance.md",
+    "Camunda/VideoSeries2026/scripts/drafts/video_06_human_in_the_loop.md",
+    "Camunda/VideoSeries2026/scripts/drafts/video_05_avoiding_ai_silos.md",
+    "Camunda/VideoSeries2026/scripts/drafts/Video-iPaaS-vs-Camunda.rtl.md",
+    "CAMUNDA_ISRAEL_MARKET_RESEARCH.md",
+    "CAMUNDA_PROSPECTS_ISRAEL.md",
+    "marketing/competitive-research-agentic-programs.md",
+    "marketing/90-day-agentic-process-program.md"
+  ]
+}

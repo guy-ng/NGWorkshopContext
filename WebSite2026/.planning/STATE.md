@@ -4,7 +4,7 @@
 **Current Phase:** 1 - Homepage Design Implementation
 **Status:** In Progress
 
-Last activity: 2026-02-17 - Completed quick task 003: Match contact us page to design
+Last activity: 2026-02-17 - Completed quick task 004: Translate contact page to English
 
 ### Blockers/Concerns
 
@@ -17,3 +17,4 @@ None currently.
 | 001 | Main page redesign to match design | 2026-02-17 | 1e503c7 | [001-main-page-redesign](./quick/001-main-page-redesign/) |
 | 002 | Homepage cleanup: remove top banner, simplify nav, fix language dropdown, translate to English | 2026-02-17 | 5dcf08c | [2-homepage-cleanup-remove-top-banner-simpl](./quick/2-homepage-cleanup-remove-top-banner-simpl/) |
 | 003 | Match contact us page to design | 2026-02-17 | 06b5249 | [3-match-contact-us-page-to-design](./quick/3-match-contact-us-page-to-design/) |
+| 004 | Translate contact page to English with bidirectional layout | 2026-02-17 | c68df64 | [4-translate-contact-page-to-english](./quick/4-translate-contact-page-to-english/) |

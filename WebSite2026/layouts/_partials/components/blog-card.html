@@ -1,37 +1,48 @@
-<div class="bg-body dark:bg-darkmode-body">
-  {{ $image:= .Params.image }}
-  {{ if $image }}
-    {{ partial "image" (dict "Src" $image "Context" .Page "Alt" .Title "Class" "mb-6 w-full rounded") }}
-  {{ end }}
-  <h4 class="mb-3">
-    <a href="{{ .RelPermalink }}">
-      {{ .Title }}
-    </a>
-  </h4>
-  {{ $categories:= .Params.categories }}
-  {{ if $categories }}
-    <ul class="mb-4">
-      <li class="me-4 inline-block">
-        <a href="https://www.linkedin.com/in/guyelisha/" target="_blank" rel="noopener noreferrer">
-          <i class="fa-regular fa-circle-user me-2"></i>{{ .Params.author }}
-        </a>
-      </li>
-      <li class="me-4 inline-block">
-        <i class="fa-regular fa-folder me-1"></i>
-        {{ range $i,$p:= $categories }}
-          <a
-            href="{{ `categories/` | relLangURL }}{{ . | urlize | lower }}/"
-            class="ms-1"
-            >{{ . | humanize }}{{ if ne $i (sub (len $categories) 1) }}
-              {{ "," }}
-            {{ end }}
-          </a>
+<article class="flex flex-col bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 border border-gray-100 group">
+  <!-- Image / illustration area -->
+  <div class="h-48 bg-gray-100 relative overflow-hidden">
+    {{ $image := .Params.image }}
+    {{ if $image }}
+      <a href="{{ .RelPermalink }}" class="block w-full h-full">
+        {{ partial "image" (dict "Src" $image "Context" .Page "Alt" .Title "Class" "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300") }}
+      </a>
+    {{ else }}
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(62,53,43,0.1),transparent)]"></div>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="material-symbols-outlined text-6xl text-[#3E352B]/10 group-hover:text-primary/20 transition-colors">article</span>
+      </div>
+    {{ end }}
+    {{ with .Params.categories }}
+      <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold text-[#3E352B] shadow-sm">
+        {{ index . 0 | humanize }}
+      </div>
+    {{ end }}
+  </div>
+
+  <!-- Card content -->
+  <div class="p-6 flex flex-col flex-grow">
+    {{ with .Params.categories }}
+      <div class="mb-3 flex items-center gap-2 text-xs text-primary font-semibold">
+        {{ range $i, $cat := . }}
+          {{ if $i }}<span class="w-1 h-1 bg-gray-300 rounded-full"></span>{{ end }}
+          <span>{{ $cat | humanize }}</span>
         {{ end }}
-      </li>
-    </ul>
-  {{ end }}
-  <p class="mb-6">{{ .Summary | plainify }}</p>
-  <a class="btn btn-outline-primary btn-sm" href="{{ .RelPermalink }}">
-    {{ T "read_more" | default "Read More" }}
-  </a>
-</div>
+      </div>
+    {{ end }}
+
+    <h3 class="text-xl font-bold text-[#3E352B] mb-3 leading-snug group-hover:text-primary transition-colors">
+      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+    </h3>
+
+    <p class="text-[#6B6054] text-sm line-clamp-3 mb-6 leading-relaxed">
+      {{ .Summary | plainify | truncate 150 }}
+    </p>
+
+    <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+      <span class="text-xs text-gray-400">{{ .Date.Format "2 January, 2006" }}</span>
+      <a class="flex items-center gap-1 text-sm font-bold text-primary hover:brightness-110 transition-colors" href="{{ .RelPermalink }}">
+        קרא עוד <span class="material-icons text-xs rtl-flip">arrow_forward</span>
+      </a>
+    </div>
+  </div>
+</article>

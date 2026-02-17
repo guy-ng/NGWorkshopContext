@@ -1,28 +1,98 @@
 {{ define "main" }}
-  {{ partial "page-header" . }}
+  <!-- Breadcrumb + Featured Article -->
+  <section class="relative pt-12 pb-20 overflow-hidden">
+    <div class="absolute inset-0 gradient-mesh z-0"></div>
+    <div class="container relative z-10">
+      <!-- Breadcrumb -->
+      <div class="mb-8 flex items-center gap-2 text-sm text-[#6B6054]">
+        <a class="hover:text-primary" href="{{ site.Home.RelPermalink }}">בית</a>
+        <span class="text-gray-300">/</span>
+        <span class="font-bold text-primary">{{ .Title }}</span>
+      </div>
 
-
-  <section class="section">
-    <div class="container">
-      <div class="row gx-5">
-        <!-- blog posts -->
-        <div class="lg:col-8">
-          <div class="row">
-            {{ $paginator:= .Paginate .RegularPages }}
-            {{ range $paginator.Pages }}
-              <div class="md:col-6 mb-14">
-                {{ partial "components/blog-card" . }}
+      <!-- Featured article (first post) -->
+      {{ $paginator := .Paginate .RegularPages }}
+      {{ $featured := index $paginator.Pages 0 }}
+      {{ with $featured }}
+        <div class="group featured-card-hover relative bg-white rounded-3xl overflow-hidden shadow-natural border border-gray-100 grid lg:grid-cols-2">
+          <!-- Image / illustration side -->
+          <div class="relative h-64 lg:h-auto overflow-hidden bg-[#2A241E]">
+            <div class="absolute inset-0 bg-primary/20 mix-blend-overlay z-10"></div>
+            {{ $image := .Params.image }}
+            {{ if $image }}
+              <div class="absolute inset-0 featured-image transition-transform duration-700 ease-out">
+                {{ partial "image" (dict "Src" $image "Context" .Page "Alt" .Title "Class" "w-full h-full object-cover") }}
               </div>
+            {{ else }}
+              <div class="absolute inset-0 flex items-center justify-center opacity-80 featured-image transition-transform duration-700 ease-out">
+                <div class="absolute w-[150%] h-[150%] bg-[radial-gradient(circle_at_center,rgba(138,191,59,0.3),transparent,transparent)] animate-pulse"></div>
+                <svg class="w-full h-full text-primary opacity-60" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+                  <path class="animate-[dash_10s_linear_infinite]" d="M50 150 Q 100 50 150 150 T 250 150 T 350 150" fill="none" stroke="currentColor" stroke-dasharray="10,5" stroke-width="2"></path>
+                  <circle cx="150" cy="150" fill="none" r="40" stroke="currentColor" stroke-width="1"></circle>
+                  <circle class="opacity-50" cx="250" cy="150" fill="currentColor" r="20"></circle>
+                </svg>
+              </div>
+            {{ end }}
+            <div class="absolute top-6 right-6 z-20">
+              <span class="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">Featured Article</span>
+            </div>
+          </div>
+
+          <!-- Content side -->
+          <div class="p-8 lg:p-12 flex flex-col justify-center">
+            <div class="flex items-center gap-3 mb-4 text-xs font-semibold uppercase tracking-wider text-primary">
+              {{ with .Params.categories }}
+                <span>{{ index . 0 }}</span>
+                <span class="w-1 h-1 rounded-full bg-gray-300"></span>
+              {{ end }}
+              <span>{{ math.Round (div (countwords .Content) 200.0) }} דקות קריאה</span>
+            </div>
+            <h1 class="text-3xl lg:text-4xl font-bold text-[#3E352B] mb-6 leading-tight">
+              {{ .Title }}
+            </h1>
+            <p class="text-[#6B6054] text-lg mb-8 leading-relaxed">
+              {{ .Summary | plainify | truncate 200 }}
+            </p>
+            <div class="flex items-center justify-between mt-auto">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                  <div class="w-full h-full bg-[#3E352B] flex items-center justify-center text-white font-bold text-xs">NG</div>
+                </div>
+                <div class="text-sm">
+                  <p class="font-bold text-[#3E352B]">{{ .Params.author | default "צוות NG Workshop" }}</p>
+                  <p class="text-gray-400 text-xs">{{ .Date.Format "2 January, 2006" }}</p>
+                </div>
+              </div>
+              <a class="inline-flex items-center gap-2 text-primary font-bold hover:brightness-110 transition-colors group/link" href="{{ .RelPermalink }}">
+                קרא עוד
+                <span class="material-icons text-sm rtl-flip transform group-hover/link:-translate-x-1 transition-transform">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      {{ end }}
+    </div>
+  </section>
+
+  <!-- Main grid -->
+  <section class="pb-24 bg-[#FAF9F6]">
+    <div class="container">
+      <div class="grid lg:grid-cols-12 gap-12">
+        <!-- Blog posts grid (8 cols) -->
+        <div class="lg:col-span-8 space-y-12">
+          <div class="grid md:grid-cols-2 gap-8">
+            {{ range after 1 $paginator.Pages }}
+              {{ partial "components/blog-card" . }}
             {{ end }}
           </div>
           {{ partial "components/pagination.html" . }}
         </div>
-        <!-- sidebar -->
-        <div class="lg:col-4">
-          <!-- widget -->
-          {{ $widget:= site.Params.widgets.sidebar }}
+
+        <!-- Sidebar (4 cols) -->
+        <aside class="hidden lg:block lg:col-span-4 space-y-8">
+          {{ $widget := site.Params.widgets.sidebar }}
           {{ partialCached "widgets/widget-wrapper" ( dict "Widgets" $widget "Scope" . ) }}
-        </div>
+        </aside>
       </div>
     </div>
   </section>

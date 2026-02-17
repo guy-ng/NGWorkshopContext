@@ -1,99 +1,166 @@
 {{ define "main" }}
-  <section class="section pt-7">
-    <div class="container">
-      <div class="row justify-center">
-        <article class="lg:col-10">
-          {{ $image:= .Params.image }}
-          {{ if $image }}
-            <div class="mb-10">
-              {{ partial "image" (dict "Src" $image "Context" .Page "Alt" .Title "Class" "w-full rounded") }}
+  <main class="relative">
+    <div class="absolute inset-0 gradient-mesh z-0 pointer-events-none"></div>
+    <div class="absolute inset-0 circuit-pattern z-0 pointer-events-none"></div>
+
+    <!-- Article Header (centered) -->
+    <header class="relative pt-16 pb-12 overflow-hidden">
+      <div class="container relative z-10">
+        <div class="max-w-4xl mx-auto text-center">
+          <!-- Category badge -->
+          {{ with .Params.categories }}
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-[#76A632] text-xs font-bold mb-6 border border-primary/20">
+              <span class="material-symbols-outlined text-sm">psychology</span>
+              {{ index . 0 | humanize }}
             </div>
           {{ end }}
-          <h1 class="h2 mb-4">
+
+          <h1 class="text-4xl md:text-5xl font-bold text-[#3E352B] leading-[1.2] mb-6">
             {{ .Title }}
           </h1>
-          <ul class="mb-4">
-            <li class="me-4 inline-block">
-              <a
-                href="https://www.linkedin.com/in/guyelisha/"
-                target="_blank"
-                rel="noopener noreferrer">
-                <i class="fa-regular fa-circle-user me-2"></i
-                >{{ .Params.author }}
-              </a>
-            </li>
-            {{ $categories:= .Params.categories }}
-            {{ if $categories }}
-              <li class="me-4 inline-block">
-                <i class="fa-regular fa-folder me-2"></i>
-                {{ range $i,$p:= $categories }}
-                  <a
-                    href="{{ `categories/` | relLangURL }}{{ . | urlize | lower }}/"
-                    class=""
-                    >{{ . | humanize }}{{ if ne $i (sub (len $categories) 1) }}
-                      {{ "," }}
-                    {{ end }}
-                  </a>
-                {{ end }}
-              </li>
-            {{ end }}
-            <li class="me-4 inline-block">
-              <i class="fa-regular fa-clock me-2"></i>
-              {{ time.Format ":date_long" .PublishDate }}
-            </li>
-          </ul>
-          <div class="content mb-10">
-            {{ .Content }}
-          </div>
-          <div class="row items-start justify-between">
-            {{ $tags:= .Params.tags }}
-            {{ if $tags }}
-              <div class="lg:col-6 mb-10 flex items-center lg:mb-0">
-                <h5 class="me-3">{{ T "tags" | default "Tags" }} :</h5>
-                <ul>
-                  {{ range $i,$p:= $tags }}
-                    <li class="inline-block">
-                      <a
-                        class="bg-light hover:bg-primary dark:bg-darkmode-light dark:hover:bg-darkmode-primary dark:hover:text-text-dark m-1 block rounded px-3 py-1 hover:text-white"
-                        href="{{ `tags/` | relLangURL }}{{ . | urlize | lower }}/">
-                        {{ . | humanize }}
-                      </a>
-                    </li>
-                  {{ end }}
-                </ul>
-              </div>
-            {{ end }}
-            <div class="lg:col-6 flex items-center lg:justify-end">
-              <h5>{{ T "share" | default "Share" }} :</h5>
-              {{ partial "social-share" (dict "Context" . "Class" "share-icons" "Title" .Title "Whatsapp" false "Telegram" false "Linkedin" false "Pinterest" false "Tumblr" false "Vk" false "Reddit" false) }}
-            </div>
-          </div>
-          <!-- comments -->
-          {{ if site.Config.Services.Disqus.Shortname }}
-            <div class="mt-20">
-              {{ partial "disqus.html" . }}
-            </div>
-          {{ end }}
-        </article>
-      </div>
 
-      <!-- Related posts -->
-      {{ $related := .Site.RegularPages.Related . | first 10 }}
-      {{ $related = $related | shuffle | first 3 }}
-      {{ with $related }}
-        <div class="section pb-0">
-          <h2 class="h3 mb-12">
-            {{ T "related_posts" | default "Related Posts" }}
-          </h2>
-          <div class="row">
-            {{ range . }}
-              <div class="lg:col-4 md:col-6 mb-14">
-                {{ partial "components/blog-card" . }}
+          {{ with .Params.description }}
+            <p class="text-xl text-[#6B6054] leading-relaxed mb-8 max-w-2xl mx-auto">
+              {{ . }}
+            </p>
+          {{ end }}
+
+          <!-- Metadata row -->
+          <div class="flex items-center justify-center gap-4 text-sm text-[#6B6054]/80 border-t border-[#3E352B]/10 pt-6 max-w-lg mx-auto">
+            <div class="flex items-center gap-2">
+              <span class="material-icons text-base">calendar_today</span>
+              <span>{{ .Date.Format "2 January, 2006" }}</span>
+            </div>
+            <span class="h-1 w-1 rounded-full bg-[#6B6054]/50"></span>
+            <div class="flex items-center gap-2">
+              <span class="material-icons text-base">schedule</span>
+              <span>{{ math.Round (div (countwords .Content) 200.0) }} דקות קריאה</span>
+            </div>
+            {{ with .Params.author }}
+              <span class="h-1 w-1 rounded-full bg-[#6B6054]/50"></span>
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full bg-[#3E352B] flex items-center justify-center text-white text-[8px] font-bold">NG</div>
+                <span>מאת {{ . }}</span>
               </div>
             {{ end }}
           </div>
         </div>
-      {{ end }}
+      </div>
+    </header>
+
+    <!-- Content grid -->
+    <div class="container pb-24 relative z-10">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <!-- Sidebar (sticky TOC + CTA) -->
+        <aside class="hidden lg:block lg:col-span-3 lg:col-start-10 relative">
+          <div class="sticky top-32 space-y-8">
+            <!-- Table of Contents -->
+            {{ $toc := .TableOfContents }}
+            {{ if $toc }}
+              <div class="glass-toc rounded-2xl p-6 shadow-natural">
+                <h4 class="font-bold text-[#3E352B] mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary">list_alt</span>
+                  תוכן העניינים
+                </h4>
+                <nav class="space-y-3 text-sm [&_a]:block [&_a]:text-[#6B6054] [&_a]:hover:text-primary [&_a]:hover:border-r-2 [&_a]:hover:border-primary/50 [&_a]:pr-3 [&_a]:transition-all [&_ul]:space-y-2 [&_li]:mt-1">
+                  {{ $toc }}
+                </nav>
+              </div>
+            {{ end }}
+
+            <!-- Sidebar CTA -->
+            <div class="bg-gradient-to-br from-[#3E352B] to-[#2A241E] rounded-2xl p-6 text-white shadow-xl relative overflow-hidden group">
+              <div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl transform translate-x-10 -translate-y-10 group-hover:bg-primary/20 transition-all duration-700"></div>
+              <h4 class="font-bold text-lg mb-2 relative z-10">רוצים ליישם את הגישה?</h4>
+              <p class="text-sm text-gray-300 mb-6 relative z-10">הצוות שלנו מתמחה בבניית מערכות AI שקופות ומנוהלות.</p>
+              <a href="{{ `contact` | relLangURL }}" class="w-full bg-primary hover:brightness-110 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-primary/20 transition-all text-sm flex items-center justify-center gap-2 relative z-10">
+                <span>דבר עם מומחה</span>
+                <span class="material-icons text-sm rtl-flip">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Main article -->
+        <article class="lg:col-span-9 lg:col-start-1">
+          <!-- Hero image -->
+          {{ $image := .Params.image }}
+          {{ if $image }}
+            <div class="rounded-3xl bg-[#FAF9F6] border border-white shadow-natural overflow-hidden mb-12 relative group">
+              {{ partial "image" (dict "Src" $image "Context" .Page "Alt" .Title "Class" "w-full h-80 md:h-[450px] object-cover") }}
+            </div>
+          {{ end }}
+
+          <!-- Article content -->
+          <div class="content mb-10">
+            {{ .Content }}
+          </div>
+
+          <!-- Tags -->
+          {{ $tags := .Params.tags }}
+          {{ if $tags }}
+            <div class="flex flex-wrap items-center gap-2 mb-10 pt-6 border-t border-gray-200">
+              <span class="text-sm font-bold text-[#3E352B] me-2">{{ T "tags" | default "תגיות" }}:</span>
+              {{ range $tags }}
+                <a
+                  class="px-3 py-1 bg-gray-50 text-[#6B6054] text-xs rounded-full hover:bg-primary hover:text-white transition-colors border border-gray-100"
+                  href="{{ `tags/` | relLangURL }}{{ . | urlize | lower }}/">
+                  {{ . | humanize }}
+                </a>
+              {{ end }}
+            </div>
+          {{ end }}
+
+          <!-- Share -->
+          <div class="flex items-center gap-4 mb-10">
+            <span class="text-sm font-bold text-[#3E352B]">{{ T "share" | default "שתף" }}:</span>
+            {{ partial "social-share" (dict "Context" . "Class" "share-icons" "Title" .Title "Whatsapp" false "Telegram" false "Linkedin" false "Pinterest" false "Tumblr" false "Vk" false "Reddit" false) }}
+          </div>
+
+          <!-- Bottom CTA card -->
+          <div class="mt-16 pt-10 border-t border-gray-200">
+            <div class="bg-[#FAF9F6] rounded-3xl p-8 md:p-12 text-center relative overflow-hidden border border-white shadow-lg">
+              <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-[#3E352B]"></div>
+              <div class="absolute -z-10 bottom-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+              <h3 class="text-3xl font-bold text-[#3E352B] mb-4">מוכנים לקחת את השליטה לידיים?</h3>
+              <p class="text-[#6B6054] mb-8 max-w-xl mx-auto text-lg">
+                בואו נבדוק יחד איך אפשר ליישם את הגישות מהמאמר הזה בארגון שלכם. שיחת ייעוץ ראשונית ללא התחייבות.
+              </p>
+              <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{{ `contact` | relLangURL }}" class="bg-primary text-white px-8 py-4 rounded-full text-lg font-bold hover:brightness-110 hover:shadow-glow transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2 group">
+                  <span>קבע פגישת ייעוץ</span>
+                  <span class="material-icons text-sm rtl-flip group-hover:-translate-x-1 transition-transform">arrow_forward</span>
+                </a>
+                {{ $blogSection := site.GetPage "/blog" }}
+                {{ if $blogSection }}
+                  <a href="{{ $blogSection.RelPermalink }}" class="bg-white text-[#3E352B] border border-gray-200 px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-50 hover:border-primary/30 transition-all shadow-sm flex items-center justify-center gap-2">
+                    <span>קרא עוד בבלוג</span>
+                    <span class="material-icons text-primary">article</span>
+                  </a>
+                {{ end }}
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
     </div>
-  </section>
+
+    <!-- Related posts -->
+    {{ $related := .Site.RegularPages.Related . | first 10 }}
+    {{ $related = $related | shuffle | first 3 }}
+    {{ with $related }}
+      <section class="pb-24 bg-white relative z-10">
+        <div class="container">
+          <h2 class="text-3xl font-bold text-[#3E352B] mb-12">
+            {{ T "related_posts" | default "מאמרים קשורים" }}
+          </h2>
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {{ range . }}
+              {{ partial "components/blog-card" . }}
+            {{ end }}
+          </div>
+        </div>
+      </section>
+    {{ end }}
+  </main>
 {{ end }}

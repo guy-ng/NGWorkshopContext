@@ -332,8 +332,8 @@
    New Design System - Light Theme
    ===================================================== */
 
-/* RTL directional flip for Material Icons arrows */
-.rtl-flip {
+/* RTL directional flip for Material Icons arrows - only flip in RTL contexts */
+[dir="rtl"] .rtl-flip {
   transform: scaleX(-1);
 }
 

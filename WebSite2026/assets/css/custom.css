@@ -327,3 +327,92 @@
 [data-theme="light"] .chat-bubble-system {
   color: #6b7280;
 }
+
+/* =====================================================
+   New Design System - Light Theme
+   ===================================================== */
+
+/* RTL directional flip for Material Icons arrows */
+.rtl-flip {
+  transform: scaleX(-1);
+}
+
+/* Gradient mesh background for hero/sections */
+.gradient-mesh {
+  background-color: #FAF9F6;
+  background-image:
+    radial-gradient(at 80% 0%, hsla(76, 55%, 52%, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(37, 20%, 30%, 0.05) 0px, transparent 50%);
+}
+
+/* Circuit dot pattern overlay */
+.circuit-pattern {
+  background-image: radial-gradient(#8ABF3B 1px, transparent 1px);
+  background-size: 32px 32px;
+  opacity: 0.1;
+}
+
+/* Glass morphism panels */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(138, 191, 59, 0.2);
+}
+
+.glass-dark {
+  background: rgba(42, 36, 30, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(138, 191, 59, 0.15);
+}
+
+/* Glass TOC sidebar */
+.glass-toc {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Isometric card effect for hero diagram */
+.iso-card {
+  transform: perspective(1000px) rotateX(5deg) rotateY(-5deg);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.iso-card:hover {
+  transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateZ(10px);
+}
+
+/* Featured card hover on blog list */
+.featured-card-hover:hover .featured-image {
+  transform: scale(1.02);
+}
+
+/* Custom shadows */
+.shadow-natural {
+  box-shadow: 0 10px 30px -5px rgba(62, 53, 43, 0.1);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(138, 191, 59, 0.4);
+}
+
+.shadow-glow-sm {
+  box-shadow: 0 0 10px rgba(138, 191, 59, 0.3);
+}
+
+/* Neon line glow effect */
+.neon-line {
+  box-shadow: 0 0 8px #8ABF3B, 0 0 15px #B6D66B;
+}
+
+/* Shimmer animation for data pipeline connections */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+/* Dash animation for SVG paths */
+@keyframes dash {
+  to { stroke-dashoffset: 1000; }
+}

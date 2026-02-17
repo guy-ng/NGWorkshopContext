@@ -1,257 +1,422 @@
 {{ define "main" }}
-  <!-- Banner -->
-  {{ with .Params.banner }}
-    <section class="section pt-14">
-      <div class="container">
-        <div class="row justify-center">
-          <div class="lg:col-7 md:col-9 mb-8 text-center">
-            <h1 class="mb-4 text-h3 lg:text-h1">
-              {{ .title | markdownify }}
+  <!-- Hero Section -->
+  {{ with .Params.hero }}
+    <section class="relative pt-20 pb-32 overflow-hidden">
+      <div class="absolute inset-0 gradient-mesh z-0"></div>
+      <div class="absolute inset-0 circuit-pattern z-0"></div>
+      <div class="absolute top-20 right-[10%] w-64 h-64 bg-primary/20 rounded-full blur-3xl filter opacity-40 animate-pulse"></div>
+      <div class="absolute bottom-20 left-[10%] w-80 h-80 bg-dark/5 rounded-full blur-3xl filter opacity-60"></div>
+
+      <div class="container relative z-10">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+          <!-- Text content -->
+          <div class="text-right space-y-8 relative z-20">
+            <!-- Badge -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/70 backdrop-blur-sm text-[#6B6054] text-xs font-bold border border-primary/20 shadow-sm">
+              <span class="relative flex h-2.5 w-2.5">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+              </span>
+              {{ .badge }}
+            </div>
+
+            <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-[#3E352B] leading-[1.1] tracking-tight">
+              {{ .title }}<br/>
+              <span class="text-transparent bg-clip-text bg-gradient-to-l from-primary to-[#76A632] filter drop-shadow-sm">{{ .title_highlight }}</span>
             </h1>
-            <p class="mb-8">
-              {{ .content | markdownify }}
+
+            <p class="text-lg text-[#6B6054] max-w-2xl leading-relaxed font-medium">
+              {{ .subtitle }}
             </p>
-            {{ with .button }}
-              {{ if .enable }}
-                <a
-                  class="btn btn-primary"
-                  href="{{ .link | absURL }}"
-                  {{ if strings.HasPrefix .link `http` }}
-                    target="_blank" rel="noopener"
-                  {{ end }}>
-                  {{ .label }}
-                  <i class="fa fa-arrow-right ps-2"></i>
+
+            <div class="flex flex-wrap gap-4">
+              {{ with .button_primary }}
+                <a href="{{ .link | relLangURL }}" class="bg-primary text-white px-8 py-4 rounded-full text-base font-bold hover:brightness-110 hover:shadow-glow transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
+                  <span>{{ .label }}</span>
+                  <span class="material-icons text-sm rtl-flip">arrow_back</span>
                 </a>
               {{ end }}
-            {{ end }}
+              {{ with .button_secondary }}
+                <a href="{{ .link | relLangURL }}" class="bg-white/80 backdrop-blur text-[#3E352B] border border-gray-200 px-8 py-4 rounded-full text-base font-medium hover:bg-white hover:border-primary/30 transition-all flex items-center gap-2 shadow-sm hover:shadow-md">
+                  <span>{{ .label }}</span>
+                  <span class="material-icons text-sm text-primary">play_circle_outline</span>
+                </a>
+              {{ end }}
+            </div>
           </div>
-          <div class="col-12">
-            {{/* image modules comes from https://github.com/gethugothemes/hugo-modules/tree/master/images */}}
-            {{ partial "image" (dict "Src" .image "Alt" "Banner image" "Loading" "eager" "Class" "mx-auto lg:!max-w-[800px]" "DisplayXL" "800x" ) }}
+
+          <!-- Data pipeline diagram -->
+          <div class="relative group lg:h-[550px] flex items-center justify-center">
+            <div class="absolute inset-0 bg-[radial-gradient(circle,rgba(138,191,59,0.15),transparent)] blur-3xl transform scale-125 z-0"></div>
+            <div class="relative w-full max-w-lg bg-white/60 backdrop-blur-2xl border border-white/80 rounded-3xl p-6 shadow-natural z-10 iso-card ring-1 ring-white/50">
+              <!-- Window controls -->
+              <div class="flex items-center justify-between mb-8">
+                <div class="flex gap-2">
+                  <div class="w-3 h-3 rounded-full bg-[#3E352B]/20 shadow-inner"></div>
+                  <div class="w-3 h-3 rounded-full bg-[#3E352B]/20 shadow-inner"></div>
+                  <div class="w-3 h-3 rounded-full bg-[#3E352B]/20 shadow-inner"></div>
+                </div>
+                <div class="flex items-center gap-2 bg-white/50 px-3 py-1 rounded-full border border-white/60">
+                  <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                  <span class="text-[10px] font-bold text-[#6B6054] tracking-wide uppercase">Live Monitoring</span>
+                </div>
+              </div>
+
+              <!-- Pipeline nodes -->
+              <div class="relative h-72 flex items-center justify-between px-2">
+                <!-- Raw Data node -->
+                <div class="relative z-20 flex flex-col items-center gap-4 group/node">
+                  <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-white to-[#f4f1ea] border border-white shadow-lg flex items-center justify-center transform group-hover/node:-translate-y-2 transition-transform duration-300">
+                    <span class="material-symbols-outlined text-4xl text-[#6B6054]">database</span>
+                  </div>
+                  <div class="text-xs font-bold text-[#6B6054] bg-white/60 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/40 shadow-sm">Raw Data</div>
+                </div>
+
+                <!-- Connection line 1 -->
+                <div class="flex-1 h-[3px] bg-[#3E352B]/10 relative mx-3 rounded-full overflow-hidden">
+                  <div class="absolute top-0 left-0 h-full bg-gradient-to-r from-transparent via-primary to-transparent w-2/3 -translate-x-full animate-[shimmer_2s_infinite]"></div>
+                </div>
+
+                <!-- AI Processing node -->
+                <div class="relative z-20 flex flex-col items-center gap-4 group/center">
+                  <div class="absolute inset-0 bg-primary/40 blur-2xl rounded-full animate-pulse"></div>
+                  <div class="w-24 h-24 rounded-2xl bg-gradient-to-br from-primary to-[#76A632] border border-[#B6D66B]/50 shadow-glow flex items-center justify-center relative overflow-hidden transform group-hover/center:scale-105 transition-transform duration-300">
+                    <span class="material-symbols-outlined text-5xl text-white animate-[pulse_3s_infinite]">psychology_alt</span>
+                  </div>
+                  <div class="text-xs font-bold text-[#76A632] bg-primary/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-primary/20 shadow-sm">AI Processing</div>
+                </div>
+
+                <!-- Connection line 2 -->
+                <div class="flex-1 h-[3px] bg-[#3E352B]/10 relative mx-3 rounded-full overflow-hidden">
+                  <div class="absolute top-0 right-0 h-full bg-gradient-to-l from-transparent via-primary to-transparent w-2/3 translate-x-full animate-[shimmer_2s_infinite_0.8s]"></div>
+                </div>
+
+                <!-- Approval node -->
+                <div class="relative z-20 flex flex-col items-center gap-4 group/node">
+                  <div class="absolute -top-3 -right-3 z-30">
+                    <span class="flex h-4 w-4">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-4 w-4 bg-primary border-2 border-white"></span>
+                    </span>
+                  </div>
+                  <div class="w-20 h-20 rounded-2xl bg-white border-2 border-primary/30 shadow-lg flex items-center justify-center transform group-hover/node:-translate-y-2 transition-transform duration-300">
+                    <span class="material-symbols-outlined text-4xl text-[#3E352B]">verified_user</span>
+                  </div>
+                  <div class="text-xs font-bold text-[#3E352B] bg-white/60 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/40 shadow-sm">Approval</div>
+                </div>
+              </div>
+
+              <!-- Metrics cards -->
+              <div class="mt-8 grid grid-cols-3 gap-4">
+                <div class="bg-white/40 rounded-2xl border border-white/60 p-3 flex flex-col justify-center backdrop-blur-sm hover:bg-white/60 transition-colors">
+                  <div class="flex items-center gap-1 mb-1">
+                    <span class="material-icons text-[10px] text-[#6B6054]">speed</span>
+                    <div class="text-[10px] text-[#6B6054] uppercase tracking-wider font-semibold">Latency</div>
+                  </div>
+                  <div class="text-lg font-bold text-[#3E352B] font-mono">24<span class="text-xs font-normal text-[#6B6054]">ms</span></div>
+                  <div class="w-full h-1.5 bg-[#3E352B]/5 rounded-full mt-2 overflow-hidden">
+                    <div class="h-full bg-primary w-[80%] rounded-full"></div>
+                  </div>
+                </div>
+                <div class="bg-white/40 rounded-2xl border border-white/60 p-3 flex flex-col justify-center backdrop-blur-sm hover:bg-white/60 transition-colors">
+                  <div class="flex items-center gap-1 mb-1">
+                    <span class="material-icons text-[10px] text-[#6B6054]">bolt</span>
+                    <div class="text-[10px] text-[#6B6054] uppercase tracking-wider font-semibold">Throughput</div>
+                  </div>
+                  <div class="text-lg font-bold text-[#3E352B] font-mono">1.2k<span class="text-xs font-normal text-[#6B6054]">/s</span></div>
+                  <div class="w-full h-1.5 bg-[#3E352B]/5 rounded-full mt-2 overflow-hidden">
+                    <div class="h-full bg-[#3E352B] w-[45%] rounded-full"></div>
+                  </div>
+                </div>
+                <div class="bg-white/40 rounded-2xl border border-white/60 p-3 flex flex-col justify-center backdrop-blur-sm hover:bg-white/60 transition-colors">
+                  <div class="flex items-center gap-1 mb-1">
+                    <span class="material-icons text-[10px] text-[#6B6054]">check_circle</span>
+                    <div class="text-[10px] text-[#6B6054] uppercase tracking-wider font-semibold">Accuracy</div>
+                  </div>
+                  <div class="text-lg font-bold text-[#3E352B] font-mono">99.9<span class="text-xs font-normal text-[#6B6054]">%</span></div>
+                  <div class="w-full h-1.5 bg-[#3E352B]/5 rounded-full mt-2 overflow-hidden">
+                    <div class="h-full bg-primary w-[98%] rounded-full"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="absolute -z-10 top-10 -right-16 w-40 h-40 bg-gradient-to-br from-primary/30 to-[#3E352B]/10 rounded-full blur-2xl opacity-60 animate-pulse"></div>
+            <div class="absolute -z-10 bottom-0 -left-10 w-32 h-32 bg-gradient-to-tr from-[#B6D66B]/40 to-primary/20 rounded-full blur-2xl opacity-60"></div>
           </div>
         </div>
       </div>
     </section>
   {{ end }}
-  <!-- /Banner -->
+  <!-- /Hero Section -->
 
-  <!-- Logo Carousel -->
-  {{ with site.GetPage "sections/logos" }}
-    {{ if .Params.enable }}
-      <section class="section-sm bg-gradient">
-        <div class="container">
-          <div class="row">
-            <div class="col-12 text-center mb-8">
-              {{ with .Title }}
-                <h2 class="mb-4">{{ . | markdownify }}</h2>
-              {{ end }}
-              {{ with .Params.description }}
-                <p class="text-lg">{{ . | markdownify }}</p>
-              {{ end }}
-            </div>
-            <div class="col-12">
-              <div class="swiper logo-slider">
-                <div class="swiper-wrapper items-center">
-                  {{ range .Params.logos }}
-                    <div class="swiper-slide">
-                      {{ $imgPath := strings.TrimPrefix "/images/" .image }}
-                      {{ $img := resources.Get (printf "images/%s" $imgPath) }}
-                      {{ if .link }}
-                        <a href="{{ .link }}" target="_blank" rel="noopener" class="logo-item block">
-                          {{ if $img }}
-                            <img src="{{ $img.RelPermalink }}" alt="{{ .name }}" class="logo-img">
-                          {{ end }}
-                        </a>
-                      {{ else }}
-                        <div class="logo-item block">
-                          {{ if $img }}
-                            <img src="{{ $img.RelPermalink }}" alt="{{ .name }}" class="logo-img">
-                          {{ end }}
-                        </div>
-                      {{ end }}
+  <!-- Services Section -->
+  {{ with .Params.services }}
+    <section class="py-24 bg-white relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-[#faf9f6] to-transparent"></div>
+      <div class="absolute bottom-0 left-0 w-1/3 h-full bg-gradient-to-r from-[#faf9f6] to-transparent"></div>
+      <div class="container relative z-10">
+        <div class="text-center mb-20">
+          <h2 class="text-4xl font-bold text-[#3E352B] mb-4 tracking-tight">{{ .title }}</h2>
+          <div class="h-1.5 w-24 bg-gradient-to-r from-primary to-[#3E352B] mx-auto rounded-full"></div>
+          <p class="mt-6 text-xl text-[#6B6054] max-w-2xl mx-auto font-light">
+            {{ .subtitle }}
+          </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+          {{ range $i, $service := .items }}
+            <div class="group relative bg-white rounded-2xl p-0 hover:shadow-2xl hover:shadow-[#3E352B]/5 transition-all duration-500 border border-gray-100 overflow-hidden">
+              <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+              <!-- Icon illustration area - unique per service -->
+              <div class="h-56 bg-[#faf9f6] relative overflow-hidden flex items-center justify-center p-6 border-b border-gray-100">
+
+                {{ if eq $service.icon "hub" }}
+                  <!-- AI Agent Integration: spinning orbits -->
+                  <div class="absolute inset-0 opacity-10">
+                    <svg width="100%" height="100%" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M0 0 L100 0 L100 100 L0 100 Z" fill="#ffffff"></path>
+                      <path d="M0 100 C 20 0 50 0 100 100 Z" fill="#8ABF3B"></path>
+                    </svg>
+                  </div>
+                  <div class="relative w-full h-full flex items-center justify-center">
+                    <div class="relative w-24 h-24 rounded-full bg-white shadow-lg border border-primary/20 flex items-center justify-center z-10 group-hover:scale-110 transition-transform duration-500">
+                      <div class="absolute inset-0 rounded-full bg-primary/10 animate-pulse"></div>
+                      <span class="material-symbols-outlined text-5xl text-primary">hub</span>
                     </div>
+                    <div class="absolute w-40 h-40 border border-dashed border-primary/30 rounded-full animate-[spin_10s_linear_infinite]">
+                      <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#3E352B] rounded-full shadow-sm"></div>
+                    </div>
+                    <div class="absolute w-32 h-32 border border-primary/10 rounded-full animate-[spin_7s_linear_infinite_reverse]">
+                      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-primary rounded-full"></div>
+                    </div>
+                  </div>
+
+                {{ else if eq $service.icon "settings" }}
+                  <!-- Process Orchestration: flow animation -->
+                  <div class="relative w-full max-w-[240px] flex items-center justify-between z-10">
+                    <div class="w-12 h-12 rounded-xl bg-white border border-gray-200 shadow-md flex items-center justify-center transform group-hover:-translate-y-2 transition-transform duration-300 delay-75">
+                      <div class="w-4 h-4 rounded-full bg-primary shadow-glow-sm"></div>
+                    </div>
+                    <div class="flex-1 h-1 bg-gray-200 mx-2 relative rounded-full overflow-hidden">
+                      <div class="absolute inset-0 bg-[#3E352B] w-0 group-hover:w-full transition-all duration-1000"></div>
+                    </div>
+                    <div class="w-14 h-14 rotate-45 bg-gradient-to-br from-white to-[#f4f1ea] border border-gray-200 shadow-lg flex items-center justify-center transform group-hover:rotate-[225deg] transition-transform duration-700">
+                      <span class="material-symbols-outlined -rotate-45 group-hover:rotate-[135deg] transition-transform duration-700 text-[#3E352B]">settings</span>
+                    </div>
+                    <div class="flex-1 h-1 bg-gray-200 mx-2 relative rounded-full overflow-hidden">
+                      <div class="absolute inset-0 bg-primary w-0 group-hover:w-full transition-all duration-1000 delay-500"></div>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-white border border-gray-200 shadow-md flex items-center justify-center transform group-hover:-translate-y-2 transition-transform duration-300 delay-1000">
+                      <span class="material-symbols-outlined text-primary font-bold">done_all</span>
+                    </div>
+                  </div>
+
+                {{ else if eq $service.icon "north_east" }}
+                  <!-- Strategic Consulting: mini dashboard mockup -->
+                  <div class="relative w-full max-w-[240px] h-36 bg-white/60 backdrop-blur border border-white/80 rounded-2xl shadow-lg p-4 flex flex-col justify-between group-hover:scale-105 transition-transform duration-500">
+                    <div class="flex gap-2 mb-2">
+                      <div class="w-full h-8 bg-primary/10 rounded-lg relative overflow-hidden border border-primary/10">
+                        <div class="absolute top-0 left-0 h-full bg-primary/30 w-1/3"></div>
+                      </div>
+                    </div>
+                    <div class="flex gap-3 flex-1">
+                      <div class="w-1/2 bg-[#f4f1ea] rounded-lg flex flex-col justify-end p-2 border border-[#eaddcf]">
+                        <div class="w-full h-1/2 bg-[#dcd6c6] rounded-md mb-1"></div>
+                        <div class="w-full h-1/3 bg-[#ebe7de] rounded-md"></div>
+                      </div>
+                      <div class="w-1/2 bg-white border border-primary/20 rounded-lg relative shadow-sm">
+                        <div class="absolute bottom-2 right-2 w-8 h-8 bg-gradient-to-tr from-primary to-[#B6D66B] rounded-full flex items-center justify-center shadow-glow-sm">
+                          <span class="material-symbols-outlined text-[#3E352B] text-sm font-bold">north_east</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                {{ else if eq $service.icon "devices" }}
+                  <!-- Custom Development: stacked cards -->
+                  <div class="relative w-36 h-36 transform rotate-[-15deg] group-hover:rotate-0 transition-transform duration-500">
+                    <div class="absolute top-10 left-0 w-36 h-24 bg-[#3E352B] rounded-xl shadow-xl transform skew-x-12 translate-x-4 translate-y-4 transition-transform duration-300 group-hover:translate-x-0 group-hover:translate-y-8 group-hover:skew-x-0">
+                      <div class="p-3 flex gap-1.5">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></div>
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></div>
+                      </div>
+                    </div>
+                    <div class="absolute top-5 left-0 w-36 h-24 bg-primary rounded-xl shadow-lg opacity-90 transform skew-x-12 translate-x-2 translate-y-2 transition-transform duration-300 group-hover:translate-x-0 group-hover:translate-y-4 group-hover:skew-x-0 flex items-center justify-center border border-[#76A632]">
+                      <span class="material-symbols-outlined text-white text-5xl opacity-80">api</span>
+                    </div>
+                    <div class="absolute top-0 left-0 w-36 h-24 bg-white border border-gray-200 rounded-xl shadow-lg transform skew-x-12 transition-transform duration-300 group-hover:skew-x-0 flex items-center justify-center">
+                      <span class="material-symbols-outlined text-[#3E352B] text-5xl">devices</span>
+                    </div>
+                  </div>
+
+                {{ else }}
+                  <!-- Default: spinning orbits -->
+                  <div class="relative w-full h-full flex items-center justify-center">
+                    <div class="relative w-24 h-24 rounded-full bg-white shadow-lg border border-primary/20 flex items-center justify-center z-10 group-hover:scale-110 transition-transform duration-500">
+                      <div class="absolute inset-0 rounded-full bg-primary/10 animate-pulse"></div>
+                      <span class="material-symbols-outlined text-5xl text-primary">{{ $service.icon }}</span>
+                    </div>
+                    <div class="absolute w-40 h-40 border border-dashed border-primary/30 rounded-full animate-[spin_10s_linear_infinite]">
+                      <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-[#3E352B] rounded-full shadow-sm"></div>
+                    </div>
+                    <div class="absolute w-32 h-32 border border-primary/10 rounded-full animate-[spin_7s_linear_infinite_reverse]">
+                      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-primary rounded-full"></div>
+                    </div>
+                  </div>
+                {{ end }}
+              </div>
+
+              <!-- Card content -->
+              <div class="p-8">
+                <h3 class="text-2xl font-bold text-[#3E352B] mb-2 group-hover:text-primary transition-colors">{{ $service.title }}</h3>
+                <h4 class="text-lg text-[#6B6054] font-medium mb-4">{{ $service.subtitle }}</h4>
+                <p class="text-[#6B6054] mb-6 leading-relaxed">
+                  {{ $service.description }}
+                </p>
+                <div class="flex flex-wrap gap-2 mt-auto">
+                  {{ range $service.tags }}
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-[#f4f1ea] text-[#3E352B] border border-[#eaddcf]">{{ . }}</span>
                   {{ end }}
                 </div>
               </div>
             </div>
-          </div>
+          {{ end }}
         </div>
-      </section>
-    {{ end }}
+      </div>
+    </section>
   {{ end }}
-  <!-- /Logo Carousel -->
+  <!-- /Services Section -->
 
-  <!-- Features -->
-  {{ range $i, $e:= .Params.features }}
-    <section class="section-sm {{ if (modBool $i 2) }}bg-gradient{{ end }}">
-      <div class="container">
-        <div class="row items-center justify-between">
-          <div
-            class="mb:md-0 {{ if not (modBool $i 2) }}
-              md:order-2
-            {{ end }} md:col-5 mb-6">
-            {{ partial "image" (dict "Src" .image "Alt" "feature image" "DisplayXL" "520x" "DisplayLG" "425x" "DisplayMD" "360x") }}
-          </div>
-          <div
-            class="{{ if not (modBool $i 2) }}
-              md:order-1
-            {{ end }} md:col-7 lg:col-6">
-            <h2 class="mb-4">
-              {{ .title | markdownify }}
-            </h2>
-            <p class="mb-8 text-lg">
-              {{ .content | markdownify }}
+  <!-- Methodology Section (Dark) -->
+  {{ with .Params.methodology }}
+    <section id="methodology" class="py-24 bg-[#2A241E] text-white relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,rgba(107,96,84,0.2),transparent,transparent)] pointer-events-none"></div>
+      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-[radial-gradient(ellipse_at_bottom_left,rgba(138,191,59,0.1),transparent)] pointer-events-none"></div>
+
+      <div class="container relative z-10">
+        <div class="grid lg:grid-cols-2 gap-20 items-center">
+          <!-- Text content -->
+          <div class="order-2 lg:order-1">
+            <div class="inline-flex items-center gap-2 mb-6 px-3 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary text-sm font-medium">
+              <span class="material-symbols-outlined text-sm">verified_user</span>
+              {{ .badge }}
+            </div>
+
+            <h2 class="text-4xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#dcd6c6]">{{ .title }}</h2>
+
+            <p class="text-[#dcd6c6] mb-8 text-lg leading-relaxed border-r-4 border-primary pr-6">
+              {{ .description }}
+              <br/><br/>
+              {{ .extended_description }}
             </p>
-            <ul>
-              {{ range .bulletpoints }}
-                <li class="relative mb-4 ps-6">
-                  <i class="fa fa-check absolute start-0 top-1.5"></i>
-                  {{ . | markdownify }}
+
+            <ul class="space-y-6">
+              {{ range .features }}
+                <li class="flex items-start gap-4 group">
+                  <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/20 transition-all">
+                    <span class="material-symbols-outlined text-primary">{{ .icon }}</span>
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-white mb-1">{{ .title }}</h4>
+                    <p class="text-sm text-[#dcd6c6]">{{ .description }}</p>
+                  </div>
                 </li>
               {{ end }}
             </ul>
-            {{ with .button }}
-              {{ if .enable }}
-                <a class="btn btn-primary mt-6" href="{{ .link | absURL }}">
-                  {{ .label }}
-                  <i class="fa fa-arrow-right ps-2"></i>
-                </a>
-              {{ end }}
-            {{ end }}
+          </div>
+
+          <!-- Dashboard mockup -->
+          <div class="order-1 lg:order-2 flex justify-center">
+            <div class="relative w-full max-w-lg aspect-square lg:aspect-[4/3] glass-dark rounded-2xl p-1 shadow-2xl shadow-primary/5 border border-white/10 overflow-hidden group">
+              <!-- Window bar -->
+              <div class="h-10 border-b border-white/10 flex items-center justify-between px-4 bg-black/40">
+                <div class="flex gap-1.5">
+                  <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]/80"></div>
+                  <div class="w-2.5 h-2.5 rounded-full bg-[#febc2e]/80"></div>
+                  <div class="w-2.5 h-2.5 rounded-full bg-[#28c840]/80"></div>
+                </div>
+                <div class="text-[10px] font-mono text-gray-400 uppercase tracking-widest">Live Process Monitor</div>
+              </div>
+
+              <div class="p-6 relative h-full">
+                <div class="absolute inset-0 bg-[linear-gradient(rgba(138,191,59,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(138,191,59,0.02)_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+                <div class="relative z-10 flex flex-col h-full gap-4">
+                  <!-- Metrics row -->
+                  <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-white/5 border border-primary/20 rounded-lg p-3 backdrop-blur-sm">
+                      <div class="text-xs text-gray-400 mb-1">Accuracy</div>
+                      <div class="text-xl font-bold text-primary">99.8%</div>
+                    </div>
+                    <div class="bg-white/5 border border-primary/20 rounded-lg p-3 backdrop-blur-sm">
+                      <div class="text-xs text-gray-400 mb-1">Processing</div>
+                      <div class="text-xl font-bold text-[#B6D66B]">1.4ms</div>
+                    </div>
+                    <div class="bg-white/5 border border-primary/20 rounded-lg p-3 backdrop-blur-sm">
+                      <div class="text-xs text-gray-400 mb-1">Queue</div>
+                      <div class="text-xl font-bold text-white">Idle</div>
+                    </div>
+                  </div>
+
+                  <!-- Bar chart -->
+                  <div class="flex-1 bg-black/40 border border-white/5 rounded-lg relative overflow-hidden flex items-end justify-center p-4 gap-2">
+                    <div class="w-4 bg-primary/40 rounded-t h-1/3 animate-pulse"></div>
+                    <div class="w-4 bg-primary/50 rounded-t h-2/3 animate-[pulse_1.5s_infinite]"></div>
+                    <div class="w-4 bg-white/30 rounded-t h-1/2 animate-[pulse_1s_infinite]"></div>
+                    <div class="w-4 bg-primary/70 rounded-t h-3/4 animate-[pulse_2s_infinite]"></div>
+                    <div class="w-4 bg-white/20 rounded-t h-2/5 animate-[pulse_1.2s_infinite]"></div>
+                    <div class="w-4 bg-primary/90 rounded-t h-full animate-[pulse_1.8s_infinite]"></div>
+                    <div class="w-4 bg-white/10 rounded-t h-1/4 animate-[pulse_1.3s_infinite]"></div>
+                    <svg class="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none">
+                      <path class="filter drop-shadow-[0_0_5px_rgba(138,191,59,0.8)]" d="M0 100 Q 50 50, 100 80 T 200 40 T 300 120 T 400 30" fill="none" stroke="#8ABF3B" stroke-linecap="round" stroke-width="2"></path>
+                      <path class="filter blur-[2px] opacity-50" d="M0 110 Q 50 60, 100 90 T 200 50 T 300 130 T 400 40" fill="none" stroke="#B6D66B" stroke-linecap="round" stroke-width="1"></path>
+                    </svg>
+                  </div>
+
+                  <!-- Terminal -->
+                  <div class="h-24 bg-black/60 rounded-lg border border-white/10 p-3 font-mono text-[10px] text-primary overflow-hidden">
+                    <div class="opacity-70">&gt; Initializing nature-inspired neural algorithms...</div>
+                    <div class="opacity-80">&gt; Loading organic business rules v4.2...</div>
+                    <div class="opacity-90">&gt; Connection established securely.</div>
+                    <div class="animate-pulse">&gt; Waiting for input stream_</div>
+                  </div>
+                </div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </section>
   {{ end }}
-  <!-- /Features -->
+  <!-- /Methodology Section -->
 
-  <!-- Featured Blog Posts Carousel -->
-  {{ with site.GetPage "sections/featured-posts" }}
-    {{ if .Params.enable }}
-      {{ $posts := where site.RegularPages "Section" "blog" }}
-      {{ $posts = $posts | first 6 }}
-      {{ if gt (len $posts) 0 }}
-        <section class="section bg-gradient">
-          <div class="container">
-            <div class="row">
-              <div class="md:col-10 lg:col-8 xl:col-6 mx-auto mb-12 text-center">
-                <h2 class="mb-4">
-                  {{ .Title | markdownify }}
-                </h2>
-                <p>
-                  {{ .Params.description | markdownify }}
-                </p>
-              </div>
-              <div class="col-12">
-                <div class="swiper blog-slider">
-                  <div class="swiper-wrapper">
-                    {{ range $posts }}
-                      <div class="swiper-slide">
-                        <div class="bg-body dark:bg-darkmode-body rounded-lg overflow-hidden shadow-lg h-full">
-                          {{ $image := .Params.image }}
-                          {{ if $image }}
-                            <a href="{{ .RelPermalink }}" class="block overflow-hidden">
-                              {{ partial "image" (dict "Src" $image "Context" .Page "Alt" .Title "Class" "w-full h-48 object-cover hover:scale-105 transition-transform duration-300") }}
-                            </a>
-                          {{ end }}
-                          <div class="p-6">
-                            <div class="mb-3 text-sm text-text-dark dark:text-gray-400">
-                              <span>{{ .Date.Format "Jan 02, 2006" }}</span>
-                              {{ with .Params.categories }}
-                                <span class="mx-2">|</span>
-                                <a href="{{ `categories/` | relLangURL }}{{ index . 0 | urlize | lower }}/" class="text-primary">
-                                  {{ index . 0 | humanize }}
-                                </a>
-                              {{ end }}
-                            </div>
-                            <h4 class="mb-3 line-clamp-2">
-                              <a href="{{ .RelPermalink }}" class="hover:text-primary transition-colors">
-                                {{ .Title }}
-                              </a>
-                            </h4>
-                            <p class="text-text-dark dark:text-gray-400 line-clamp-3 mb-4">
-                              {{ .Summary | plainify | truncate 120 }}
-                            </p>
-                            <a href="{{ .RelPermalink }}" class="btn btn-outline-primary btn-sm">
-                              {{ T "read_more" | default "Read More" }}
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    {{ end }}
-                  </div>
-                  <div class="blog-slider-pagination mt-9 flex items-center justify-center text-center"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      {{ end }}
-    {{ end }}
-  {{ end }}
-  <!-- /Featured Blog Posts Carousel -->
-
-  <!-- Testimonials -->
-  {{ with site.GetPage "sections/testimonial" }}
-    {{ if .Params.enable }}
-      <section class="section">
-        <div class="container">
-          <div class="row">
-            <div class="md:col-10 lg:col-8 xl:col-6 mx-auto mb-12 text-center">
-              <h2 class="mb-4">
-                {{ .Title | markdownify }}
-              </h2>
-              <p>
-                {{ .Params.description | markdownify }}
-              </p>
-            </div>
-            <div class="col-12">
-              <div class="swiper testimonial-slider">
-                <div class="swiper-wrapper">
-                  {{ range .Params.testimonials }}
-                    <div class="swiper-slide">
-                      <div
-                        class="bg-light dark:bg-darkmode-light rounded-lg px-7 py-10">
-                        <div class="text-text-dark dark:text-white">
-                          <svg
-                            width="33"
-                            height="20"
-                            viewBox="0 0 33 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path
-                              d="M1.28375 19.41L0.79375 18.64C1.21375 17.0067 1.75042 15.07 2.40375 12.83C3.05708 10.5433 3.75708 8.28 4.50375 6.04C5.29708 3.75333 6.06708 1.77 6.81375 0.0899959H15.3538C14.9338 2.09666 14.4904 4.26667 14.0238 6.6C13.5571 8.88666 13.1371 11.15 12.7638 13.39C12.4371 15.5833 12.1571 17.59 11.9238 19.41H1.28375ZM31.69 0.0899959L32.18 0.859998C31.76 2.54 31.2233 4.5 30.57 6.74C29.9167 8.98 29.2167 11.2433 28.47 13.53C27.7233 15.77 26.9533 17.73 26.16 19.41H17.69C18.0167 17.9167 18.3433 16.33 18.67 14.65C18.9967 12.9233 19.3 11.22 19.58 9.54C19.9067 7.81333 20.1867 6.15667 20.42 4.57C20.7 2.93666 20.91 1.44333 21.05 0.0899959H31.69Z"
-                              fill="currentColor" />
-                          </svg>
-                        </div>
-                        <blockquote class="mt-8">
-                          {{ .content | markdownify }}
-                        </blockquote>
-                        <div class="mt-11 flex items-center">
-                          <div class="text-text-dark dark:text-white">
-                            {{ partial "image" (dict "Src" .avatar "Size" "50x50" "Class" "rounded-full" "Alt" .name) }}
-                          </div>
-                          <div class="ms-4">
-                            <h3 class="h5 font-primary font-semibold">
-                              {{ .name }}
-                            </h3>
-                            <p class="text-text-dark dark:text-white">
-                              {{ .designation | markdownify }}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  {{ end }}
-                </div>
-                <div
-                  class="testimonial-slider-pagination mt-9 flex items-center justify-center text-center"></div>
-              </div>
-            </div>
-          </div>
+  <!-- CTA Section -->
+  {{ with .Params.cta }}
+    <section class="py-24 bg-[#FAF9F6] border-t border-gray-200 relative overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,white,#FAF9F6,#FAF9F6)]"></div>
+      <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+        <h2 class="text-4xl font-bold text-[#3E352B] mb-6">{{ .title }}</h2>
+        <p class="text-xl text-[#6B6054] mb-12 max-w-2xl mx-auto">
+          {{ .description }}
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center items-center gap-5">
+          {{ with .button_primary }}
+            <a href="{{ .link | relLangURL }}" class="w-full sm:w-auto bg-primary hover:brightness-110 hover:shadow-glow text-white font-bold py-4 px-10 rounded-full shadow-xl shadow-primary/20 transition-all flex items-center justify-center gap-3 transform hover:-translate-y-1">
+              <span class="material-icons text-xl">{{ .icon }}</span>
+              {{ .label }}
+            </a>
+          {{ end }}
+          {{ with .button_secondary }}
+            <a href="{{ .link | relLangURL }}" class="w-full sm:w-auto bg-white hover:bg-[#f4f1ea] text-[#3E352B] font-bold py-4 px-10 rounded-full border border-gray-200 hover:border-primary/30 shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-3 transform hover:-translate-y-1">
+              <span class="material-icons text-xl text-primary">{{ .icon }}</span>
+              {{ .label }}
+            </a>
+          {{ end }}
         </div>
-      </section>
-    {{ end }}
+      </div>
+    </section>
   {{ end }}
-  <!-- /Testimonials -->
+  <!-- /CTA Section -->
 {{ end }}

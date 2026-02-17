@@ -1,6 +1,6 @@
 ################ Hebrew language ##################
 [he]
-languageName = "עברית"
+languageName = "Hebrew"
 languageCode = "he-IL"
 languageDirection = "rtl"
 contentDir = "content/hebrew"

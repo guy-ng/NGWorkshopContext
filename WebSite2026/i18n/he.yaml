@@ -25,3 +25,8 @@ reading_time: זמן קריאה
 minutes: דקות
 page_not_found: העמוד לא נמצא
 go_home: חזור לדף הבית
+
+# Contact page additional keys
+whatsapp_greeting: "שלום, שמי "
+whatsapp_inquiry: ". אשמח לקבל מידע על שירותי NG Workshop"
+form_email_subject: "בקשת פגישה חדשה מהאתר - "

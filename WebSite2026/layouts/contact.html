@@ -27,11 +27,11 @@
             Meeting
           </div>
 
-          <div class="flex flex-row-reverse items-start justify-between mb-6 md:mb-8">
+          <div class="flex flex-row rtl:flex-row-reverse items-start justify-between mb-6 md:mb-8">
             <div class="w-12 h-12 md:w-14 md:h-14 bg-gray-100 rounded-2xl flex items-center justify-center shrink-0">
               <span class="material-icons text-gray-700 text-2xl md:text-3xl">calendar_month</span>
             </div>
-            <div class="text-right flex-1 pr-3 md:pr-4">
+            <div class="text-start flex-1 pe-3 md:pe-4">
               <h2 class="text-xl md:text-2xl font-bold text-[#3E352B] mb-1">
                 {{ i18n "contact_meeting_title" | default "תיאום פגישת אפיון" }}
               </h2>
@@ -43,7 +43,7 @@
 
           <form id="contact-booking-form-desktop" class="space-y-5 md:space-y-6 flex-1 flex flex-col">
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-[#6B6054] text-right mr-1">
+              <label class="block text-xs font-bold text-[#6B6054] text-start ms-1">
                 {{ i18n "form_name" | default "שם מלא" }}
               </label>
               <input
@@ -55,7 +55,7 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-[#6B6054] text-right mr-1">
+              <label class="block text-xs font-bold text-[#6B6054] text-start ms-1">
                 {{ i18n "form_email" | default "אימייל עסקי" }}
               </label>
               <input
@@ -68,7 +68,7 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-[#6B6054] text-right mr-1">
+              <label class="block text-xs font-bold text-[#6B6054] text-start ms-1">
                 {{ i18n "form_phone" | default "מספר טלפון" }}
               </label>
               <input
@@ -84,7 +84,7 @@
               <button
                 type="submit"
                 class="w-full h-14 md:h-16 bg-[#3E352B] text-white font-bold rounded-2xl shadow-lg hover:bg-black transition-all flex items-center justify-center gap-3 text-lg group">
-                <span class="material-icons text-xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                <span class="material-icons text-xl rtl-flip group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform">arrow_forward</span>
                 <span>{{ i18n "contact_meeting_cta" | default "בחירת מועד ביומן" }}</span>
               </button>
             </div>
@@ -95,11 +95,11 @@
 
         <!-- WhatsApp Card (order-2 on desktop = left in RTL) -->
         <div class="glass-panel rounded-[32px] md:rounded-[40px] p-6 md:p-10 shadow-natural border-primary/20 flex flex-col relative overflow-hidden order-2 ring-1 ring-primary/20">
-          <div class="flex flex-row-reverse items-start justify-between mb-6 md:mb-8">
+          <div class="flex flex-row rtl:flex-row-reverse items-start justify-between mb-6 md:mb-8">
             <div class="w-12 h-12 md:w-14 md:h-14 bg-[#F1F8E9] rounded-2xl flex items-center justify-center shrink-0">
               <span class="material-icons text-[#8ABF3B] text-2xl md:text-3xl">chat</span>
             </div>
-            <div class="text-right flex-1 pr-3 md:pr-4">
+            <div class="text-start flex-1 pe-3 md:pe-4">
               <h2 class="text-xl md:text-2xl font-bold text-[#3E352B] mb-1">
                 {{ i18n "contact_whatsapp_title" | default "WhatsApp-שיחה מהירה ב" }}
               </h2>
@@ -111,7 +111,7 @@
 
           <div class="space-y-5 md:space-y-6 flex-1 flex flex-col">
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-[#6B6054] text-right mr-1">
+              <label class="block text-xs font-bold text-[#6B6054] text-start ms-1">
                 {{ i18n "form_name" | default "שם מלא" }}
               </label>
               <input
@@ -122,7 +122,7 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-[#6B6054] text-right mr-1">
+              <label class="block text-xs font-bold text-[#6B6054] text-start ms-1">
                 {{ i18n "form_phone" | default "מספר טלפון" }}
               </label>
               <input
@@ -162,7 +162,7 @@
           <svg class="w-8 h-8 md:w-10 md:h-10 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
           </svg>
-          <div class="flex flex-col text-right">
+          <div class="flex flex-col text-start">
             <span class="text-xl md:text-2xl font-bold leading-tight">{{ i18n "contact_whatsapp_mobile_cta" | default "דברו איתנו בווטסאפ" }}</span>
             <span class="text-sm opacity-90 font-normal">{{ i18n "contact_whatsapp_mobile_sub" | default "מענה מהיר וזמין" }}</span>
           </div>
@@ -181,11 +181,11 @@
             Meeting
           </div>
 
-          <div class="flex flex-row-reverse items-start justify-between mb-6">
+          <div class="flex flex-row rtl:flex-row-reverse items-start justify-between mb-6">
             <div class="w-12 h-12 bg-gray-100 rounded-2xl flex items-center justify-center shrink-0">
               <span class="material-icons text-gray-700 text-2xl">calendar_month</span>
             </div>
-            <div class="text-right flex-1 pr-3">
+            <div class="text-start flex-1 pe-3">
               <h2 class="text-xl font-bold text-[#3E352B] mb-1">
                 {{ i18n "contact_meeting_title" | default "תיאום פגישת אפיון" }}
               </h2>
@@ -197,7 +197,7 @@
 
           <form id="contact-booking-form-mobile" class="space-y-4 flex-1 flex flex-col">
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-[#6B6054] text-right mr-1">
+              <label class="block text-xs font-bold text-[#6B6054] text-start ms-1">
                 {{ i18n "form_name" | default "שם מלא" }}
               </label>
               <input
@@ -209,7 +209,7 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-[#6B6054] text-right mr-1">
+              <label class="block text-xs font-bold text-[#6B6054] text-start ms-1">
                 {{ i18n "form_email" | default "אימייל עסקי" }}
               </label>
               <input
@@ -222,7 +222,7 @@
             </div>
 
             <div class="space-y-1.5">
-              <label class="block text-xs font-bold text-[#6B6054] text-right mr-1">
+              <label class="block text-xs font-bold text-[#6B6054] text-start ms-1">
                 {{ i18n "form_phone" | default "מספר טלפון" }}
               </label>
               <input
@@ -238,7 +238,7 @@
               <button
                 type="submit"
                 class="w-full h-14 bg-[#3E352B] text-white font-bold rounded-2xl shadow-lg hover:bg-black transition-all flex items-center justify-center gap-3 text-lg group">
-                <span class="material-icons text-xl group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                <span class="material-icons text-xl rtl-flip group-hover:ltr:translate-x-1 group-hover:rtl:-translate-x-1 transition-transform">arrow_forward</span>
                 <span>{{ i18n "contact_meeting_cta" | default "בחירת מועד ביומן" }}</span>
               </button>
             </div>
@@ -299,7 +299,7 @@
           <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-[#3E352B] text-2xl" style="font-variation-settings: 'FILL' 1, 'wght' 400;">verified</span>
           </div>
-          <div class="text-right">
+          <div class="text-start">
             <h3 class="font-bold text-[#3E352B] text-base">
               {{ i18n "feature_partnership_title" | default "שותפות רשמית" }}
             </h3>
@@ -311,7 +311,7 @@
           <div class="w-12 h-12 bg-[#8ABF3B]/10 rounded-xl flex items-center justify-center shrink-0">
             <span class="material-icons text-[#8ABF3B] text-2xl">insights</span>
           </div>
-          <div class="text-right">
+          <div class="text-start">
             <h3 class="font-bold text-[#3E352B] text-base">
               {{ i18n "feature_roi_title" | default "ניתוח ROI חינם" }}
             </h3>
@@ -323,7 +323,7 @@
           <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center shrink-0">
             <span class="material-icons text-[#6B6054] text-2xl">security</span>
           </div>
-          <div class="text-right">
+          <div class="text-start">
             <h3 class="font-bold text-[#3E352B] text-base">
               {{ i18n "feature_enterprise_title" | default "Enterprise Grade" }}
             </h3>
@@ -373,7 +373,7 @@
           name: name,
           email: email,
           phone: phone,
-          _subject: 'בקשת פגישה חדשה מהאתר - ' + name,
+          _subject: '{{ i18n "form_email_subject" | default "New meeting request from website - " }}' + name,
           _template: 'table'
         })
       })
@@ -406,11 +406,11 @@
       let message = '{{ i18n "whatsapp_message" | default "שלום, אשמח לקבל מידע על שירותי NG Workshop" }}';
 
       if (name) {
-        message = 'שלום, שמי ' + name;
+        message = '{{ i18n "whatsapp_greeting" | default "Hi, my name is " }}' + name;
         if (phone) {
-          message += ' (טלפון: ' + phone + ')';
+          message += ' ({{ i18n "form_phone" | default "Phone" }}: ' + phone + ')';
         }
-        message += '. אשמח לקבל מידע על שירותי NG Workshop';
+        message += '{{ i18n "whatsapp_inquiry" | default ". I would like to learn more about NG Workshop services" }}';
       }
 
       const url = 'https://wa.me/972528232535?text=' + encodeURIComponent(message);

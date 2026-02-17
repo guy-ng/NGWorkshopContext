@@ -14,3 +14,4 @@ None currently.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 001 | Main page redesign to match design | 2026-02-17 | 1e503c7 | [001-main-page-redesign](./quick/001-main-page-redesign/) |

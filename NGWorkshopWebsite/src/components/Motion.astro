@@ -1,0 +1,74 @@
+---
+// Scroll-reveal animations built on motion.dev.
+// The initial hidden state lives in global.css under `html.motion` — the selector
+// list there mirrors GROUPS/SINGLES below, so keep the two in sync.
+---
+<script>
+  import { animate } from 'motion/mini';
+  import { inView } from 'motion';
+
+  // The inline guard in BaseLayout un-hides everything if this module never loads.
+  clearTimeout((window as any).__ngMotionFallback);
+
+  if (document.documentElement.classList.contains('motion')) {
+    const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+    const STAGGER = 0.07;
+
+    // Containers whose direct children reveal one after another.
+    const GROUPS = [
+      '.hero-copy',
+      '.section-heading',
+      '.service-grid',
+      '.testimonial-grid',
+      '.partnership > .shell',
+      '.page-hero > .shell',
+      '.service-hero > .shell',
+      '.video-section > .shell',
+      '.tool-cloud',
+      '.post-grid',
+      '.rescue-grid',
+      '.steps',
+      '.cards',
+      '.service-links',
+      '.topic-map',
+      '.stats',
+    ];
+
+    // Elements that reveal as a single block.
+    const SINGLES = ['.process-browser', '.contact-card', '.featured-post', '.stat-callout', '.confirmation-card'];
+
+    const reveal = (el: Element, delay: number, from = 'translateY(18px)') =>
+      animate(
+        el,
+        { opacity: [0, 1], transform: [from, 'none'] },
+        { duration: 0.55, delay, ease: EASE },
+      );
+
+    const onceInView = (el: Element, run: () => void) => {
+      let done = false;
+      const stop = inView(
+        el,
+        () => {
+          if (done) return;
+          done = true;
+          stop();
+          run();
+        },
+        { amount: 0.15 },
+      );
+    };
+
+    for (const selector of GROUPS) {
+      for (const container of document.querySelectorAll(selector)) {
+        const children = Array.from(container.children);
+        onceInView(container, () => children.forEach((child, i) => reveal(child, i * STAGGER)));
+      }
+    }
+
+    for (const selector of SINGLES) {
+      for (const el of document.querySelectorAll(selector)) {
+        onceInView(el, () => reveal(el, 0.1, 'translateY(18px) scale(.985)'));
+      }
+    }
+  }
+</script>

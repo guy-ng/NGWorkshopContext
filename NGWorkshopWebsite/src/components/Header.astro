@@ -1,0 +1,48 @@
+---
+import { Image } from 'astro:assets';
+import ngLogo from '../assets/ng-logo.png';
+import Icon from './Icon.astro';
+import { counterpartPath, localizedPath, ui, type Locale } from '../lib/i18n';
+interface Props { locale: Locale; pathname: string; languagePath?: string }
+const { locale, pathname, languagePath } = Astro.props;
+const t = ui[locale];
+const other = locale === 'he' ? 'en' : 'he';
+const links = [
+  [t.home, localizedPath(locale)],
+  [t.blog, localizedPath(locale, 'blog')],
+];
+---
+<header class="site-header">
+  <div class="header-inner shell">
+    <a class="brand" href={localizedPath(locale)} aria-label={locale === 'he' ? 'NG Workshop — לעמוד הבית' : 'NG Workshop home'}>
+      <Image src={ngLogo} width={161} height={18} densities={[1, 2]} loading="eager" alt="NG Workshop" />
+    </a>
+    <nav id="primary-navigation" aria-label={t.nav}>
+      {links.map(([label, href]) => <a class={pathname === href || pathname === `${href}/` ? 'active' : ''} href={href}>{label}</a>)}
+    </nav>
+    <div class="header-actions">
+      <a class="language" href={languagePath ?? counterpartPath(pathname, locale)} aria-label={other === 'he' ? 'עברית' : 'English'}>
+        <span class={locale === 'he' ? 'selected' : ''}>עברית</span><span class={locale === 'en' ? 'selected' : ''}>EN</span>
+      </a>
+      <a class="button compact desktop-contact" href="#contact">{t.contact}</a>
+      <button class="menu-button" aria-label={locale === 'he' ? 'פתיחת תפריט' : 'Open menu'} aria-controls="primary-navigation" aria-expanded="false"><Icon name="menu" /></button>
+    </div>
+  </div>
+</header>
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.menu-button');
+  const nav = document.querySelector<HTMLElement>('.site-header nav');
+  button?.addEventListener('click', () => {
+    const open = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', String(!open));
+    nav?.classList.toggle('open', !open);
+    if (!open) nav?.querySelector<HTMLAnchorElement>('a')?.focus();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && button?.getAttribute('aria-expanded') === 'true') {
+      button.setAttribute('aria-expanded', 'false');
+      nav?.classList.remove('open');
+      button.focus();
+    }
+  });
+</script>

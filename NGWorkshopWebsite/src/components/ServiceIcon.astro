@@ -1,0 +1,33 @@
+---
+type Icon = 'rescue' | 'ai' | 'process' | 'strategy' | 'development';
+import IconSvg from './Icon.astro';
+
+const { icon } = Astro.props as { icon: Icon };
+---
+
+<span class="service-icon" aria-hidden="true">
+  <IconSvg name={icon} />
+</span>
+
+<style>
+  .service-icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
+    border-radius: 12px;
+    color: #527b18;
+    background: var(--primary-soft);
+  }
+
+  .service-icon :global(.ui-icon) {
+    width: 27px;
+    height: 27px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

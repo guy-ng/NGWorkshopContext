@@ -1,0 +1,20 @@
+---
+import type { Locale } from '../lib/i18n';
+import Icon from './Icon.astro';
+
+const { locale } = Astro.props as { locale: Locale };
+const he = locale === 'he';
+---
+
+<section class="section confirmation-section">
+  <div class="shell confirmation-card">
+    <span class="confirmation-icon"><Icon name="check" /></span>
+    <h1>{he ? 'תודה שפניתם אלינו' : 'Thank you for contacting us'}</h1>
+    <p>
+      {he
+        ? 'הפנייה התקבלה בהצלחה. נחזור אליכם תוך יום עסקים אחד.'
+        : 'Your request was received successfully. We’ll get back to you within one business day.'}
+    </p>
+    <a class="button" href={`/${locale}/`}>{he ? 'חזרה לעמוד הבית' : 'Back to the home page'}</a>
+  </div>
+</section>

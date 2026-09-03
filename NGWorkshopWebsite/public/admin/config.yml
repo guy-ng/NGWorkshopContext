@@ -1,0 +1,87 @@
+# Production authentication is provided by Netlify Identity/Git Gateway.
+# When deploying elsewhere, replace `backend` with the GitHub backend and
+# configure its OAuth application. `local_backend` supports `npx decap-server`.
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+publish_mode: editorial_workflow
+media_folder: public/uploads
+public_folder: /uploads
+site_url: https://ngworkshop.co.il
+display_url: https://ngworkshop.co.il
+logo_url: /images/ng-logo.png
+
+collections:
+  - name: blog_he
+    label: "Blog — עברית"
+    label_singular: "מאמר בעברית"
+    folder: src/content/blog/he
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{fields.urlSlug}}"
+    identifier_field: title
+    summary: "{{title}} — {{publishedAt}}"
+    sortable_fields: [publishedAt, title, category]
+    view_filters:
+      - label: Drafts
+        field: draft
+        pattern: true
+    fields: &blog_fields_he
+      - { label: "כותרת", name: title, widget: string }
+      - { label: "Slug באנגלית", name: urlSlug, widget: string, hint: "כתובת קצרה באותיות אנגליות, לדוגמה: ai-process-guide. אין לשנות אחרי פרסום." }
+      - { label: "תקציר", name: excerpt, widget: text }
+      - { label: "שפה", name: locale, widget: hidden, default: he }
+      - { label: "מפתח תרגום", name: translationKey, widget: string, hint: "כדי לחבר גרסה בעברית ובאנגלית, השתמשו בדיוק באותו ערך בשני המאמרים. אפשר להשאיר מאמר בשפה אחת בלבד." }
+      - { label: "תאריך פרסום", name: publishedAt, widget: datetime, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }
+      - { label: "תאריך עדכון", name: updatedAt, widget: datetime, required: false, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }
+      - { label: "מחבר/ת", name: author, widget: string, default: "NG Workshop" }
+      - { label: "קטגוריה", name: category, widget: string }
+      - { label: "תגיות", name: tags, widget: list, required: false, default: [] }
+      - { label: "תמונת שער", name: coverImage, widget: image, required: false }
+      - { label: "תיאור תמונה", name: coverAlt, widget: string, required: false, hint: "תיאור נגיש וקצר של התמונה." }
+      - { label: "קישור לסרטון YouTube", name: youtubeUrl, widget: string, required: false, hint: "אפשר להדביק קישור רגיל, Shorts או youtu.be. הסרטון יוצג באופן רספונסיבי במאמר." }
+      - { label: "כותרת נגישה לסרטון", name: youtubeTitle, widget: string, required: false, hint: "אם השדה ריק, כותרת המאמר תשמש לתיאור הסרטון." }
+      - { label: "מאמר מוביל", name: featured, widget: boolean, default: false }
+      - { label: "טיוטה", name: draft, widget: boolean, default: true, hint: "טיוטות לא יופיעו באתר הייצור." }
+      - { label: "כותרת SEO", name: seoTitle, widget: string, required: false }
+      - { label: "תיאור SEO", name: seoDescription, widget: text, required: false }
+      - { label: "תוכן", name: body, widget: markdown }
+
+  - name: blog_en
+    label: "Blog — English"
+    label_singular: "English article"
+    folder: src/content/blog/en
+    create: true
+    extension: md
+    format: frontmatter
+    slug: "{{fields.urlSlug}}"
+    identifier_field: title
+    summary: "{{title}} — {{publishedAt}}"
+    sortable_fields: [publishedAt, title, category]
+    view_filters:
+      - label: Drafts
+        field: draft
+        pattern: true
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: Slug, name: urlSlug, widget: string, hint: "A short URL-safe value, for example ai-process-guide. Do not change it after publication." }
+      - { label: Excerpt, name: excerpt, widget: text }
+      - { label: Language, name: locale, widget: hidden, default: en }
+      - { label: Translation key, name: translationKey, widget: string, hint: "To connect Hebrew and English versions, use exactly the same value in both articles. Either language may also be published on its own." }
+      - { label: Publication date, name: publishedAt, widget: datetime, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }
+      - { label: Updated date, name: updatedAt, widget: datetime, required: false, date_format: YYYY-MM-DD, time_format: false, format: YYYY-MM-DD }
+      - { label: Author, name: author, widget: string, default: "NG Workshop" }
+      - { label: Category, name: category, widget: string }
+      - { label: Tags, name: tags, widget: list, required: false, default: [] }
+      - { label: Cover image, name: coverImage, widget: image, required: false }
+      - { label: Cover image alt text, name: coverAlt, widget: string, required: false }
+      - { label: YouTube video URL, name: youtubeUrl, widget: string, required: false, hint: "Paste a standard YouTube, Shorts, live, or youtu.be URL. The video will be embedded responsively." }
+      - { label: Accessible video title, name: youtubeTitle, widget: string, required: false, hint: "The article title is used when this is left empty." }
+      - { label: Featured article, name: featured, widget: boolean, default: false }
+      - { label: Draft, name: draft, widget: boolean, default: true, hint: "Drafts are excluded from production builds." }
+      - { label: SEO title, name: seoTitle, widget: string, required: false }
+      - { label: SEO description, name: seoDescription, widget: text, required: false }
+      - { label: Body, name: body, widget: markdown }

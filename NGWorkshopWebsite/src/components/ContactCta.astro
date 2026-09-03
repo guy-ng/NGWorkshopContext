@@ -1,0 +1,202 @@
+---
+import type { Locale } from '../lib/i18n';
+const { locale, initialMessage } = Astro.props as { locale: Locale; initialMessage?: string };
+const he = locale === 'he';
+const assistantGreeting = initialMessage ?? (he
+  ? 'היי! אשמח להבין מה אתם בונים ואיך נוכל לעזור. במה תרצו להתמקד?'
+  : 'Hi! I’d love to learn what you’re building and how we can help. What would you like to focus on?');
+---
+<section id="contact" class="section contact-section">
+  <div class="shell contact-card">
+    <div class="section-heading">
+      <h2>{he ? 'מוכנים לשדרג את התהליכים העסקיים שלכם?' : 'Ready to upgrade your business processes?'}</h2>
+      <p>{he ? 'בואו נדבר. פגישת ייעוץ ראשונית ללא עלות, בה נבין את הצרכים שלכם ונראה איך הטכנולוגיה יכולה לשרת אתכם.' : "Let’s talk. A free initial consultation where we learn your needs and see how technology can serve you."}</p>
+    </div>
+    <div class="contact-content">
+      <div class="whatsapp-option">
+        <a class="button whatsapp" href="https://wa.me/97248232535">{he ? 'התחילו שיחת WhatsApp' : 'Start a WhatsApp chat'}</a>
+        <small>{he ? 'מענה מהיר בוואטסאפ — ללא התחייבות' : 'Fast response on WhatsApp — no commitment'}</small>
+      </div>
+      <span class="or">{he ? 'או' : 'or'}</span>
+      <div class="contact-panel">
+        <div class="agent-view" data-agent-view>
+          <div class="agent-header">
+            <span class="agent-avatar" aria-hidden="true">NG</span>
+            <div><strong>{he ? 'העוזר של NG Workshop' : 'NG Workshop assistant'}</strong><small>{he ? 'מחובר עכשיו' : 'Online now'}</small></div>
+          </div>
+          <div class="agent-messages" data-agent-messages aria-live="polite">
+            <p class="agent-message">{assistantGreeting}</p>
+          </div>
+          <form class="agent-composer" data-agent-composer>
+            <label class="visually-hidden" for={`agent-message-${locale}`}>{he ? 'הקלידו הודעה' : 'Type a message'}</label>
+            <input id={`agent-message-${locale}`} data-agent-input autocomplete="off" placeholder={he ? 'כתבו כאן…' : 'Type here…'} />
+            <button type="submit" aria-label={he ? 'שליחת הודעה' : 'Send message'}>↑</button>
+          </form>
+          <button class="form-toggle" type="button" data-show-form>{he ? 'מלאו טופס פנייה' : 'Fill out a contact form'}</button>
+        </div>
+        <div class="form-view" data-form-view hidden>
+          <form
+            name="contact"
+            method="POST"
+            action={`/${locale}/thank-you/`}
+            data-netlify="true"
+          >
+            <input type="hidden" name="form-name" value="contact" />
+            <input type="hidden" name="source" value="contact-form" />
+            <input type="hidden" name="locale" value={locale} />
+            <input type="hidden" name="page_url" data-page-url />
+            <label>{he ? 'שם מלא' : 'Full name'}<input name="name" autocomplete="name" required /></label>
+            <label>{he ? 'אימייל' : 'Email'}<input type="email" name="email" autocomplete="email" required /></label>
+            <label>{he ? 'ארגון' : 'Organization'}<input name="company" autocomplete="organization" /></label>
+            <label>{he ? 'טלפון' : 'Phone'}<input type="tel" name="phone" autocomplete="tel" /></label>
+            <button class="button" type="submit">{he ? 'שלחו פנייה' : 'Send request'}</button>
+            <small>{he ? 'נחזור אליכם תוך יום עסקים אחד.' : "We’ll get back to you within one business day."}</small>
+          </form>
+          <button class="form-toggle" type="button" data-show-agent>{he ? 'חזרה לצ׳אט' : 'Back to chat'}</button>
+        </div>
+      </div>
+    </div>
+    <form name="agent-lead" method="POST" data-netlify="true" class="visually-hidden" aria-hidden="true">
+      <input type="hidden" name="form-name" value="agent-lead" />
+      <input type="hidden" name="source" value="chat" />
+      <input type="hidden" name="page_url" />
+      <input name="name" />
+      <input type="tel" name="phone" />
+      <input type="email" name="email" />
+      <input type="hidden" name="locale" />
+      <textarea name="conversation"></textarea>
+    </form>
+  </div>
+</section>
+
+<script is:inline define:vars={{ he }}>
+  document.querySelectorAll('.contact-panel').forEach((panel) => {
+    const agentView = panel.querySelector('[data-agent-view]');
+    const formView = panel.querySelector('[data-form-view]');
+    const messageList = panel.querySelector('[data-agent-messages]');
+    const pageUrlInput = panel.querySelector('[data-page-url]');
+    if (pageUrlInput) pageUrlInput.value = window.location.href;
+    const scrollToLatest = () => requestAnimationFrame(() => {
+      messageList.scrollTop = messageList.scrollHeight;
+    });
+    panel.querySelector('[data-show-form]')?.addEventListener('click', () => {
+      agentView.hidden = true;
+      formView.hidden = false;
+      formView.querySelector('input:not([type="hidden"])')?.focus();
+    });
+    panel.querySelector('[data-show-agent]')?.addEventListener('click', () => {
+      formView.hidden = true;
+      agentView.hidden = false;
+      agentView.querySelector('[data-agent-input]')?.focus();
+      scrollToLatest();
+    });
+    const messages = [{ role: 'assistant', text: panel.querySelector('.agent-message')?.textContent ?? '' }];
+    let submitted = false;
+    panel.querySelector('[data-agent-composer]')?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const input = panel.querySelector('[data-agent-input]');
+      const sendButton = panel.querySelector('[data-agent-composer] button');
+      const value = input.value.trim();
+      if (!value) return;
+      const userMessage = document.createElement('p');
+      userMessage.className = 'agent-message user-message';
+      userMessage.textContent = value;
+      messageList.append(userMessage);
+      messages.push({ role: 'user', text: value });
+      const typingMessage = document.createElement('p');
+      typingMessage.className = 'agent-message typing-message';
+      typingMessage.setAttribute('aria-label', he ? 'הסוכן מקליד' : 'Agent is typing');
+      typingMessage.innerHTML = '<span></span><span></span><span></span>';
+      messageList.append(typingMessage);
+      input.value = '';
+      input.disabled = true;
+      sendButton.disabled = true;
+      scrollToLatest();
+
+      try {
+        const response = await fetch('/api/contact-agent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ locale: he ? 'he' : 'en', messages }),
+        });
+        if (!response.ok) throw new Error('Agent request failed');
+        const result = await response.json();
+        typingMessage.remove();
+        const reply = document.createElement('p');
+        reply.className = 'agent-message';
+        reply.textContent = result.reply;
+        messageList.append(reply);
+        scrollToLatest();
+        messages.push({ role: 'assistant', text: result.reply });
+
+        if (result.complete && !submitted) {
+          const conversation = messages
+            .map((message) => `${message.role}: ${message.text}`)
+            .join('\n');
+          const lead = new URLSearchParams({
+            'form-name': 'agent-lead',
+            source: 'chat',
+            page_url: window.location.href,
+            name: result.lead.name,
+            phone: result.lead.phone,
+            email: result.lead.email,
+            locale: he ? 'he' : 'en',
+            conversation,
+          });
+          const submission = await fetch('/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: lead.toString(),
+          });
+          if (!submission.ok) throw new Error('Lead submission failed');
+          submitted = true;
+          input.placeholder = he ? 'הפרטים התקבלו' : 'Details received';
+        }
+      } catch (error) {
+        typingMessage.remove();
+        const reply = document.createElement('p');
+        reply.className = 'agent-message agent-error';
+        reply.textContent = he ? 'לא הצלחנו לשלוח כרגע. אפשר לנסות שוב או למלא את טופס הפנייה.' : 'We could not send that right now. Please try again or use the contact form.';
+        messageList.append(reply);
+      } finally {
+        input.disabled = submitted;
+        sendButton.disabled = submitted;
+        if (!submitted) input.focus();
+        scrollToLatest();
+      }
+    });
+    scrollToLatest();
+  });
+</script>
+
+<style>
+  .contact-panel { min-width: 0; }
+  .agent-view { overflow: hidden; border: 1px solid var(--border); border-radius: 16px; background: white; box-shadow: 0 12px 30px #3d362b12; }
+  .agent-header { display: flex; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+  .agent-header div { display: flex; flex-direction: column; }
+  .agent-header small { color: #527b18; }
+  .agent-avatar { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 12px; background: var(--primary); color: #1c2609; font-size: 13px; font-weight: 700; }
+  .agent-messages { display: flex; min-height: 190px; max-height: 260px; flex-direction: column; gap: 10px; overflow-y: auto; padding: 18px; background: #faf9f6; }
+  :global(.agent-messages .agent-message) { width: fit-content; max-width: 86%; margin-right: auto; padding: 9px 14px 11px; border: 1px solid #cfdcb9; border-radius: 14px 14px 14px 4px; background: white; color: var(--ink); box-shadow: 0 3px 10px #3d362b0b; }
+  :global(.agent-messages .user-message) { margin-right: 0; margin-left: auto; border-color: var(--dark); border-radius: 14px 14px 4px; background: var(--dark); color: #fff; }
+  :global(.agent-messages .agent-error) { border-color: #d69b91; color: #8b3025; }
+  :global(.agent-messages .typing-message) { display: flex; min-width: 58px; min-height: 40px; align-items: center; justify-content: center; gap: 5px; }
+  :global(.agent-messages .typing-message span) { width: 6px; height: 6px; border-radius: 50%; background: #527b18; animation: typing-dot 1.15s infinite ease-in-out; }
+  :global(.agent-messages .typing-message span:nth-child(2)) { animation-delay: .15s; }
+  :global(.agent-messages .typing-message span:nth-child(3)) { animation-delay: .3s; }
+  @keyframes typing-dot { 0%,60%,100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-4px); opacity: 1; } }
+  .agent-composer { display: grid; grid-template-columns: 1fr 44px; gap: 8px; padding: 12px; border-top: 1px solid var(--border); }
+  .agent-composer input { min-width: 0; height: 44px; padding-inline: 14px; border: 1px solid var(--border); border-radius: 10px; background: white; }
+  .agent-composer button { border: 0; border-radius: 10px; background: var(--primary); color: #1c2609; font-size: 22px; cursor: pointer; }
+  .agent-composer button:disabled,.agent-composer input:disabled { cursor: not-allowed; opacity: .65; }
+  .form-toggle { display: block; margin: 0 auto 14px; padding: 6px 4px; border: 0; border-bottom: 1px solid currentColor; background: transparent; color: #527b18; font: inherit; font-weight: 600; cursor: pointer; }
+  .form-view form { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px; }
+  .form-view form .button,.form-view form small { grid-column: 1/-1; }
+  .form-view form small { text-align: center; color: var(--muted); }
+  .form-view label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; }
+  .form-view input { min-width: 0; height: 50px; padding-inline: 16px; border: 1px solid var(--border); border-radius: 8px; background: white; }
+  .form-view .form-toggle { margin-top: 12px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 520px) { .form-view form { grid-template-columns: 1fr; } .form-view form .button,.form-view form small { grid-column: auto; } }
+  @media (prefers-reduced-motion: reduce) { :global(.agent-messages .typing-message span) { animation: none; opacity: .7; } }
+</style>

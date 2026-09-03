@@ -1,0 +1,52 @@
+---
+// A static build cannot know the visitor's locale for an unmatched URL, so this page
+// shows both languages and links into each side of the site.
+import '../styles/global.css';
+---
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/images/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/images/favicon.png" sizes="512x512" />
+    <meta name="theme-color" content="#8abf3b" />
+    <title>הדף לא נמצא · Page not found | NG Workshop</title>
+  </head>
+  <body>
+    <main class="section not-found">
+      <div class="shell">
+        <span class="badge">404</span>
+        <div lang="he" dir="rtl">
+          <h1>הדף לא נמצא</h1>
+          <p>הכתובת שביקשתם לא קיימת או שהועברה. אפשר לחזור לעמוד הבית או לעיין בבלוג.</p>
+          <div class="actions">
+            <a class="button" href="/he/">לעמוד הבית</a>
+            <a class="button outline" href="/he/blog/">לבלוג</a>
+          </div>
+        </div>
+        <hr />
+        <div lang="en" dir="ltr">
+          <h2>Page not found</h2>
+          <p>The address you requested does not exist or has moved. Head back to the home page or browse the blog.</p>
+          <div class="actions">
+            <a class="button" href="/en/">Home page</a>
+            <a class="button outline" href="/en/blog/">Blog</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  .not-found { display: grid; min-height: 100vh; place-items: center; text-align: center; }
+  .not-found .shell { display: flex; max-width: 640px; flex-direction: column; align-items: center; gap: 20px; }
+  .not-found h1 { font-size: clamp(2rem, 5vw, 3rem); }
+  .not-found h2 { font-size: clamp(1.5rem, 4vw, 2rem); }
+  .not-found p { margin-top: 8px; color: var(--muted); }
+  .not-found .actions { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+  .not-found hr { width: 100%; border: 0; border-top: 1px solid var(--border); }
+  @media (max-width: 520px) { .not-found .actions { flex-direction: column; width: 100%; } }
+</style>

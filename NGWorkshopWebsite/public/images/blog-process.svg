@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="220" height="160" viewBox="0 0 220 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame">
+<path id="Vector" d="M24 92C30.6274 92 36 86.6274 36 80C36 73.3726 30.6274 68 24 68C17.3726 68 12 73.3726 12 80C12 86.6274 17.3726 92 24 92Z" fill="white" stroke="#3E352B" stroke-width="2.5"/>
+<path id="Vector_2" d="M36 80H66" stroke="#9A9189" stroke-width="2"/>
+<path id="Vector_3" d="M142 56H74C69.5817 56 66 59.5817 66 64V96C66 100.418 69.5817 104 74 104H142C146.418 104 150 100.418 150 96V64C150 59.5817 146.418 56 142 56Z" fill="white" stroke="#8ABF3B" stroke-width="2.5"/>
+<path id="Vector_4" d="M82 77C84.7614 77 87 74.7614 87 72C87 69.2386 84.7614 67 82 67C79.2386 67 77 69.2386 77 72C77 74.7614 79.2386 77 82 77Z" fill="#8ABF3B"/>
+<path id="Vector_5" opacity="0.45" d="M133.5 84H78.5C77.1193 84 76 85.1193 76 86.5C76 87.8807 77.1193 89 78.5 89H133.5C134.881 89 136 87.8807 136 86.5C136 85.1193 134.881 84 133.5 84Z" fill="#8ABF3B"/>
+<path id="Vector_6" d="M150 80H180" stroke="#9A9189" stroke-width="2"/>
+<path id="Vector_7" d="M192 89C196.971 89 201 84.9706 201 80C201 75.0294 196.971 71 192 71C187.029 71 183 75.0294 183 80C183 84.9706 187.029 89 192 89Z" fill="white" stroke="#8ABF3B" stroke-width="3"/>
+</g>
+</svg>

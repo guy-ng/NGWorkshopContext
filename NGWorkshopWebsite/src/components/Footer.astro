@@ -1,0 +1,54 @@
+---
+import { Image } from 'astro:assets';
+import ngLogoWhite from '../assets/ng-logo-white.png';
+import { localizedPath, ui, type Locale } from '../lib/i18n';
+import SocialIcon from './SocialIcon.astro';
+const { locale } = Astro.props as { locale: Locale };
+const t = ui[locale];
+const socialLinks = [
+  { network: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/company/ng-workshop/' },
+  { network: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/ngworkshop' },
+  { network: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/@ngworkshop_ai' },
+  { network: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/ngworkshop_ai/' },
+] as const;
+---
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <section class="footer-brand">
+      <Image src={ngLogoWhite} width={161} height={18} densities={[1, 2]} loading="lazy" alt="NG Workshop" />
+      <p>{t.tagline}</p>
+      <a class="partner-badge-link" href={localizedPath(locale, 'services/camunda/')} aria-label={locale === 'he' ? 'לעמוד Camunda' : 'Explore Camunda'}>
+        <img class="partner-badge" src="/images/camunda-gold.svg" width="146" height="48" loading="lazy" decoding="async" alt="Camunda Gold Partner" />
+      </a>
+    </section>
+    <section>
+      <h2>{t.nav}</h2>
+      <a href={localizedPath(locale)}>{t.home}</a>
+      <a href={localizedPath(locale, 'blog')}>{t.blog}</a>
+    </section>
+    <section>
+      <h2>{t.contact}</h2>
+      <a href="tel:+97248232535">04-823-2535</a>
+      <a href="mailto:workshop@ngworkshop.co.il">workshop@ngworkshop.co.il</a>
+      <p>{locale === 'he' ? 'קיבוץ רמת השופט, ישראל' : 'Kibbutz Ramat Hashofet, Israel'}</p>
+      <nav class="social-links" aria-label={locale === 'he' ? 'רשתות חברתיות' : 'Social media'}>
+        {socialLinks.map(({ network, label, href }) => (
+          <a href={href} target="_blank" rel="me noopener noreferrer" aria-label={`${label} — NG Workshop`} title={label}>
+            <SocialIcon network={network} />
+          </a>
+        ))}
+      </nav>
+    </section>
+  </div>
+  <div class="shell footer-bottom">
+    <span>© NG Workshop 2012–2026</span>
+    <span>{t.privacy} · {t.accessibility}</span>
+  </div>
+</footer>
+
+<style>
+  .social-links { display: flex; direction: ltr; gap: 10px; margin-top: 6px; }
+  .social-links a { display: grid; width: 42px; height: 42px; place-items: center; border: 1px solid #efebe455; border-radius: 50%; color: #efebe4; transition: color .2s, border-color .2s, background .2s, transform .2s; }
+  .social-links a:hover { transform: translateY(-2px); border-color: var(--primary); background: var(--primary); color: #1c2609; }
+  @media (prefers-reduced-motion: reduce) { .social-links a { transition: none; } }
+</style>

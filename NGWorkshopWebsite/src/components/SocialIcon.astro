@@ -1,0 +1,11 @@
+---
+type Network = 'linkedin' | 'facebook' | 'youtube' | 'instagram';
+import Icon from './Icon.astro';
+const { network } = Astro.props as { network: Network };
+---
+
+<Icon name={network} />
+
+<style>
+  :global(.ui-icon) { width: 20px; height: 20px; }
+</style>

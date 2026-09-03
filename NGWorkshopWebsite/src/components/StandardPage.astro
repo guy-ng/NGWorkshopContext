@@ -1,0 +1,7 @@
+---
+import type { Locale } from '../lib/i18n';
+interface Props { locale: Locale; eyebrow: string; title: string; intro: string; heading: string; body: string; }
+const { eyebrow, title, intro, heading, body } = Astro.props;
+---
+<section class="page-hero"><div class="shell"><span class="badge">{eyebrow}</span><h1>{title}</h1><p>{intro}</p></div></section>
+<section class="content-section alt"><div class="shell prose"><h2>{heading}</h2>{body.split('\n').map((paragraph) => <p>{paragraph}</p>)}</div></section>

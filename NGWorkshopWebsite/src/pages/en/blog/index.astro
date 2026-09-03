@@ -1,0 +1,118 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/Icon.astro';
+
+const locale = 'en' as const;
+const includeDrafts = !import.meta.env.PROD || import.meta.env.INCLUDE_DRAFTS === 'true';
+const posts = (await getCollection('blog', ({ data }) => data.locale === locale && (!data.draft || includeDrafts)))
+  .sort((a, b) => Number(b.data.featured) - Number(a.data.featured) || b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf());
+const [featured, ...rest] = posts;
+const categories = [...new Set(posts.map((post) => post.data.category))];
+const formatDate = (date: Date) => new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+---
+<BaseLayout locale={locale} title="NG Workshop Blog" description="Practical insights on Agentic AI, process orchestration, software engineering, and digital transformation.">
+  <section class="section blog-hero">
+    <div class="shell hero-layout">
+      <div class="hero-copy">
+        <span class="hero-kicker">THE NG WORKSHOP BLOG</span>
+        <h1>Where <em>AI</em> meets<br />real work</h1>
+        <p>Practical guides, working patterns, and field notes on AI agents, business processes, and systems that make it to production.</p>
+      </div>
+      <div class="topic-map" aria-label="Blog topics">
+        <span class="topic topic-ai">Agentic AI</span>
+        <span class="connector connector-horizontal" aria-hidden="true"></span>
+        <span class="topic topic-process">Processes</span>
+        <span class="connector connector-vertical" aria-hidden="true"></span>
+        <span class="topic topic-production">Production</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section blog-listing">
+    <div class="shell">
+      {categories.length > 1 && <nav class="category-filters" aria-label="Filter articles by topic">
+        <button type="button" class="active" data-category="all" aria-pressed="true">All</button>
+        {categories.map((category) => <button type="button" data-category={category} aria-pressed="false">{category}</button>)}
+      </nav>}
+      {featured ? (
+        <a class="post-link" href={`/en/blog/${featured.data.urlSlug}/`} data-post-category={featured.data.category}>
+          <article class="featured-post card">
+            {featured.data.coverImage && <img src={featured.data.coverImage} alt={featured.data.coverAlt ?? ''} width="720" height="405" loading="eager" />}
+            <div class="featured-copy">
+              <div class="post-meta"><span class="post-category">{featured.data.category}</span><time datetime={featured.data.publishedAt.toISOString()}>{formatDate(featured.data.publishedAt)}</time></div>
+              <h2>{featured.data.title}</h2>
+              <p>{featured.data.excerpt}</p>
+              <span class="read-more">Read article <Icon name="arrow-right" /></span>
+            </div>
+          </article>
+        </a>
+      ) : <p>New articles are coming soon.</p>}
+
+      {rest.length > 0 && (
+        <div class="post-grid">
+          {rest.map((post) => (
+            <a class="post-link" href={`/en/blog/${post.data.urlSlug}/`} data-post-category={post.data.category}>
+              <article class="card post-card">
+                <div class="post-meta"><span class="post-category">{post.data.category}</span><time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt)}</time></div>
+                <h2>{post.data.title}</h2>
+                <p>{post.data.excerpt}</p>
+                <span class="read-more">Read article <Icon name="arrow-right" /></span>
+              </article>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const filters = document.querySelectorAll<HTMLButtonElement>('.category-filters button');
+  const cards = document.querySelectorAll<HTMLElement>('[data-post-category]');
+  filters.forEach((filter) => filter.addEventListener('click', () => {
+    const category = filter.dataset.category;
+    filters.forEach((button) => {
+      const selected = button === filter;
+      button.classList.toggle('active', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+    cards.forEach((card) => { card.hidden = category !== 'all' && card.dataset.postCategory !== category; });
+  }));
+</script>
+
+<style>
+  .blog-hero { padding-block: clamp(3.5rem, 7vw, 6rem); background: linear-gradient(225deg, var(--primary-soft) 0 42%, #fff 42% 100%); border-bottom: 1px solid var(--border); }
+  .hero-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); gap: clamp(3rem, 8vw, 7rem); align-items: center; }
+  .hero-copy { display: flex; align-items: flex-start; gap: 1.25rem; text-align: start; }
+  .hero-kicker { color: #527b18; font-size: .82rem; font-weight: 700; letter-spacing: .08em; }
+  .blog-hero h1 { font-size: clamp(2.8rem, 6vw, 5.25rem); line-height: 1.02; }
+  .blog-hero h1 em { color: var(--primary); }
+  .blog-hero p { max-width: 640px; color: var(--muted); font-size: 1.1rem; }
+  .topic-map { display: grid; grid-template-columns: 1fr 38px 1fr; grid-template-areas: "ai line-one process" ". . line-two" ". . production"; align-items: center; }
+  .topic { display: grid; place-items: center; min-height: 94px; padding: 1rem; border: 2px solid var(--ink); border-radius: 16px; background: #fff; font-weight: 700; box-shadow: 8px 8px 0 #dcebc4; }
+  .topic-ai { grid-area: ai; }
+  .topic-process { grid-area: process; border-color: var(--primary); color: #36580c; }
+  .topic-production { grid-area: production; min-height: 62px; margin-top: 18px; border-radius: 999px; box-shadow: none; }
+  .connector { height: 2px; background: #9f978e; }
+  .connector-horizontal { grid-area: line-one; }
+  .connector-vertical { grid-area: line-two; width: 2px; height: 34px; margin: 0 auto; }
+  .blog-listing { padding-block: 2rem 7rem; }
+  .category-filters { display: flex; flex-wrap: wrap; gap: .65rem; margin-bottom: 2rem; }
+  .category-filters button { padding: .5rem 1rem; border: 1px solid var(--border); border-radius: 999px; background: #fff; color: var(--muted); font: inherit; font-size: .9rem; cursor: pointer; }
+  .category-filters button:hover, .category-filters button.active { border-color: var(--primary); background: var(--primary-soft); color: #36580c; }
+  .post-link { display: block; color: inherit; text-decoration: none; border-radius: 16px; }
+  .featured-post { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); padding: 0; overflow: hidden; margin-bottom: 2rem; }
+  .featured-post img { width: 100%; height: 100%; min-height: 340px; object-fit: cover; }
+  .featured-copy { padding: clamp(2rem, 5vw, 4rem); align-self: center; }
+  .post-meta { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; color: var(--muted); font-size: .84rem; font-weight: 600; }
+  .post-category { padding: .22rem .7rem; border-radius: 999px; background: var(--primary-soft); color: #527b18; font-weight: 700; }
+  h2 { margin: .75rem 0 1rem; font-size: clamp(1.45rem, 3vw, 2.25rem); }
+  .post-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .post-card { height: 100%; padding: 1.75rem; }
+  .post-card h2 { font-size: 1.35rem; }
+  .read-more { display: inline-flex; gap: .45rem; margin-top: 1rem; color: #527b18; font-weight: 700; }
+  .featured-post:not(:has(img)) { grid-template-columns: 1fr; }
+  @media (max-width: 800px) { .blog-hero { background: linear-gradient(200deg, var(--primary-soft) 0 35%, #fff 35% 100%); } .hero-layout { grid-template-columns: 1fr; gap: 2.75rem; } .hero-copy { align-items: flex-start !important; text-align: start !important; } .topic-map { width: min(480px, 100%); margin-inline: auto; } .featured-post { grid-template-columns: 1fr; } .featured-post img { min-height: 220px; } .post-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 480px) { .topic-map { grid-template-columns: 1fr 24px 1fr; } .topic { min-height: 76px; padding: .75rem; font-size: .88rem; } .topic-production { min-height: 52px; } }
+</style>

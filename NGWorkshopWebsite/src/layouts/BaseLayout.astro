@@ -1,0 +1,69 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import ContactCta from '../components/ContactCta.astro';
+import Motion from '../components/Motion.astro';
+import '../styles/global.css';
+import type { Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  image?: string;
+  noindex?: boolean;
+  alternatePath?: string | null;
+  languagePath?: string;
+  contactMessage?: string;
+}
+
+const { locale, title, description, image = '/images/og-image.png', noindex = false, alternatePath, languagePath, contactMessage } = Astro.props;
+const dir = locale === 'he' ? 'rtl' : 'ltr';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const alternateLocale = locale === 'he' ? 'en' : 'he';
+const defaultAlternatePath = Astro.url.pathname.replace(/^\/(he|en)(?=\/|$)/, `/${alternateLocale}`);
+const resolvedAlternatePath = alternatePath === undefined ? defaultAlternatePath : alternatePath;
+---
+<!doctype html>
+<html lang={locale} dir={dir}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" href="/images/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/images/favicon.png" sizes="512x512" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#8abf3b" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={locale} href={canonical} />
+    {resolvedAlternatePath && <link rel="alternate" hreflang={alternateLocale} href={new URL(resolvedAlternatePath, Astro.site)} />}
+    {resolvedAlternatePath && <link rel="alternate" hreflang="x-default" href={new URL(locale === 'he' ? Astro.url.pathname : resolvedAlternatePath, Astro.site)} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL(image, Astro.site)} />
+    <meta property="og:locale" content={locale === 'he' ? 'he_IL' : 'en_US'} />
+    <title>{title}</title>
+    <script is:inline>
+      // Opt in to scroll reveals before first paint, unless the visitor asked for less motion.
+      // The fallback timer un-hides everything if Motion.astro fails to load.
+      (function () {
+        var root = document.documentElement;
+        if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+        root.classList.add('motion');
+        window.__ngMotionFallback = setTimeout(function () { root.classList.remove('motion'); }, 3000);
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{locale === 'he' ? 'דלגו לתוכן' : 'Skip to content'}</a>
+    <Header locale={locale} pathname={Astro.url.pathname} languagePath={languagePath ?? resolvedAlternatePath ?? `/${alternateLocale}/blog/`} />
+    <main id="main"><slot /></main>
+    <ContactCta locale={locale} initialMessage={contactMessage} />
+    <Footer locale={locale} />
+    <Motion />
+  </body>
+</html>

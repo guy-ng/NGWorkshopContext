@@ -1,0 +1,88 @@
+---
+import { Image } from 'astro:assets';
+import ngLogo from '../assets/ng-logo.png';
+import ServiceIcon from './ServiceIcon.astro';
+import Icon from './Icon.astro';
+import type { Locale } from '../lib/i18n';
+const { locale } = Astro.props as { locale: Locale };
+const he = locale === 'he';
+const services = he ? [
+  ['Vibe Coding Rescue', 'חילוץ אפליקציות שנבנו ב-AI', 'בניתם ב-Lovable, Bolt, Cursor או Claude Code והמערכת נשברת במקומות הקריטיים? אנחנו סוגרים פרצות, מוסיפים בדיקות ומחזירים גרסה בטוחה.', 'rescue'],
+  ['AI Agent Integration', 'שילוב סוכני AI', 'שילוב מודלי שפה וסוכנים חכמים בתוך תהליכים ארגוניים, עם בקרה אנושית ותיעוד מלא.', 'ai'],
+  ['Process Orchestration', 'תזמור תהליכים', 'תכנון והטמעת תהליכים מקצה לקצה עם Camunda 8, BPMN ומיקרו־שירותים.', 'process'],
+  ['Strategic Consulting', 'ייעוץ טכנולוגי', 'מפת דרכים מעשית שמחברת בין צורך עסקי, ארכיטקטורה ומדדי הצלחה.', 'strategy'],
+  ['Custom Development', 'פיתוח מותאם', 'מערכות יציבות וסקיילביליות המותאמות לארגון, לצוות ולתהליכים הקיימים.', 'development'],
+] : [
+  ['Vibe Coding Rescue', 'From prototype to production', 'We rescue apps built with Lovable, Bolt, Cursor or Claude Code: close security gaps, add tests and ship a dependable release.', 'rescue'],
+  ['AI Agent Integration', 'Agents with guardrails', 'We embed language models and agents inside real workflows, with human control and a complete audit trail.', 'ai'],
+  ['Process Orchestration', 'Visible end-to-end processes', 'Design and implementation with Camunda 8, BPMN, microservices and measurable operational outcomes.', 'process'],
+  ['Strategic Consulting', 'Technology aligned with outcomes', 'A pragmatic roadmap connecting business needs, architecture, delivery and success metrics.', 'strategy'],
+  ['Custom Development', 'Software built for your reality', 'Scalable systems shaped around your organization, team and existing operational processes.', 'development'],
+];
+const testimonials = he ? [
+  ['הצוות של NG Workshop מקצועי, יצירתי ומביא חשיבה מוצרית אמיתית לכל משימה.', 'יובל קליין', 'CTO, SmarTap'],
+  ['שותף אמין שיודע להפוך מורכבות טכנולוגית לתהליך ברור ולתוצאה עובדת.', 'דביר פראווי', 'מייסד ומנכ״ל, Keepy AI'],
+  ['ארסנל מרשים של כישרונות שמוכן לקחת את צורכי הפיתוח שלכם לרמה הבאה.', 'רועי וולר', 'CTO, Masof'],
+] : [
+  ['NG Workshop brings professionalism, creativity and genuine product thinking to every engagement.', 'Yuval Klein', 'CTO, SmarTap'],
+  ['A dependable partner that turns technical complexity into a clear process and a working outcome.', 'Dvir Frauwy', 'Founder & CEO, Keepy AI'],
+  ['An impressive arsenal of talent ready to take your development needs to the next level.', 'Roy Weller', 'CTO, Masof'],
+];
+---
+<section class="hero section">
+  <div class="shell hero-grid">
+    <div class="hero-copy">
+      <span class="badge">Enterprise AI &amp; Process Engineering</span>
+      <h1>{he ? <>הופכים טכנולוגיה מורכבת <em>ליתרון עסקי טבעי</em></> : <>Reliable AI Agents.<br />Orchestrated Processes.<br /><em>Real Results.</em></>}</h1>
+      <p>{he ? 'אנחנו ב-NG Workshop מתמחים בבניית מערכות חכמות שצומחות עם הארגון. אנו משלבים בינה מלאכותית עם תהליכי עבודה ארגוניים (BPM), תוך שמירה על שליטה אנושית מלאה בצמתים הקריטיים.' : 'NG Workshop specializes in building intelligent systems that grow with the organization. We combine AI with business process management while keeping people in control at every critical decision.'}</p>
+      <div class="actions">
+        <a class="button" href="#contact">{he ? 'קבעו פגישת אפיון' : 'Book a discovery call'}</a>
+        <a class="button outline" href="#services">{he ? 'צפו בתהליך העבודה' : 'See how we work'}</a>
+      </div>
+      <small>{he ? 'שותפי Camunda רשמיים · מלווים ארגונים משנת 2012 · AI שעובד בתוך התהליך, לא במקומו' : 'Official Camunda partners · Building with organizations since 2012 · AI inside the process, never instead of it'}</small>
+    </div>
+    <div class="process-browser" aria-label={he ? 'תרשים תהליך עסקי' : 'Business process diagram'}>
+      <div class="browser-bar"><i></i><i></i><i></i><span>process.ngworkshop.co.il</span></div>
+      <div class="process-canvas"><span>Human-in-the-Loop</span><img src="/images/bpmn-flow.svg" width="480" height="288" alt="" /></div>
+    </div>
+  </div>
+</section>
+
+<section id="services" class="section services-section">
+  <div class="shell">
+    <header class="section-heading">
+      <span class="badge">{he ? 'ההתמחות שלנו' : 'Our expertise'}</span>
+      <h2>{he ? 'תחומי ההתמחות שלנו' : 'What we do'}</h2>
+      <p>{he ? 'מעטפת טכנולוגית שלמה, משלב האסטרטגיה ועד הטמעה ופיתוח, עם דגש על ארכיטקטורה יציבה וסקיילביליות.' : 'A complete technology envelope—from strategy through implementation—with a relentless focus on stable, scalable architecture.'}</p>
+    </header>
+    <div class="service-grid">
+      {services.map(([title, subtitle, body, icon], index) => {
+        const href = title.includes('Vibe') ? `/${locale}/services/vibe-coding-rescue/` : title.includes('Process') ? `/${locale}/services/camunda/` : '#contact';
+        return (
+        <a class:list={['card service-card', { featured: index === 0 }]} href={href}> 
+          <ServiceIcon icon={icon as 'rescue' | 'ai' | 'process' | 'strategy' | 'development'} />
+          <h3>{title}</h3><strong>{subtitle}</strong><p>{body}</p>
+          <span class="service-cta" dir={he ? 'rtl' : 'ltr'}>
+            <span>{he ? 'למידע נוסף' : 'Learn more'}</span>
+            <span class="link-arrow"><Icon name={he ? 'arrow-left' : 'arrow-right'} /></span>
+          </span>
+        </a>
+      )})}
+    </div>
+  </div>
+</section>
+
+<section class="section partnership">
+  <div class="shell">
+    <div class="partner-lockup"><Image src={ngLogo} width={197} height={22} densities={[1, 2]} loading="lazy" alt="NG Workshop" /><span>×</span><img src="/images/camunda-wordmark.svg" width="99" height="34" loading="lazy" decoding="async" alt="Camunda" /></div>
+    <a class="gold-link" href={`/${locale}/services/camunda/`} aria-label={he ? 'למידע נוסף על Camunda' : 'Explore Camunda services'}>
+      <img class="gold" src="/images/camunda-gold.svg" width="195" height="64" loading="lazy" decoding="async" alt="Camunda Gold Partner Certified" />
+    </a>
+    <h2>{he ? 'שותפי Camunda רשמיים בישראל' : 'Official Camunda Partner in Israel'}</h2>
+    <p>{he ? 'יישום Camunda 8, מיגרציה, תזמור, ניטור ואופטימיזציה — עם ניסיון שמחבר בין תהליך עסקי למערכת עובדת.' : 'Camunda 8 implementation, migration, orchestration, monitoring and optimization—connecting business processes to production systems.'}</p>
+    <div class="stats"><div><b>+20,000</b><span>{he ? 'שעות פיתוח שנחסכו' : 'Developer hours saved'}</span></div><div><b>$15M</b><span>{he ? 'חיסכון באיכות תהליכים' : 'Process-quality savings'}</span></div><div><b>389%</b><span>{he ? 'החזר השקעה' : 'Return on investment'}</span></div></div>
+    <a class="button" href={`/${locale}/services/camunda/`}>{he ? 'למידע נוסף על Camunda' : 'Explore Camunda services'}</a>
+  </div>
+</section>
+
+<section class="section testimonials"><div class="shell"><header class="section-heading"><span class="badge">Testimonials</span><h2>{he ? 'מה הלקוחות שלנו אומרים' : 'What our clients say'}</h2></header><div class="testimonial-grid">{testimonials.map(([quote, name, role]) => <figure class="card"><div class="stars" aria-label={he ? '5 מתוך 5 כוכבים' : '5 out of 5 stars'}>{Array.from({ length: 5 }).map(() => <Icon name="star" />)}</div><blockquote>“{quote}”</blockquote><figcaption><b>{name}</b><span>{role}</span></figcaption></figure>)}</div></div></section>

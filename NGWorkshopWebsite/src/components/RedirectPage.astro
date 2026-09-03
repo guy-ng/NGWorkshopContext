@@ -1,0 +1,26 @@
+---
+import { localeMeta, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  to: string;
+}
+
+const { locale, to } = Astro.props;
+const canonical = new URL(to, Astro.site);
+const label = locale === 'he' ? 'המשיכו לעמוד היעד' : 'Continue to the destination page';
+---
+<!doctype html>
+<html lang={locale} dir={localeMeta[locale].dir}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="refresh" content={`0;url=${to}`} />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonical} />
+    <title>{locale === 'he' ? `מפנה אל ${to}` : `Redirecting to ${to}`}</title>
+  </head>
+  <body>
+    <a href={to}>{label}</a>
+  </body>
+</html>

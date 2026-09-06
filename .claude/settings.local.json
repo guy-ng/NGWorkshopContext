@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(bash:*)",
+      "Bash(clawdbot doctor:*)",
+      "Bash(clawdbot logs:*)",
+      "mcp__claude_ai_Figma__use_figma"
     ]
   }
 }

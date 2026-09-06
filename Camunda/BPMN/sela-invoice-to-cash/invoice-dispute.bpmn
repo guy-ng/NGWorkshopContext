@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_InvoiceDispute" targetNamespace="http://bpmn.io/schema/bpmn" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:process id="InvoiceDispute" name="מחלוקת על חשבונית" isExecutable="true">
+    <bpmn:startEvent id="Start_DisputeOpened" name="הלקוח טוען שקיבל פחות ממה שחויב">
+      <bpmn:outgoing>Flow_StartToEvidence</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_FetchDeliveryEvidence" name="איתור תעודת משלוח ותיעוד מסירה">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="fetch-delivery-evidence" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=invoiceId" target="invoiceId" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_StartToEvidence</bpmn:incoming>
+      <bpmn:outgoing>Flow_EvidenceToRules</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:businessRuleTask id="Rules_DisputeRouting" name="סיווג המחלוקת ומסלול הטיפול">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="dispute_routing" resultVariable="disputeRoute" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_EvidenceToRules</bpmn:incoming>
+      <bpmn:outgoing>Flow_RulesToRoute</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="Gateway_DisputeRoute" name="מסלול הטיפול" default="Flow_RouteManagerReview">
+      <bpmn:incoming>Flow_RulesToRoute</bpmn:incoming>
+      <bpmn:outgoing>Flow_RouteAutoCredit</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RouteWarehouse</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RouteManagerReview</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_WarehouseCheck" name="בירור מול המחסן: ספירה ותיעוד ליקוט">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="dispute-warehouse-check" />
+        <zeebe:assignmentDefinition candidateGroups="warehouse_supervisors" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_RouteWarehouse</bpmn:incoming>
+      <bpmn:outgoing>Flow_WarehouseChecked</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="Boundary_WarehouseSla" name="חריגת SLA" attachedToRef="Task_WarehouseCheck" cancelActivity="false">
+      <bpmn:outgoing>Flow_SlaBreach</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_WarehouseSla">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">=duration(disputeRoute.slaDuration)</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="Task_EscalateWarehouseSla" name="הסלמה למנהל המחסן ועדכון הלקוח">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="escalate-dispute-sla" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_SlaBreach</bpmn:incoming>
+      <bpmn:outgoing>Flow_SlaToEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_SlaEscalated" name="ההסלמה נשלחה">
+      <bpmn:incoming>Flow_SlaToEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_ClaimJustified" name="הטענה מוצדקת?" default="Flow_ClaimRejected">
+      <bpmn:incoming>Flow_WarehouseChecked</bpmn:incoming>
+      <bpmn:outgoing>Flow_ClaimJustified</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ClaimRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_ApproveExceptionalCredit" name="אישור זיכוי חריג">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="dispute-credit-approval" />
+        <zeebe:assignmentDefinition candidateGroups="=[disputeRoute.approvalGroup]" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_RouteManagerReview</bpmn:incoming>
+      <bpmn:outgoing>Flow_ManagerDecided</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_CreditApproved" name="הזיכוי אושר?" default="Flow_CreditRejected">
+      <bpmn:incoming>Flow_ManagerDecided</bpmn:incoming>
+      <bpmn:outgoing>Flow_ManagerApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_CreditRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Gateway_CreditNoteEntry" name="הפקת זיכוי">
+      <bpmn:incoming>Flow_RouteAutoCredit</bpmn:incoming>
+      <bpmn:incoming>Flow_ClaimJustified</bpmn:incoming>
+      <bpmn:incoming>Flow_ManagerApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreditNoteEntryToIssue</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_IssueCreditNote" name="הפקת חשבונית זיכוי בפריוריטי">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="issue-credit-note" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=if is defined(approvedCreditAmount) then approvedCreditAmount else evidence.gapValue" target="creditAmount" />
+          <zeebe:input source="=invoiceId" target="invoiceId" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_CreditNoteEntryToIssue</bpmn:incoming>
+      <bpmn:outgoing>Flow_IssueToManufacturer</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_UpdateManufacturerCredit" name="עדכון היצרן: זיכוי, החזרת מלאי והתאמת עמלה">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="report-credit-to-manufacturer" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=creditNote.amount" target="creditedAmount" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_IssueToManufacturer</bpmn:incoming>
+      <bpmn:outgoing>Flow_ManufacturerToOutcome</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Script_SetCreditOutcome" name="קביעת תוצאת המחלוקת">
+      <bpmn:extensionElements>
+        <zeebe:script expression="={outcome: if creditNote.amount &gt;= invoiceAmount then &quot;FULL_CREDIT&quot; else &quot;PARTIAL_CREDIT&quot;, totalSettledAmount: creditNote.amount}" resultVariable="dispute" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ManufacturerToOutcome</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToCreditEnd</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="End_CreditIssued" name="הזיכוי הופק והיצרן עודכן">
+      <bpmn:incoming>Flow_ToCreditEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_RejectionEntry" name="דחיית המחלוקת">
+      <bpmn:incoming>Flow_ClaimRejected</bpmn:incoming>
+      <bpmn:incoming>Flow_CreditRejected</bpmn:incoming>
+      <bpmn:outgoing>Flow_RejectionEntryToLetter</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_SendRejectionLetter" name="מכתב דחייה ללקוח בצירוף תעודת המסירה">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-dispute-rejection" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_RejectionEntryToLetter</bpmn:incoming>
+      <bpmn:outgoing>Flow_LetterToOutcome</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:scriptTask id="Script_SetRejectedOutcome" name="קביעת תוצאת המחלוקת">
+      <bpmn:extensionElements>
+        <zeebe:script expression="={outcome: &quot;REJECTED&quot;, totalSettledAmount: 0}" resultVariable="dispute" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_LetterToOutcome</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToRejectedEnd</bpmn:outgoing>
+    </bpmn:scriptTask>
+    <bpmn:endEvent id="End_DisputeRejected" name="המחלוקת נדחתה — החוב עומד בעינו">
+      <bpmn:incoming>Flow_ToRejectedEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_StartToEvidence" sourceRef="Start_DisputeOpened" targetRef="Task_FetchDeliveryEvidence" />
+    <bpmn:sequenceFlow id="Flow_EvidenceToRules" sourceRef="Task_FetchDeliveryEvidence" targetRef="Rules_DisputeRouting" />
+    <bpmn:sequenceFlow id="Flow_RulesToRoute" sourceRef="Rules_DisputeRouting" targetRef="Gateway_DisputeRoute" />
+    <bpmn:sequenceFlow id="Flow_RouteAutoCredit" name="זיכוי אוטומטי בסכום זניח" sourceRef="Gateway_DisputeRoute" targetRef="Gateway_CreditNoteEntry">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=disputeRoute.route = "AUTO_CREDIT"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_RouteWarehouse" name="בירור במחסן" sourceRef="Gateway_DisputeRoute" targetRef="Task_WarehouseCheck">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=disputeRoute.route = "WAREHOUSE_CHECK"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_RouteManagerReview" name="החלטת הנהלה" sourceRef="Gateway_DisputeRoute" targetRef="Task_ApproveExceptionalCredit" />
+    <bpmn:sequenceFlow id="Flow_WarehouseChecked" sourceRef="Task_WarehouseCheck" targetRef="Gateway_ClaimJustified" />
+    <bpmn:sequenceFlow id="Flow_ClaimJustified" name="כן" sourceRef="Gateway_ClaimJustified" targetRef="Gateway_CreditNoteEntry">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=claimJustified = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_ClaimRejected" name="לא" sourceRef="Gateway_ClaimJustified" targetRef="Gateway_RejectionEntry" />
+    <bpmn:sequenceFlow id="Flow_SlaBreach" sourceRef="Boundary_WarehouseSla" targetRef="Task_EscalateWarehouseSla" />
+    <bpmn:sequenceFlow id="Flow_SlaToEnd" sourceRef="Task_EscalateWarehouseSla" targetRef="End_SlaEscalated" />
+    <bpmn:sequenceFlow id="Flow_ManagerDecided" sourceRef="Task_ApproveExceptionalCredit" targetRef="Gateway_CreditApproved" />
+    <bpmn:sequenceFlow id="Flow_ManagerApproved" name="אושר" sourceRef="Gateway_CreditApproved" targetRef="Gateway_CreditNoteEntry">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=creditApproved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_CreditRejected" name="נדחה" sourceRef="Gateway_CreditApproved" targetRef="Gateway_RejectionEntry" />
+    <bpmn:sequenceFlow id="Flow_CreditNoteEntryToIssue" sourceRef="Gateway_CreditNoteEntry" targetRef="Task_IssueCreditNote" />
+    <bpmn:sequenceFlow id="Flow_IssueToManufacturer" sourceRef="Task_IssueCreditNote" targetRef="Task_UpdateManufacturerCredit" />
+    <bpmn:sequenceFlow id="Flow_ManufacturerToOutcome" sourceRef="Task_UpdateManufacturerCredit" targetRef="Script_SetCreditOutcome" />
+    <bpmn:sequenceFlow id="Flow_ToCreditEnd" sourceRef="Script_SetCreditOutcome" targetRef="End_CreditIssued" />
+    <bpmn:sequenceFlow id="Flow_RejectionEntryToLetter" sourceRef="Gateway_RejectionEntry" targetRef="Task_SendRejectionLetter" />
+    <bpmn:sequenceFlow id="Flow_LetterToOutcome" sourceRef="Task_SendRejectionLetter" targetRef="Script_SetRejectedOutcome" />
+    <bpmn:sequenceFlow id="Flow_ToRejectedEnd" sourceRef="Script_SetRejectedOutcome" targetRef="End_DisputeRejected" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="InvoiceDispute">
+      <bpmndi:BPMNShape id="Start_DisputeOpened_di" bpmnElement="Start_DisputeOpened">
+        <dc:Bounds x="152" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="130" y="265" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FetchDeliveryEvidence_di" bpmnElement="Task_FetchDeliveryEvidence">
+        <dc:Bounds x="240" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Rules_DisputeRouting_di" bpmnElement="Rules_DisputeRouting">
+        <dc:Bounds x="400" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DisputeRoute_di" bpmnElement="Gateway_DisputeRoute" isMarkerVisible="true">
+        <dc:Bounds x="560" y="215" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="550" y="185" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_WarehouseCheck_di" bpmnElement="Task_WarehouseCheck">
+        <dc:Bounds x="660" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Boundary_WarehouseSla_di" bpmnElement="Boundary_WarehouseSla">
+        <dc:Bounds x="692" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="620" y="272" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EscalateWarehouseSla_di" bpmnElement="Task_EscalateWarehouseSla">
+        <dc:Bounds x="660" y="340" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_SlaEscalated_di" bpmnElement="End_SlaEscalated">
+        <dc:Bounds x="880" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="866" y="405" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ClaimJustified_di" bpmnElement="Gateway_ClaimJustified" isMarkerVisible="true">
+        <dc:Bounds x="820" y="215" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="808" y="185" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ApproveExceptionalCredit_di" bpmnElement="Task_ApproveExceptionalCredit">
+        <dc:Bounds x="660" y="460" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CreditApproved_di" bpmnElement="Gateway_CreditApproved" isMarkerVisible="true">
+        <dc:Bounds x="820" y="475" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="810" y="445" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CreditNoteEntry_di" bpmnElement="Gateway_CreditNoteEntry" isMarkerVisible="true">
+        <dc:Bounds x="960" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="955" y="65" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IssueCreditNote_di" bpmnElement="Task_IssueCreditNote">
+        <dc:Bounds x="1060" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_UpdateManufacturerCredit_di" bpmnElement="Task_UpdateManufacturerCredit">
+        <dc:Bounds x="1220" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Script_SetCreditOutcome_di" bpmnElement="Script_SetCreditOutcome">
+        <dc:Bounds x="1380" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_CreditIssued_di" bpmnElement="End_CreditIssued">
+        <dc:Bounds x="1540" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1520" y="145" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_RejectionEntry_di" bpmnElement="Gateway_RejectionEntry" isMarkerVisible="true">
+        <dc:Bounds x="960" y="595" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="950" y="565" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendRejectionLetter_di" bpmnElement="Task_SendRejectionLetter">
+        <dc:Bounds x="1060" y="580" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Script_SetRejectedOutcome_di" bpmnElement="Script_SetRejectedOutcome">
+        <dc:Bounds x="1220" y="580" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_DisputeRejected_di" bpmnElement="End_DisputeRejected">
+        <dc:Bounds x="1380" y="602" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1358" y="645" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_StartToEvidence_di" bpmnElement="Flow_StartToEvidence">
+        <di:waypoint x="188" y="240" />
+        <di:waypoint x="240" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EvidenceToRules_di" bpmnElement="Flow_EvidenceToRules">
+        <di:waypoint x="340" y="240" />
+        <di:waypoint x="400" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RulesToRoute_di" bpmnElement="Flow_RulesToRoute">
+        <di:waypoint x="500" y="240" />
+        <di:waypoint x="560" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RouteAutoCredit_di" bpmnElement="Flow_RouteAutoCredit">
+        <di:waypoint x="585" y="215" />
+        <di:waypoint x="585" y="120" />
+        <di:waypoint x="960" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="96" width="130" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RouteWarehouse_di" bpmnElement="Flow_RouteWarehouse">
+        <di:waypoint x="610" y="240" />
+        <di:waypoint x="660" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="605" y="216" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RouteManagerReview_di" bpmnElement="Flow_RouteManagerReview">
+        <di:waypoint x="585" y="265" />
+        <di:waypoint x="585" y="500" />
+        <di:waypoint x="660" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="592" y="476" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WarehouseChecked_di" bpmnElement="Flow_WarehouseChecked">
+        <di:waypoint x="760" y="240" />
+        <di:waypoint x="820" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ClaimJustified_di" bpmnElement="Flow_ClaimJustified">
+        <di:waypoint x="845" y="215" />
+        <di:waypoint x="845" y="120" />
+        <di:waypoint x="960" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="852" y="140" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ClaimRejected_di" bpmnElement="Flow_ClaimRejected">
+        <di:waypoint x="845" y="265" />
+        <di:waypoint x="845" y="300" />
+        <di:waypoint x="920" y="300" />
+        <di:waypoint x="920" y="620" />
+        <di:waypoint x="960" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="852" y="276" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SlaBreach_di" bpmnElement="Flow_SlaBreach">
+        <di:waypoint x="710" y="298" />
+        <di:waypoint x="710" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SlaToEnd_di" bpmnElement="Flow_SlaToEnd">
+        <di:waypoint x="760" y="380" />
+        <di:waypoint x="880" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ManagerDecided_di" bpmnElement="Flow_ManagerDecided">
+        <di:waypoint x="760" y="500" />
+        <di:waypoint x="820" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ManagerApproved_di" bpmnElement="Flow_ManagerApproved">
+        <di:waypoint x="870" y="500" />
+        <di:waypoint x="940" y="500" />
+        <di:waypoint x="940" y="120" />
+        <di:waypoint x="960" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="880" y="476" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreditRejected_di" bpmnElement="Flow_CreditRejected">
+        <di:waypoint x="845" y="525" />
+        <di:waypoint x="845" y="620" />
+        <di:waypoint x="960" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="852" y="546" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreditNoteEntryToIssue_di" bpmnElement="Flow_CreditNoteEntryToIssue">
+        <di:waypoint x="1010" y="120" />
+        <di:waypoint x="1060" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IssueToManufacturer_di" bpmnElement="Flow_IssueToManufacturer">
+        <di:waypoint x="1160" y="120" />
+        <di:waypoint x="1220" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ManufacturerToOutcome_di" bpmnElement="Flow_ManufacturerToOutcome">
+        <di:waypoint x="1320" y="120" />
+        <di:waypoint x="1380" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToCreditEnd_di" bpmnElement="Flow_ToCreditEnd">
+        <di:waypoint x="1480" y="120" />
+        <di:waypoint x="1540" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RejectionEntryToLetter_di" bpmnElement="Flow_RejectionEntryToLetter">
+        <di:waypoint x="1010" y="620" />
+        <di:waypoint x="1060" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LetterToOutcome_di" bpmnElement="Flow_LetterToOutcome">
+        <di:waypoint x="1160" y="620" />
+        <di:waypoint x="1220" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToRejectedEnd_di" bpmnElement="Flow_ToRejectedEnd">
+        <di:waypoint x="1320" y="620" />
+        <di:waypoint x="1380" y="620" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

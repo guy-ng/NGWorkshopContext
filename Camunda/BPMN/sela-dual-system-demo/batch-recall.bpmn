@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_BatchRecall" targetNamespace="http://bpmn.io/schema/bpmn" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:message id="Message_RecallAlert" name="recall-alert" />
+  <bpmn:message id="Message_DestinationAcknowledged" name="recall-destination-acknowledged">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=recallId + &#34;:&#34; + recallTarget.id" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:process id="BatchRecall" name="ריקול אצווה" isExecutable="true">
+    <bpmn:startEvent id="Start_RecallAlert" name="התראת ריקול">
+      <bpmn:outgoing>Flow_StartToClassification</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_RecallAlert" messageRef="Message_RecallAlert" />
+    </bpmn:startEvent>
+    <bpmn:businessRuleTask id="Rules_ClassifyRecall" name="סיווג רמת ריקול">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="recall_classification" resultVariable="recallPolicy" bindingType="deployment" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_StartToClassification</bpmn:incoming>
+      <bpmn:outgoing>Flow_ClassificationToShipmentFork</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:parallelGateway id="Gateway_ShipmentSearchFork" name="איתור בשתי המערכות">
+      <bpmn:incoming>Flow_ClassificationToShipmentFork</bpmn:incoming>
+      <bpmn:outgoing>Flow_SearchAs400</bpmn:outgoing>
+      <bpmn:outgoing>Flow_SearchPriority</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:serviceTask id="Task_FindAs400Shipments" name="איתור משלוחים ב-AS/400">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="as400-find-shipments-by-batch" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_SearchAs400</bpmn:incoming>
+      <bpmn:outgoing>Flow_As400ToShipmentJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_FindPriorityShipments" name="איתור משלוחים בפריוריטי">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="priority-find-shipments-by-batch" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_SearchPriority</bpmn:incoming>
+      <bpmn:outgoing>Flow_PriorityToShipmentJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:parallelGateway id="Gateway_ShipmentSearchJoin" name="סנכרון תוצאות האיתור">
+      <bpmn:incoming>Flow_As400ToShipmentJoin</bpmn:incoming>
+      <bpmn:incoming>Flow_PriorityToShipmentJoin</bpmn:incoming>
+      <bpmn:outgoing>Flow_ShipmentJoinToMerge</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:serviceTask id="Task_MergeDestinations" name="מיזוג ודה-דופליקציה של היעדים">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="merge-recall-destinations" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ShipmentJoinToMerge</bpmn:incoming>
+      <bpmn:outgoing>Flow_MergeToQuarantine</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_QuarantineInventory" name="הסגר מלאי וחסימת פריט בשתי המערכות">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="quarantine-and-block-recalled-batch" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_MergeToQuarantine</bpmn:incoming>
+      <bpmn:outgoing>Flow_QuarantineToPharmacist</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_NotifyResponsiblePharmacist" name="הודעה לרוקח האחראי ופתיחת תיק">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="notify-responsible-pharmacist" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_QuarantineToPharmacist</bpmn:incoming>
+      <bpmn:outgoing>Flow_PharmacistToDestinations</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="SubProcess_HandleDestination" name="טיפול מקבילי בכל יעד">
+      <bpmn:incoming>Flow_PharmacistToDestinations</bpmn:incoming>
+      <bpmn:outgoing>Flow_DestinationsToInterimTimer</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics>
+        <bpmn:extensionElements>
+          <zeebe:loopCharacteristics inputCollection="=recallTargets" inputElement="recallTarget" outputCollection="destinationResults" outputElement="=destinationResult" />
+        </bpmn:extensionElements>
+      </bpmn:multiInstanceLoopCharacteristics>
+      <bpmn:startEvent id="Start_DestinationHandling" name="תחילת טיפול ביעד">
+        <bpmn:outgoing>Flow_DestinationStartToNotify</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="Task_SendDestinationNotice" name="שליחת הודעת ריקול ליעד">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="send-recall-destination-notice" retries="3" />
+          <zeebe:ioMapping>
+            <zeebe:input source="=recallTarget" target="destination" />
+            <zeebe:input source="=recallPolicy" target="policy" />
+          </zeebe:ioMapping>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_DestinationStartToNotify</bpmn:incoming>
+        <bpmn:outgoing>Flow_NoticeToAcknowledgementWait</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:eventBasedGateway id="Gateway_WaitForDestinationAck" name="המתנה לאישור יעד">
+        <bpmn:incoming>Flow_NoticeToAcknowledgementWait</bpmn:incoming>
+        <bpmn:outgoing>Flow_WaitForDestinationMessage</bpmn:outgoing>
+        <bpmn:outgoing>Flow_WaitForDestinationTimer</bpmn:outgoing>
+      </bpmn:eventBasedGateway>
+      <bpmn:intermediateCatchEvent id="Catch_DestinationAcknowledged" name="אישור קליטה">
+        <bpmn:incoming>Flow_WaitForDestinationMessage</bpmn:incoming>
+        <bpmn:outgoing>Flow_DestinationAckToMerge</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_DestinationAck" messageRef="Message_DestinationAcknowledged" />
+      </bpmn:intermediateCatchEvent>
+      <bpmn:intermediateCatchEvent id="Catch_DestinationSlaExpired" name="פג ה-SLA">
+        <bpmn:incoming>Flow_WaitForDestinationTimer</bpmn:incoming>
+        <bpmn:outgoing>Flow_DestinationTimerToEscalation</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_DestinationSla">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">=recallPolicy.targetSlaDuration</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:userTask id="Task_EscalateDestination" name="מעקב טלפוני למנהל ההפצה">
+        <bpmn:extensionElements>
+          <zeebe:userTask />
+          <zeebe:formDefinition formId="recall-escalation-call" bindingType="deployment" />
+          <zeebe:assignmentDefinition candidateGroups="distribution_managers" />
+          <zeebe:ioMapping>
+            <zeebe:input source="=recallTarget.name" target="destinationName" />
+            <zeebe:input source="=recallTarget.contactName" target="contactName" />
+            <zeebe:input source="=recallTarget.contactPhone" target="contactPhone" />
+            <zeebe:input source="=batchNumber" target="batchNumber" />
+            <zeebe:output source="={ outcome: callOutcome, notes: callNotes }" target="escalationResult" />
+          </zeebe:ioMapping>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_DestinationTimerToEscalation</bpmn:incoming>
+        <bpmn:outgoing>Flow_DestinationEscalationToMerge</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="Gateway_DestinationAckMerge" name="סיום ההמתנה ליעד">
+        <bpmn:incoming>Flow_DestinationAckToMerge</bpmn:incoming>
+        <bpmn:incoming>Flow_DestinationEscalationToMerge</bpmn:incoming>
+        <bpmn:outgoing>Flow_DestinationMergeToPickup</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="Task_ConfirmPickup" name="אישור איסוף וכמות">
+        <bpmn:extensionElements>
+          <zeebe:userTask />
+          <zeebe:formDefinition formId="recall-pickup-confirmation" bindingType="deployment" />
+          <zeebe:assignmentDefinition candidateGroups="recall_collection" />
+          <zeebe:ioMapping>
+            <zeebe:input source="=recallTarget.name" target="destinationName" />
+            <zeebe:input source="=productName" target="productName" />
+            <zeebe:input source="=batchNumber" target="batchNumber" />
+            <zeebe:output source="={ quantity: collectedQuantity, collector: collectorName, collectedAt: collectionTime, notes: collectionNotes }" target="pickupResult" />
+          </zeebe:ioMapping>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_DestinationMergeToPickup</bpmn:incoming>
+        <bpmn:outgoing>Flow_PickupToCredit</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:serviceTask id="Task_CreateSourceCredit" name="יצירת זיכוי במערכת המקור">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="create-recall-credit-by-source" retries="3" />
+          <zeebe:ioMapping>
+            <zeebe:input source="=recallTarget.sourceSystem" target="sourceSystem" />
+            <zeebe:input source="=recallTarget.id" target="destinationId" />
+            <zeebe:input source="=pickupResult.quantity" target="collectedQuantity" />
+          </zeebe:ioMapping>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_PickupToCredit</bpmn:incoming>
+        <bpmn:outgoing>Flow_CreditToDestinationEnd</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="End_DestinationClosed" name="היעד נסגר">
+        <bpmn:incoming>Flow_CreditToDestinationEnd</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_DestinationStartToNotify" sourceRef="Start_DestinationHandling" targetRef="Task_SendDestinationNotice" />
+      <bpmn:sequenceFlow id="Flow_NoticeToAcknowledgementWait" sourceRef="Task_SendDestinationNotice" targetRef="Gateway_WaitForDestinationAck" />
+      <bpmn:sequenceFlow id="Flow_WaitForDestinationMessage" sourceRef="Gateway_WaitForDestinationAck" targetRef="Catch_DestinationAcknowledged" />
+      <bpmn:sequenceFlow id="Flow_WaitForDestinationTimer" sourceRef="Gateway_WaitForDestinationAck" targetRef="Catch_DestinationSlaExpired" />
+      <bpmn:sequenceFlow id="Flow_DestinationAckToMerge" sourceRef="Catch_DestinationAcknowledged" targetRef="Gateway_DestinationAckMerge" />
+      <bpmn:sequenceFlow id="Flow_DestinationTimerToEscalation" sourceRef="Catch_DestinationSlaExpired" targetRef="Task_EscalateDestination" />
+      <bpmn:sequenceFlow id="Flow_DestinationEscalationToMerge" sourceRef="Task_EscalateDestination" targetRef="Gateway_DestinationAckMerge" />
+      <bpmn:sequenceFlow id="Flow_DestinationMergeToPickup" sourceRef="Gateway_DestinationAckMerge" targetRef="Task_ConfirmPickup" />
+      <bpmn:sequenceFlow id="Flow_PickupToCredit" sourceRef="Task_ConfirmPickup" targetRef="Task_CreateSourceCredit" />
+      <bpmn:sequenceFlow id="Flow_CreditToDestinationEnd" sourceRef="Task_CreateSourceCredit" targetRef="End_DestinationClosed" />
+    </bpmn:subProcess>
+    <bpmn:intermediateCatchEvent id="Catch_InterimReportDeadline" name="חלפו שבועיים">
+      <bpmn:incoming>Flow_DestinationsToInterimTimer</bpmn:incoming>
+      <bpmn:outgoing>Flow_InterimTimerToReport</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_InterimReport">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">="P14D"</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Task_CreateInterimReport" name="הפקת דוח איסוף ביניים">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="create-recall-interim-report" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_InterimTimerToReport</bpmn:incoming>
+      <bpmn:outgoing>Flow_InterimReportToDisposition</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Task_DecideDisposition" name="החלטת דיספוזיציה">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="recall-disposition" bindingType="deployment" />
+        <zeebe:assignmentDefinition candidateGroups="responsible_pharmacists" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_InterimReportToDisposition</bpmn:incoming>
+      <bpmn:outgoing>Flow_DispositionToGateway</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Gateway_Disposition" name="אופן הטיפול במלאי" default="Flow_ReturnToManufacturer">
+      <bpmn:incoming>Flow_DispositionToGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_DestroyInventory</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ReturnToManufacturer</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_DestroyInventory" name="הזמנת השמדה וקליטת תעודה">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="destroy-recalled-inventory" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_DestroyInventory</bpmn:incoming>
+      <bpmn:outgoing>Flow_DestroyToDispositionJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_ReturnInventory" name="החזרת המלאי ליצרן">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="return-recalled-inventory" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ReturnToManufacturer</bpmn:incoming>
+      <bpmn:outgoing>Flow_ReturnToDispositionJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_DispositionJoin" name="השלמת הדיספוזיציה">
+      <bpmn:incoming>Flow_DestroyToDispositionJoin</bpmn:incoming>
+      <bpmn:incoming>Flow_ReturnToDispositionJoin</bpmn:incoming>
+      <bpmn:outgoing>Flow_DispositionJoinToEffectivenessTimer</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="Catch_EffectivenessDeadline" name="חלפו 6 שבועות">
+      <bpmn:incoming>Flow_DispositionJoinToEffectivenessTimer</bpmn:incoming>
+      <bpmn:outgoing>Flow_EffectivenessTimerToReport</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_EffectivenessReport">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">="P42D"</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Task_CreateEffectivenessReport" name="הפקת דוח יעילות לרגולטור">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="create-recall-effectiveness-report" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_EffectivenessTimerToReport</bpmn:incoming>
+      <bpmn:outgoing>Flow_EffectivenessReportToEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_RecallCompleted" name="הריקול הושלם">
+      <bpmn:incoming>Flow_EffectivenessReportToEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_StartToClassification" sourceRef="Start_RecallAlert" targetRef="Rules_ClassifyRecall" />
+    <bpmn:sequenceFlow id="Flow_ClassificationToShipmentFork" sourceRef="Rules_ClassifyRecall" targetRef="Gateway_ShipmentSearchFork" />
+    <bpmn:sequenceFlow id="Flow_SearchAs400" sourceRef="Gateway_ShipmentSearchFork" targetRef="Task_FindAs400Shipments" />
+    <bpmn:sequenceFlow id="Flow_SearchPriority" sourceRef="Gateway_ShipmentSearchFork" targetRef="Task_FindPriorityShipments" />
+    <bpmn:sequenceFlow id="Flow_As400ToShipmentJoin" sourceRef="Task_FindAs400Shipments" targetRef="Gateway_ShipmentSearchJoin" />
+    <bpmn:sequenceFlow id="Flow_PriorityToShipmentJoin" sourceRef="Task_FindPriorityShipments" targetRef="Gateway_ShipmentSearchJoin" />
+    <bpmn:sequenceFlow id="Flow_ShipmentJoinToMerge" sourceRef="Gateway_ShipmentSearchJoin" targetRef="Task_MergeDestinations" />
+    <bpmn:sequenceFlow id="Flow_MergeToQuarantine" sourceRef="Task_MergeDestinations" targetRef="Task_QuarantineInventory" />
+    <bpmn:sequenceFlow id="Flow_QuarantineToPharmacist" sourceRef="Task_QuarantineInventory" targetRef="Task_NotifyResponsiblePharmacist" />
+    <bpmn:sequenceFlow id="Flow_PharmacistToDestinations" sourceRef="Task_NotifyResponsiblePharmacist" targetRef="SubProcess_HandleDestination" />
+    <bpmn:sequenceFlow id="Flow_DestinationsToInterimTimer" sourceRef="SubProcess_HandleDestination" targetRef="Catch_InterimReportDeadline" />
+    <bpmn:sequenceFlow id="Flow_InterimTimerToReport" sourceRef="Catch_InterimReportDeadline" targetRef="Task_CreateInterimReport" />
+    <bpmn:sequenceFlow id="Flow_InterimReportToDisposition" sourceRef="Task_CreateInterimReport" targetRef="Task_DecideDisposition" />
+    <bpmn:sequenceFlow id="Flow_DispositionToGateway" sourceRef="Task_DecideDisposition" targetRef="Gateway_Disposition" />
+    <bpmn:sequenceFlow id="Flow_DestroyInventory" name="השמדה" sourceRef="Gateway_Disposition" targetRef="Task_DestroyInventory">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=disposition = "DESTROY"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_ReturnToManufacturer" name="החזרה ליצרן" sourceRef="Gateway_Disposition" targetRef="Task_ReturnInventory" />
+    <bpmn:sequenceFlow id="Flow_DestroyToDispositionJoin" sourceRef="Task_DestroyInventory" targetRef="Gateway_DispositionJoin" />
+    <bpmn:sequenceFlow id="Flow_ReturnToDispositionJoin" sourceRef="Task_ReturnInventory" targetRef="Gateway_DispositionJoin" />
+    <bpmn:sequenceFlow id="Flow_DispositionJoinToEffectivenessTimer" sourceRef="Gateway_DispositionJoin" targetRef="Catch_EffectivenessDeadline" />
+    <bpmn:sequenceFlow id="Flow_EffectivenessTimerToReport" sourceRef="Catch_EffectivenessDeadline" targetRef="Task_CreateEffectivenessReport" />
+    <bpmn:sequenceFlow id="Flow_EffectivenessReportToEnd" sourceRef="Task_CreateEffectivenessReport" targetRef="End_RecallCompleted" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_BatchRecall">
+    <bpmndi:BPMNPlane id="BPMNPlane_BatchRecall" bpmnElement="BatchRecall">
+      <bpmndi:BPMNShape id="Start_RecallAlert_di" bpmnElement="Start_RecallAlert">
+        <dc:Bounds x="80" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="58" y="385" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Rules_ClassifyRecall_di" bpmnElement="Rules_ClassifyRecall">
+        <dc:Bounds x="170" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ShipmentSearchFork_di" bpmnElement="Gateway_ShipmentSearchFork">
+        <dc:Bounds x="330" y="335" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="305" y="305" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FindAs400Shipments_di" bpmnElement="Task_FindAs400Shipments">
+        <dc:Bounds x="450" y="170" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_FindPriorityShipments_di" bpmnElement="Task_FindPriorityShipments">
+        <dc:Bounds x="450" y="470" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ShipmentSearchJoin_di" bpmnElement="Gateway_ShipmentSearchJoin">
+        <dc:Bounds x="620" y="335" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="595" y="390" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_MergeDestinations_di" bpmnElement="Task_MergeDestinations">
+        <dc:Bounds x="730" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_QuarantineInventory_di" bpmnElement="Task_QuarantineInventory">
+        <dc:Bounds x="880" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyResponsiblePharmacist_di" bpmnElement="Task_NotifyResponsiblePharmacist">
+        <dc:Bounds x="1030" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_HandleDestination_di" bpmnElement="SubProcess_HandleDestination" isExpanded="true">
+        <dc:Bounds x="1180" y="80" width="1210" height="560" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_DestinationHandling_di" bpmnElement="Start_DestinationHandling">
+        <dc:Bounds x="1240" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1218" y="385" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendDestinationNotice_di" bpmnElement="Task_SendDestinationNotice">
+        <dc:Bounds x="1330" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_WaitForDestinationAck_di" bpmnElement="Gateway_WaitForDestinationAck">
+        <dc:Bounds x="1490" y="335" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1465" y="305" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_DestinationAcknowledged_di" bpmnElement="Catch_DestinationAcknowledged">
+        <dc:Bounds x="1610" y="172" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1588" y="215" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_DestinationSlaExpired_di" bpmnElement="Catch_DestinationSlaExpired">
+        <dc:Bounds x="1610" y="492" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1588" y="535" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EscalateDestination_di" bpmnElement="Task_EscalateDestination">
+        <dc:Bounds x="1730" y="470" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DestinationAckMerge_di" bpmnElement="Gateway_DestinationAckMerge" isMarkerVisible="true">
+        <dc:Bounds x="1900" y="335" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1875" y="305" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ConfirmPickup_di" bpmnElement="Task_ConfirmPickup">
+        <dc:Bounds x="2020" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateSourceCredit_di" bpmnElement="Task_CreateSourceCredit">
+        <dc:Bounds x="2180" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_DestinationClosed_di" bpmnElement="End_DestinationClosed">
+        <dc:Bounds x="2320" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2298" y="385" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_InterimReportDeadline_di" bpmnElement="Catch_InterimReportDeadline">
+        <dc:Bounds x="2460" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2438" y="385" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateInterimReport_di" bpmnElement="Task_CreateInterimReport">
+        <dc:Bounds x="2550" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DecideDisposition_di" bpmnElement="Task_DecideDisposition">
+        <dc:Bounds x="2710" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Disposition_di" bpmnElement="Gateway_Disposition" isMarkerVisible="true">
+        <dc:Bounds x="2870" y="335" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2845" y="305" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DestroyInventory_di" bpmnElement="Task_DestroyInventory">
+        <dc:Bounds x="2990" y="170" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReturnInventory_di" bpmnElement="Task_ReturnInventory">
+        <dc:Bounds x="2990" y="470" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DispositionJoin_di" bpmnElement="Gateway_DispositionJoin" isMarkerVisible="true">
+        <dc:Bounds x="3160" y="335" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3135" y="390" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_EffectivenessDeadline_di" bpmnElement="Catch_EffectivenessDeadline">
+        <dc:Bounds x="3280" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3258" y="385" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateEffectivenessReport_di" bpmnElement="Task_CreateEffectivenessReport">
+        <dc:Bounds x="3370" y="320" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_RecallCompleted_di" bpmnElement="End_RecallCompleted">
+        <dc:Bounds x="3530" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3508" y="385" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_StartToClassification_di" bpmnElement="Flow_StartToClassification">
+        <di:waypoint x="116" y="360" />
+        <di:waypoint x="170" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ClassificationToShipmentFork_di" bpmnElement="Flow_ClassificationToShipmentFork">
+        <di:waypoint x="270" y="360" />
+        <di:waypoint x="330" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SearchAs400_di" bpmnElement="Flow_SearchAs400">
+        <di:waypoint x="355" y="335" />
+        <di:waypoint x="355" y="210" />
+        <di:waypoint x="450" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SearchPriority_di" bpmnElement="Flow_SearchPriority">
+        <di:waypoint x="355" y="385" />
+        <di:waypoint x="355" y="510" />
+        <di:waypoint x="450" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_As400ToShipmentJoin_di" bpmnElement="Flow_As400ToShipmentJoin">
+        <di:waypoint x="550" y="210" />
+        <di:waypoint x="645" y="210" />
+        <di:waypoint x="645" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PriorityToShipmentJoin_di" bpmnElement="Flow_PriorityToShipmentJoin">
+        <di:waypoint x="550" y="510" />
+        <di:waypoint x="645" y="510" />
+        <di:waypoint x="645" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ShipmentJoinToMerge_di" bpmnElement="Flow_ShipmentJoinToMerge">
+        <di:waypoint x="670" y="360" />
+        <di:waypoint x="730" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MergeToQuarantine_di" bpmnElement="Flow_MergeToQuarantine">
+        <di:waypoint x="830" y="360" />
+        <di:waypoint x="880" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_QuarantineToPharmacist_di" bpmnElement="Flow_QuarantineToPharmacist">
+        <di:waypoint x="980" y="360" />
+        <di:waypoint x="1030" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PharmacistToDestinations_di" bpmnElement="Flow_PharmacistToDestinations">
+        <di:waypoint x="1130" y="360" />
+        <di:waypoint x="1180" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DestinationStartToNotify_di" bpmnElement="Flow_DestinationStartToNotify">
+        <di:waypoint x="1276" y="360" />
+        <di:waypoint x="1330" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NoticeToAcknowledgementWait_di" bpmnElement="Flow_NoticeToAcknowledgementWait">
+        <di:waypoint x="1430" y="360" />
+        <di:waypoint x="1490" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WaitForDestinationMessage_di" bpmnElement="Flow_WaitForDestinationMessage">
+        <di:waypoint x="1515" y="335" />
+        <di:waypoint x="1515" y="190" />
+        <di:waypoint x="1610" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WaitForDestinationTimer_di" bpmnElement="Flow_WaitForDestinationTimer">
+        <di:waypoint x="1515" y="385" />
+        <di:waypoint x="1515" y="510" />
+        <di:waypoint x="1610" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DestinationAckToMerge_di" bpmnElement="Flow_DestinationAckToMerge">
+        <di:waypoint x="1646" y="190" />
+        <di:waypoint x="1925" y="190" />
+        <di:waypoint x="1925" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DestinationTimerToEscalation_di" bpmnElement="Flow_DestinationTimerToEscalation">
+        <di:waypoint x="1646" y="510" />
+        <di:waypoint x="1730" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DestinationEscalationToMerge_di" bpmnElement="Flow_DestinationEscalationToMerge">
+        <di:waypoint x="1830" y="510" />
+        <di:waypoint x="1925" y="510" />
+        <di:waypoint x="1925" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DestinationMergeToPickup_di" bpmnElement="Flow_DestinationMergeToPickup">
+        <di:waypoint x="1950" y="360" />
+        <di:waypoint x="2020" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PickupToCredit_di" bpmnElement="Flow_PickupToCredit">
+        <di:waypoint x="2120" y="360" />
+        <di:waypoint x="2180" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreditToDestinationEnd_di" bpmnElement="Flow_CreditToDestinationEnd">
+        <di:waypoint x="2280" y="360" />
+        <di:waypoint x="2320" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DestinationsToInterimTimer_di" bpmnElement="Flow_DestinationsToInterimTimer">
+        <di:waypoint x="2390" y="360" />
+        <di:waypoint x="2460" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InterimTimerToReport_di" bpmnElement="Flow_InterimTimerToReport">
+        <di:waypoint x="2496" y="360" />
+        <di:waypoint x="2550" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InterimReportToDisposition_di" bpmnElement="Flow_InterimReportToDisposition">
+        <di:waypoint x="2650" y="360" />
+        <di:waypoint x="2710" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DispositionToGateway_di" bpmnElement="Flow_DispositionToGateway">
+        <di:waypoint x="2810" y="360" />
+        <di:waypoint x="2870" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DestroyInventory_di" bpmnElement="Flow_DestroyInventory">
+        <di:waypoint x="2895" y="335" />
+        <di:waypoint x="2895" y="210" />
+        <di:waypoint x="2990" y="210" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2910" y="190" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReturnToManufacturer_di" bpmnElement="Flow_ReturnToManufacturer">
+        <di:waypoint x="2895" y="385" />
+        <di:waypoint x="2895" y="510" />
+        <di:waypoint x="2990" y="510" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2905" y="515" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DestroyToDispositionJoin_di" bpmnElement="Flow_DestroyToDispositionJoin">
+        <di:waypoint x="3090" y="210" />
+        <di:waypoint x="3185" y="210" />
+        <di:waypoint x="3185" y="335" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReturnToDispositionJoin_di" bpmnElement="Flow_ReturnToDispositionJoin">
+        <di:waypoint x="3090" y="510" />
+        <di:waypoint x="3185" y="510" />
+        <di:waypoint x="3185" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DispositionJoinToEffectivenessTimer_di" bpmnElement="Flow_DispositionJoinToEffectivenessTimer">
+        <di:waypoint x="3210" y="360" />
+        <di:waypoint x="3280" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EffectivenessTimerToReport_di" bpmnElement="Flow_EffectivenessTimerToReport">
+        <di:waypoint x="3316" y="360" />
+        <di:waypoint x="3370" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EffectivenessReportToEnd_di" bpmnElement="Flow_EffectivenessReportToEnd">
+        <di:waypoint x="3470" y="360" />
+        <di:waypoint x="3530" y="360" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

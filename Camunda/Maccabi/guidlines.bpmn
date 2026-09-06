@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:ns1="modeler" xmlns:ns0="xmlns" id="bpmn_copilot_Definition_id" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="80a5306" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0" ns0:modeler="http://camunda.org/schema/modeler/1.0" ns1:executionPlatform="Camunda Cloud" ns1:executionPlatformVersion="8.6">
+  <bpmn:process id="Process_PikudHaoref" name="הנחיות התגוננות פיקוד העורף" processType="None" isClosed="false" isExecutable="true">
+    <bpmn:exclusiveGateway id="Gateway_LocationCheck" name="היכן אתה נמצא?">
+      <bpmn:incoming>Flow_To_LocationCheck</bpmn:incoming>
+      <bpmn:outgoing>Flow_Location_Building</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Location_Outside</bpmn:outgoing>
+      <bpmn:outgoing>Flow_Location_Vehicle</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_To_LocationCheck" sourceRef="StartEvent_AlertReceived" targetRef="Gateway_LocationCheck" />
+    <bpmn:sequenceFlow id="Flow_Location_Building" name="במבנה" sourceRef="Gateway_LocationCheck" targetRef="Gateway_ChooseProtectedSpace" />
+    <bpmn:exclusiveGateway id="Gateway_ChooseProtectedSpace">
+      <bpmn:incoming>Flow_Location_Building</bpmn:incoming>
+      <bpmn:incoming>Flow_CanEnterBuilding_Yes</bpmn:incoming>
+      <bpmn:incoming>Flow_CanReachBuilding_Yes</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ouw5xz</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:task id="Task_CloseDoorAndWindows" name="סגור דלת וחלונות">
+      <bpmn:incoming>Flow_0u85efv</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_WaitForAllClear_1</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_GoToMiddleFloor" name="עבור לקומה אמצעית">
+      <bpmn:incoming>Flow_1l5rmys</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_WaitForAllClear_2</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:task id="Task_SitByInternalWall" name="שב ליד קיר פנימי מתחת לקו חלונות">
+      <bpmn:incoming>Flow_0yzvuup</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_WaitForAllClear_3</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_Location_Outside" name="בחוץ" sourceRef="Gateway_LocationCheck" targetRef="Gateway_CanEnterBuilding" />
+    <bpmn:exclusiveGateway id="Gateway_CanEnterBuilding" name="ניתן להיכנס למבנה?">
+      <bpmn:incoming>Flow_Location_Outside</bpmn:incoming>
+      <bpmn:outgoing>Flow_CanEnterBuilding_Yes</bpmn:outgoing>
+      <bpmn:outgoing>Flow_CanEnterBuilding_No</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_CanEnterBuilding_Yes" name="כן" sourceRef="Gateway_CanEnterBuilding" targetRef="Gateway_ChooseProtectedSpace" />
+    <bpmn:sequenceFlow id="Flow_CanEnterBuilding_No" name="לא" sourceRef="Gateway_CanEnterBuilding" targetRef="Task_LieDownAndProtectHead" />
+    <bpmn:task id="Task_LieDownAndProtectHead" name="שכב על הקרקע והגן על הראש">
+      <bpmn:incoming>Flow_CanEnterBuilding_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_0q9x9bj</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_Location_Vehicle" name="ברכב" sourceRef="Gateway_LocationCheck" targetRef="Task_StopCar" />
+    <bpmn:task id="Task_StopCar" name="עצור בצד הדרך">
+      <bpmn:incoming>Flow_Location_Vehicle</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_CanReachBuilding</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_To_CanReachBuilding" sourceRef="Task_StopCar" targetRef="Gateway_CanReachBuilding" />
+    <bpmn:exclusiveGateway id="Gateway_CanReachBuilding" name="ניתן להגיע למבנה?">
+      <bpmn:incoming>Flow_To_CanReachBuilding</bpmn:incoming>
+      <bpmn:outgoing>Flow_CanReachBuilding_No</bpmn:outgoing>
+      <bpmn:outgoing>Flow_CanReachBuilding_Yes</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_CanReachBuilding_No" name="לא" sourceRef="Gateway_CanReachBuilding" targetRef="Task_ExitCarAndLieDown" />
+    <bpmn:task id="Task_ExitCarAndLieDown" name="צא מהרכב, התרחק, שכב והגן על הראש">
+      <bpmn:incoming>Flow_CanReachBuilding_No</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_WaitForAllClear_5</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_To_WaitForAllClear_1" sourceRef="Task_CloseDoorAndWindows" targetRef="Gateway_05zlmte" />
+    <bpmn:sequenceFlow id="Flow_To_WaitForAllClear_2" sourceRef="Task_GoToMiddleFloor" targetRef="Gateway_05zlmte" />
+    <bpmn:sequenceFlow id="Flow_To_WaitForAllClear_3" sourceRef="Task_SitByInternalWall" targetRef="Gateway_05zlmte" />
+    <bpmn:sequenceFlow id="Flow_To_WaitForAllClear_5" sourceRef="Task_ExitCarAndLieDown" targetRef="Gateway_05zlmte" />
+    <bpmn:endEvent id="EndEvent_Safe" name="סיום אירוע">
+      <bpmn:incoming>Flow_17ccozc</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_CanReachBuilding_Yes" name="כן" sourceRef="Gateway_CanReachBuilding" targetRef="Gateway_ChooseProtectedSpace" />
+    <bpmn:exclusiveGateway id="Gateway_1ok3vv2" name="האם קיים מרחב מוגן תקני?">
+      <bpmn:incoming>Flow_1ouw5xz</bpmn:incoming>
+      <bpmn:outgoing>Flow_0u85efv</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0gyysrs</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0u85efv" name="קיים מרחב מוגן תקני" sourceRef="Gateway_1ok3vv2" targetRef="Task_CloseDoorAndWindows" />
+    <bpmn:sequenceFlow id="Flow_1ouw5xz" sourceRef="Gateway_ChooseProtectedSpace" targetRef="Gateway_1ok3vv2" />
+    <bpmn:exclusiveGateway id="Gateway_05zlmte">
+      <bpmn:incoming>Flow_To_WaitForAllClear_3</bpmn:incoming>
+      <bpmn:incoming>Flow_To_WaitForAllClear_2</bpmn:incoming>
+      <bpmn:incoming>Flow_To_WaitForAllClear_1</bpmn:incoming>
+      <bpmn:incoming>Flow_To_WaitForAllClear_5</bpmn:incoming>
+      <bpmn:incoming>Flow_0q9x9bj</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ltmvjf</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0q9x9bj" sourceRef="Task_LieDownAndProtectHead" targetRef="Gateway_05zlmte" />
+    <bpmn:exclusiveGateway id="Gateway_0z99e8t" name="האם קיים חדר מדרגות?">
+      <bpmn:incoming>Flow_0gyysrs</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yzvuup</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1l5rmys</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_0gyysrs" name="לא קיים מרחב מוגן תקני" sourceRef="Gateway_1ok3vv2" targetRef="Gateway_0z99e8t" />
+    <bpmn:sequenceFlow id="Flow_0yzvuup" name="אין חדר מדרגות" sourceRef="Gateway_0z99e8t" targetRef="Task_SitByInternalWall" />
+    <bpmn:sequenceFlow id="Flow_1l5rmys" name="קיים חדר מדרגות" sourceRef="Gateway_0z99e8t" targetRef="Task_GoToMiddleFloor" />
+    <bpmn:startEvent id="StartEvent_AlertReceived" name="צבע אדום">
+      <bpmn:outgoing>Flow_To_LocationCheck</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:eventBasedGateway id="Gateway_1osdcsg">
+      <bpmn:incoming>Flow_0ltmvjf</bpmn:incoming>
+      <bpmn:outgoing>Flow_1uycnsc</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0nc87nt</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:sequenceFlow id="Flow_0ltmvjf" sourceRef="Gateway_05zlmte" targetRef="Gateway_1osdcsg" />
+    <bpmn:intermediateCatchEvent id="Event_WaitForAllClear" name="התקבלה הנחיית יציאה">
+      <bpmn:incoming>Flow_1uycnsc</bpmn:incoming>
+      <bpmn:outgoing>Flow_185751c</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_1290gae" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1uycnsc" sourceRef="Gateway_1osdcsg" targetRef="Event_WaitForAllClear" />
+    <bpmn:intermediateCatchEvent id="Event_12pwnqi" name="10 דקות">
+      <bpmn:incoming>Flow_0nc87nt</bpmn:incoming>
+      <bpmn:outgoing>Flow_1wz91cz</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_18f43a1" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_0nc87nt" sourceRef="Gateway_1osdcsg" targetRef="Event_12pwnqi" />
+    <bpmn:exclusiveGateway id="Gateway_170ptxr">
+      <bpmn:incoming>Flow_185751c</bpmn:incoming>
+      <bpmn:incoming>Flow_1wz91cz</bpmn:incoming>
+      <bpmn:outgoing>Flow_17ccozc</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_185751c" sourceRef="Event_WaitForAllClear" targetRef="Gateway_170ptxr" />
+    <bpmn:sequenceFlow id="Flow_1wz91cz" sourceRef="Event_12pwnqi" targetRef="Gateway_170ptxr" />
+    <bpmn:sequenceFlow id="Flow_17ccozc" sourceRef="Gateway_170ptxr" targetRef="EndEvent_Safe" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Process_PikudHaoref">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_PikudHaoref" bpmnElement="Process_PikudHaoref">
+      <bpmndi:BPMNShape id="Gateway_LocationCheck_di" bpmnElement="Gateway_LocationCheck" isMarkerVisible="true">
+        <dc:Bounds x="300" y="485" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="289" y="468" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ChooseProtectedSpace_di" bpmnElement="Gateway_ChooseProtectedSpace" isMarkerVisible="true">
+        <dc:Bounds x="535" y="485" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="482" y="88" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CloseDoorAndWindows_di" bpmnElement="Task_CloseDoorAndWindows">
+        <dc:Bounds x="1080" y="470" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_GoToMiddleFloor_di" bpmnElement="Task_GoToMiddleFloor">
+        <dc:Bounds x="1460" y="340" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SitByInternalWall_di" bpmnElement="Task_SitByInternalWall">
+        <dc:Bounds x="1460" y="220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CanEnterBuilding_di" bpmnElement="Gateway_CanEnterBuilding" isMarkerVisible="true">
+        <dc:Bounds x="535" y="235" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="595" y="253" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_LieDownAndProtectHead_di" bpmnElement="Task_LieDownAndProtectHead">
+        <dc:Bounds x="760" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_StopCar_di" bpmnElement="Task_StopCar">
+        <dc:Bounds x="380" y="710" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CanReachBuilding_di" bpmnElement="Gateway_CanReachBuilding" isMarkerVisible="true">
+        <dc:Bounds x="535" y="725" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="595" y="743" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ExitCarAndLieDown_di" bpmnElement="Task_ExitCarAndLieDown">
+        <dc:Bounds x="750" y="850" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_Safe_di" bpmnElement="EndEvent_Safe">
+        <dc:Bounds x="2242" y="492" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2237" y="468" width="45" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ok3vv2_di" bpmnElement="Gateway_1ok3vv2" isMarkerVisible="true">
+        <dc:Bounds x="695" y="485" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="677" y="542" width="88" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_05zlmte_di" bpmnElement="Gateway_05zlmte" isMarkerVisible="true">
+        <dc:Bounds x="1745" y="485" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0z99e8t_di" bpmnElement="Gateway_0z99e8t" isMarkerVisible="true">
+        <dc:Bounds x="875" y="295" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="949" y="310" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1eblxoj_di" bpmnElement="StartEvent_AlertReceived">
+        <dc:Bounds x="157" y="492" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="155" y="528" width="42" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_074z1wz_di" bpmnElement="Gateway_1osdcsg">
+        <dc:Bounds x="1845" y="485" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1a8uea0_di" bpmnElement="Event_WaitForAllClear">
+        <dc:Bounds x="1992" y="392" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1974" y="355" width="71" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1lp1ht4_di" bpmnElement="Event_12pwnqi">
+        <dc:Bounds x="1992" y="582" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1992" y="625" width="37" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_170ptxr_di" bpmnElement="Gateway_170ptxr" isMarkerVisible="true">
+        <dc:Bounds x="2105" y="485" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_To_LocationCheck_di" bpmnElement="Flow_To_LocationCheck">
+        <di:waypoint x="193" y="510" />
+        <di:waypoint x="300" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Location_Building_di" bpmnElement="Flow_Location_Building">
+        <di:waypoint x="350" y="510" />
+        <di:waypoint x="535" y="510" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="494" y="489" width="30" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Location_Outside_di" bpmnElement="Flow_Location_Outside">
+        <di:waypoint x="325" y="485" />
+        <di:waypoint x="325" y="260" />
+        <di:waypoint x="535" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="330" y="393" width="21" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_Location_Vehicle_di" bpmnElement="Flow_Location_Vehicle">
+        <di:waypoint x="325" y="535" />
+        <di:waypoint x="325" y="750" />
+        <di:waypoint x="380" y="750" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="329" y="581" width="23" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CanEnterBuilding_Yes_di" bpmnElement="Flow_CanEnterBuilding_Yes">
+        <di:waypoint x="560" y="285" />
+        <di:waypoint x="560" y="485" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="574" y="378" width="8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CanReachBuilding_Yes_di" bpmnElement="Flow_CanReachBuilding_Yes">
+        <di:waypoint x="560" y="725" />
+        <di:waypoint x="560" y="535" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="538" y="623" width="8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ouw5xz_di" bpmnElement="Flow_1ouw5xz">
+        <di:waypoint x="585" y="510" />
+        <di:waypoint x="695" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0u85efv_di" bpmnElement="Flow_0u85efv">
+        <di:waypoint x="745" y="510" />
+        <di:waypoint x="1080" y="510" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="868" y="492" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_WaitForAllClear_1_di" bpmnElement="Flow_To_WaitForAllClear_1">
+        <di:waypoint x="1180" y="510" />
+        <di:waypoint x="1745" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1l5rmys_di" bpmnElement="Flow_1l5rmys">
+        <di:waypoint x="900" y="345" />
+        <di:waypoint x="900" y="380" />
+        <di:waypoint x="1460" y="380" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1333" y="393" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_WaitForAllClear_2_di" bpmnElement="Flow_To_WaitForAllClear_2">
+        <di:waypoint x="1560" y="380" />
+        <di:waypoint x="1770" y="380" />
+        <di:waypoint x="1770" y="485" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yzvuup_di" bpmnElement="Flow_0yzvuup">
+        <di:waypoint x="900" y="295" />
+        <di:waypoint x="900" y="260" />
+        <di:waypoint x="1460" y="260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1336" y="233" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_WaitForAllClear_3_di" bpmnElement="Flow_To_WaitForAllClear_3">
+        <di:waypoint x="1560" y="260" />
+        <di:waypoint x="1770" y="260" />
+        <di:waypoint x="1770" y="485" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CanEnterBuilding_No_di" bpmnElement="Flow_CanEnterBuilding_No">
+        <di:waypoint x="560" y="235" />
+        <di:waypoint x="560" y="120" />
+        <di:waypoint x="760" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="572" y="96" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0q9x9bj_di" bpmnElement="Flow_0q9x9bj">
+        <di:waypoint x="860" y="120" />
+        <di:waypoint x="1770" y="120" />
+        <di:waypoint x="1770" y="485" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_CanReachBuilding_di" bpmnElement="Flow_To_CanReachBuilding">
+        <di:waypoint x="480" y="750" />
+        <di:waypoint x="535" y="750" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CanReachBuilding_No_di" bpmnElement="Flow_CanReachBuilding_No">
+        <di:waypoint x="560" y="775" />
+        <di:waypoint x="560" y="890" />
+        <di:waypoint x="750" y="890" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="572" y="826" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_WaitForAllClear_5_di" bpmnElement="Flow_To_WaitForAllClear_5">
+        <di:waypoint x="850" y="890" />
+        <di:waypoint x="1770" y="890" />
+        <di:waypoint x="1770" y="535" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_17ccozc_di" bpmnElement="Flow_17ccozc">
+        <di:waypoint x="2155" y="510" />
+        <di:waypoint x="2242" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0gyysrs_di" bpmnElement="Flow_0gyysrs">
+        <di:waypoint x="720" y="485" />
+        <di:waypoint x="720" y="320" />
+        <di:waypoint x="875" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="695" y="400" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ltmvjf_di" bpmnElement="Flow_0ltmvjf">
+        <di:waypoint x="1795" y="510" />
+        <di:waypoint x="1845" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1uycnsc_di" bpmnElement="Flow_1uycnsc">
+        <di:waypoint x="1870" y="485" />
+        <di:waypoint x="1870" y="410" />
+        <di:waypoint x="1992" y="410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0nc87nt_di" bpmnElement="Flow_0nc87nt">
+        <di:waypoint x="1870" y="535" />
+        <di:waypoint x="1870" y="600" />
+        <di:waypoint x="1992" y="600" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_185751c_di" bpmnElement="Flow_185751c">
+        <di:waypoint x="2028" y="410" />
+        <di:waypoint x="2130" y="410" />
+        <di:waypoint x="2130" y="485" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1wz91cz_di" bpmnElement="Flow_1wz91cz">
+        <di:waypoint x="2028" y="600" />
+        <di:waypoint x="2130" y="600" />
+        <di:waypoint x="2130" y="535" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

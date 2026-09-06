@@ -1,0 +1,75 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### תמחור ושיוך למחירונים",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_TradeName",
+      "key": "tradeName",
+      "label": "מוצר",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_WholesalePrice",
+      "key": "wholesalePrice",
+      "label": "מחיר סיטונאי (₪)",
+      "decimalDigits": 2,
+      "increment": "0.01",
+      "validate": { "required": true, "min": 0 },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "taglist",
+      "id": "Field_PriceLists",
+      "key": "priceLists",
+      "label": "מחירונים",
+      "values": [
+        { "label": "בתי מרקחת פרטיים", "value": "PRIVATE_PHARMACY" },
+        { "label": "רשתות", "value": "CHAINS" },
+        { "label": "בתי חולים", "value": "HOSPITALS" },
+        { "label": "קופות חולים", "value": "HMO" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_PriceControlled",
+      "key": "priceControlled",
+      "label": "המוצר כפוף לפיקוח מחירים",
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "taglist",
+      "id": "Field_AllowedSegments",
+      "key": "allowedCustomerSegments",
+      "label": "סוגי לקוחות מורשים",
+      "values": [
+        { "label": "בתי מרקחת", "value": "PHARMACY" },
+        { "label": "בתי חולים", "value": "HOSPITAL" },
+        { "label": "מרפאות", "value": "CLINIC" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_5", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_PricingApproved",
+      "key": "pricingApproved",
+      "label": "התמחור אושר",
+      "layout": { "row": "row_6", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "sku-pricing-approval",
+  "type": "default"
+}

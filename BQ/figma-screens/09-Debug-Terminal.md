@@ -1,0 +1,42 @@
+# SCR-08: Debug Terminal — BQ Technician App
+
+390×844, Material Design 3. Dark terminal theme.
+
+## Purpose
+Interactive terminal for sending diagnostic commands to device and viewing output. Developer/technician tool.
+
+## Layout
+
+### Terminal Output (fills screen, dark bg #1E1E1E)
+- Monospace font (JetBrains Mono 14sp), scrollable
+- Each line: timestamp prefix in dim gray [14:32:05.123]
+- Color by response type: Output=white, Success=green, Error=red, In Progress=amber
+- User commands in cyan with "> " prefix
+- Auto-scroll to bottom; "Scroll to bottom" mini FAB when scrolled up
+- Selectable text for copy
+
+### Command Input (bottom, sticky)
+- Dark text field, mono font, placeholder "Enter command..."
+- Send button (arrow icon) right, disabled when empty
+- Up/down arrows left for command history
+- Character counter shown when >150 chars (max 200)
+
+### Quick Commands (above input, horizontal scroll)
+- Chips: help | status | reset | factory | log | diag
+- Tap = auto-send
+- "factory" chip styled red (destructive) — double-confirm dialog before sending
+
+### App Bar Actions
+- Clear (trash icon) — confirmation
+- Save session (download) — exports .txt
+- Pause (pause icon) — buffers incoming
+- Landscape toggle
+
+## States
+- Empty: dark screen, "Type a command to begin" centered dim text
+- Active: scrolling output, multiple colored lines
+- Command sending: input field shows spinner
+- Paused: amber "PAUSED" badge top-right, buffering indicator
+
+## Figma Notes
+Create both portrait and landscape frames. Include 8-10 lines of sample output with mixed colors.

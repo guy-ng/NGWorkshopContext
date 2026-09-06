@@ -1,0 +1,47 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "text": "### אישור העברה לטיפול משפטי\n\nהמדרג מיצה את עצמו: תזכורות, שיחות ועצירת אשראי. זו הנקודה שבה נדרשת החלטה אנושית לפני יציאה משפטית.",
+      "id": "Text_Header",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_InvoiceId",
+      "key": "invoiceId",
+      "label": "מספר חשבונית",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_CustomerId",
+      "key": "customerId",
+      "label": "לקוח",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_ApproveHandover",
+      "key": "approveLegalHandover",
+      "label": "מאשר פתיחת תיק משפטי ודיווח ליצרן",
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_Justification",
+      "key": "legalHandoverNotes",
+      "label": "נימוק והנחיות לעורך הדין",
+      "validate": { "required": true, "minLength": 5 },
+      "layout": { "row": "row_3", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "legal-handover-approval",
+  "type": "default"
+}

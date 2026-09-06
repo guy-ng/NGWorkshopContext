@@ -1,0 +1,11 @@
+{
+  "fileDirections": {
+    "marketing/AI weekly EE/AI Weekly by NG Workshop_Script_Feb9-12_2026.md": "rtl"
+  },
+  "defaultDirection": "auto",
+  "rememberPerFile": true,
+  "setNoteTitleDirection": true,
+  "setYamlDirection": false,
+  "preventRTLFrontmatter": false,
+  "statusBar": true
+}

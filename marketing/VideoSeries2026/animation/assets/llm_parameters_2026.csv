@@ -1,0 +1,52 @@
+Provider,Model,Release Date,Total Parameters,Active Parameters,Confidence
+OpenAI,GPT-3,May 2020,175B,175B,Official
+OpenAI,GPT-4,Mar 2023,~1.76T,~280B,Leaked
+OpenAI,GPT-4o,May 2024,~200B,~200B,Estimated
+OpenAI,GPT-4o mini,Jul 2024,~8B,~8B,Estimated
+OpenAI,GPT-4.5 Orion,Feb 2025,~4-7T,~600B,Estimated
+OpenAI,GPT-4.1,Apr 2025,Unknown,Unknown,No data
+OpenAI,GPT-5,Aug 2025,~3-5T,~300B-1.8T,Speculative
+OpenAI,GPT-5.2,Dec 2025,Unknown,Unknown,No data
+OpenAI,GPT-5.2 Pro,Jan 2026,Unknown,Unknown,No data
+Anthropic,Claude 3 Haiku,Mar 2024,~20B,~20B,Speculative
+Anthropic,Claude 3 Sonnet,Mar 2024,~70B,~70B,Speculative
+Anthropic,Claude 3 Opus,Mar 2024,~137B,~137B,Speculative
+Anthropic,Claude 3.5 Sonnet,Jun 2024,~175B,~175B,Estimated
+Anthropic,Claude 3.7 Sonnet,Feb 2025,~175B+,~175B+,Speculative
+Anthropic,Claude Sonnet 4,May 2025,Unknown,Unknown,No data
+Anthropic,Claude Opus 4,May 2025,Unknown,Unknown,No data
+Anthropic,Claude Sonnet 4.5,Sep 2025,Unknown,Unknown,No data
+Anthropic,Claude Opus 4.5,Nov 2025,Unknown,Unknown,No data
+Anthropic,Claude Sonnet 4.6,Feb 2026,Unknown,Unknown,No data
+Anthropic,Claude Opus 4.6,Feb 2026,Unknown,Unknown,No data
+Google,Gemini 1.0 Ultra,Feb 2024,~1.5T,~1.5T,Speculative
+Google,Gemini 1.5 Pro,Feb 2024,Unknown (MoE),Unknown,No data
+Google,Gemini 2.0 Flash,Dec 2024,~18-20B,~18-20B,Estimated
+Google,Gemini 2.5 Pro,Mar 2025,~1T,Unknown,Speculative
+Google,Gemini 2.5 Flash,Apr 2025,~32B,Unknown,Speculative
+Google,Gemini 3 Pro,Nov 2025,~1-3T,~15-20B,Speculative
+xAI,Grok-1,Mar 2024,314B,78.5B,Official
+xAI,Grok-2,Aug 2024,~270B,~115B,Estimated
+xAI,Grok-3,Feb 2025,~3T,Unknown,CEO stated
+Meta,LLaMA 3.1 8B,Jul 2024,8B,8B,Official
+Meta,LLaMA 3.1 70B,Jul 2024,70B,70B,Official
+Meta,LLaMA 3.1 405B,Jul 2024,405B,405B,Official
+Meta,LLaMA 3.3 70B,Dec 2024,70B,70B,Official
+Meta,LLaMA 4 Scout,Apr 2025,109B,17B,Official
+Meta,LLaMA 4 Maverick,Apr 2025,400B,17B,Official
+Meta,LLaMA 4 Behemoth,TBD 2026,~2T,288B,Official (announced)
+DeepSeek,DeepSeek-V2,May 2024,236B,21B,Official
+DeepSeek,DeepSeek-V3,Dec 2024,671B,37B,Official
+DeepSeek,DeepSeek-R1,Jan 2025,671B,37B,Official
+Mistral,Mistral 7B,Sep 2023,7.3B,7.3B,Official
+Mistral,Mixtral 8x7B,Dec 2023,46.7B,12.9B,Official
+Mistral,Mixtral 8x22B,Apr 2024,141B,39B,Official
+Mistral,Mistral Large 2,Jul 2024,123B,123B,Official
+Mistral,Mistral Small 3,Jan 2025,24B,24B,Official
+Mistral,Mistral Large 3,Dec 2025,675B,41B,Official
+Alibaba,Qwen2.5 72B,Sep 2024,72B,72B,Official
+Alibaba,Qwen3-30B-A3B,Apr 2025,30B,3B,Official
+Alibaba,Qwen3-235B-A22B,Apr 2025,235B,22B,Official
+TII,Falcon 180B,Sep 2023,180B,180B,Official
+Cohere,Command R+,Apr 2024,104B,104B,Official
+Cohere,Command A,Mar 2025,111B,111B,Official

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style C: Split Modern - תצוגה מקדימה</title>
+
+    <!-- Heebo for Hebrew -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           STYLE C: SPLIT MODERN
+           Two-tone split layout, editorial feel
+           Green panel with cream content, bold typography
+           =========================================== */
+
+        :root {
+            /* Brand Colors */
+            --primary: #8ABF3B;
+            --primary-light: #B6D66B;
+            --primary-dark: #6B9A2E;
+            --bg-cream: #FAF9F6;
+            --bg-light: #f0ede8;
+            --dark: #3E352B;
+            --text: #6B6054;
+            --text-light: #9a9189;
+
+            /* Typography */
+            --font-primary: 'Heebo', sans-serif;
+            --title-size: clamp(2.5rem, 8vw, 5.5rem);
+            --subtitle-size: clamp(1rem, 2vw, 1.35rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-cream);
+            color: var(--dark);
+        }
+
+        /* ===========================================
+           SLIDE CONTAINER - SPLIT LAYOUT
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            display: grid;
+            grid-template-columns: 45% 55%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ===========================================
+           LEFT PANEL - GREEN
+           =========================================== */
+        .panel-green {
+            background: linear-gradient(165deg, var(--primary-dark), var(--primary), var(--primary-light));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: clamp(2rem, 4vw, 4rem);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel-green::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.5;
+        }
+
+        .logo-container {
+            position: relative;
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.8) rotate(-10deg);
+            animation: logoSpin 0.8s var(--ease-out-expo) 0.3s forwards;
+        }
+
+        .logo {
+            width: clamp(100px, 15vw, 160px);
+            height: clamp(100px, 15vw, 160px);
+            background: var(--dark);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 900;
+            color: white;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .decorative-circle {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            opacity: 0;
+            animation: circleIn 1s var(--ease-out-expo) 0.6s forwards;
+        }
+
+        .circle-1 {
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .circle-2 {
+            width: 400px;
+            height: 400px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 0.7s;
+        }
+
+        /* ===========================================
+           RIGHT PANEL - CONTENT
+           =========================================== */
+        .panel-content {
+            background: var(--bg-cream);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: clamp(2rem, 5vw, 5rem);
+            position: relative;
+        }
+
+        .content {
+            max-width: 600px;
+        }
+
+        .eyebrow {
+            font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideRight 0.8s var(--ease-out-expo) 0.4s forwards;
+        }
+
+        h1 {
+            font-size: var(--title-size);
+            font-weight: 900;
+            color: var(--dark);
+            line-height: 1.05;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideRight 0.8s var(--ease-out-expo) 0.5s forwards;
+        }
+
+        .accent-line {
+            width: 60px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: scaleX(0);
+            transform-origin: right;
+            animation: lineScale 0.6s var(--ease-out-expo) 0.7s forwards;
+        }
+
+        .subtitle {
+            font-size: var(--subtitle-size);
+            color: var(--text);
+            font-weight: 400;
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: slideRight 0.8s var(--ease-out-expo) 0.6s forwards;
+        }
+
+        /* ===========================================
+           CORNER DECORATIONS
+           =========================================== */
+        .corner-dots {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            display: grid;
+            grid-template-columns: repeat(3, 8px);
+            gap: 8px;
+            opacity: 0;
+            animation: fadeIn 0.6s var(--ease-out-expo) 0.9s forwards;
+        }
+
+        .corner-dots span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .corner-dots span:nth-child(2),
+        .corner-dots span:nth-child(4),
+        .corner-dots span:nth-child(6),
+        .corner-dots span:nth-child(8) {
+            background: var(--border, #e5e1db);
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        @keyframes logoSpin {
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes circleIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideRight {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes lineScale {
+            to {
+                opacity: 1;
+                transform: scaleX(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ===========================================
+           STYLE LABEL
+           =========================================== */
+        .style-label {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 100;
+        }
+
+        .style-label span {
+            color: var(--primary-light);
+        }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-width: 900px) {
+            .slide {
+                grid-template-columns: 1fr;
+                grid-template-rows: 35% 65%;
+            }
+
+            .panel-green {
+                padding: clamp(1rem, 3vw, 2rem);
+            }
+
+            .logo {
+                width: 80px;
+                height: 80px;
+                font-size: 2.5rem;
+                border-radius: 20px;
+            }
+
+            .decorative-circle {
+                display: none;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .slide {
+                grid-template-columns: 40% 60%;
+            }
+
+            .logo {
+                width: 70px;
+                height: 70px;
+                font-size: 2rem;
+            }
+
+            .decorative-circle {
+                display: none;
+            }
+
+            .corner-dots {
+                display: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-delay: 0ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="style-label">Style C: <span>Split Modern</span></div>
+
+    <section class="slide">
+        <div class="panel-green">
+            <div class="logo-container">
+                <div class="logo">H</div>
+            </div>
+            <div class="decorative-circle circle-1"></div>
+            <div class="decorative-circle circle-2"></div>
+        </div>
+
+        <div class="panel-content">
+            <div class="content">
+                <p class="eyebrow">NG Workshop</p>
+                <h1>כותרת המצגת שלך</h1>
+                <div class="accent-line"></div>
+                <p class="subtitle">תת כותרת או תיאור קצר יופיע כאן. המצגת תוכננה לתמיכה מלאה בעברית ובכיוון ימין לשמאל.</p>
+            </div>
+
+            <div class="corner-dots">
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

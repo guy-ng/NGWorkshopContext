@@ -1,0 +1,108 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### קליטת מוצר חדש מיצרן\n\nהפריט ייבדק וייפתח במקביל בפריוריטי, ב-AS/400 וב-WMS.",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_TradeName",
+      "key": "tradeName",
+      "label": "שם מסחרי",
+      "validate": { "required": true, "minLength": 2 },
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_Manufacturer",
+      "key": "manufacturer",
+      "label": "יצרן",
+      "validate": { "required": true },
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_RegistrationHolder",
+      "key": "registrationHolder",
+      "label": "בעל רישום",
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_RegistrationNumber",
+      "key": "registrationNumber",
+      "label": "מספר רישום",
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ATC",
+      "key": "atcCode",
+      "label": "קוד ATC",
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_GTIN",
+      "key": "gtin",
+      "label": "GTIN",
+      "validate": { "required": true, "pattern": "^[0-9]{8,14}$", "patternErrorMessage": "יש להזין 8 עד 14 ספרות" },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_StorageConditions",
+      "key": "storageConditions",
+      "label": "תנאי אחסון",
+      "validate": { "required": true },
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_PackageUnit",
+      "key": "packageUnit",
+      "label": "יחידת אריזה",
+      "validate": { "required": true },
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_Dimensions",
+      "key": "packageDimensions",
+      "label": "ממדי אריזה",
+      "layout": { "row": "row_5", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_Weight",
+      "key": "packageWeightGrams",
+      "label": "משקל אריזה בגרם",
+      "validate": { "required": true, "min": 0 },
+      "layout": { "row": "row_5", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_Controlled",
+      "key": "controlledDrug",
+      "label": "תרופה מבוקרת",
+      "layout": { "row": "row_6", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_ColdChain",
+      "key": "coldChain",
+      "label": "דורש שרשרת קירור",
+      "layout": { "row": "row_6", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "sku-onboarding-start",
+  "type": "default"
+}

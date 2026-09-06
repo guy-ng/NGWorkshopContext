@@ -1,0 +1,56 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "text": "### אישור זיכוי חריג\n\nהמחלוקת לא נסגרה בבירור מול המחסן או שהסכום מחייב אישור הנהלה.",
+      "id": "Text_Header",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_InvoiceId",
+      "key": "invoiceId",
+      "label": "מספר חשבונית",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_InvoiceAmount",
+      "key": "invoiceAmount",
+      "label": "סכום החשבונית (₪)",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_CreditApproved",
+      "key": "creditApproved",
+      "label": "מאשר זיכוי",
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_CreditAmount",
+      "key": "approvedCreditAmount",
+      "label": "סכום הזיכוי המאושר (₪)",
+      "conditional": { "hide": "=creditApproved != true" },
+      "validate": { "min": 0 },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_Notes",
+      "key": "approvalNotes",
+      "label": "נימוק ההחלטה",
+      "validate": { "required": true, "minLength": 5 },
+      "layout": { "row": "row_4", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "dispute-credit-approval",
+  "type": "default"
+}

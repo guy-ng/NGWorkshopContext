@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:ns1="modeler" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:color="http://www.omg.org/spec/BPMN/non-normative/color/1.0" xmlns:ns0="xmlns" id="bpmn_copilot_Definition_id" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Web Modeler" exporterVersion="80a5306" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0" ns0:modeler="http://camunda.org/schema/modeler/1.0" ns1:executionPlatform="Camunda Cloud" ns1:executionPlatformVersion="8.6">
+  <bpmn:process id="Process_PizzaCamundencia" name="תהליך הכנת פיצה" processType="None" isClosed="false" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_OrderReceived" name="הזמנה התקבלה">
+      <bpmn:outgoing>Flow_To_ValidateOrder</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Task_ValidateOrder" name="אימות הזמנה">
+      <bpmn:incoming>Flow_To_ValidateOrder</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_OrderValidGateway</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_To_ValidateOrder" sourceRef="StartEvent_OrderReceived" targetRef="Task_ValidateOrder" />
+    <bpmn:exclusiveGateway id="Gateway_IsOrderValid" name="האם ההזמנה תקינה?">
+      <bpmn:incoming>Flow_To_OrderValidGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_OrderIsValid</bpmn:outgoing>
+      <bpmn:outgoing>Flow_OrderIsInvalid</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_To_OrderValidGateway" sourceRef="Task_ValidateOrder" targetRef="Gateway_IsOrderValid" />
+    <bpmn:task id="Task_NotifyCustomer" name="הודעה ללקוח על ביטול">
+      <bpmn:incoming>Flow_OrderIsInvalid</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_OrderCanceled</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_OrderIsInvalid" name="לא" sourceRef="Gateway_IsOrderValid" targetRef="Task_NotifyCustomer" />
+    <bpmn:endEvent id="EndEvent_OrderCanceled" name="הזמנה בוטלה">
+      <bpmn:incoming>Flow_To_OrderCanceled</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_To_OrderCanceled" sourceRef="Task_NotifyCustomer" targetRef="EndEvent_OrderCanceled" />
+    <bpmn:parallelGateway id="Gateway_StartPreparation">
+      <bpmn:incoming>Flow_OrderIsValid</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_PrepareDough</bpmn:outgoing>
+      <bpmn:outgoing>Flow_1pc39cf</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_OrderIsValid" name="כן" sourceRef="Gateway_IsOrderValid" targetRef="Gateway_StartPreparation">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=orderValid = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:task id="Task_PrepareDough" name="הכנת בצק">
+      <bpmn:incoming>Flow_To_PrepareDough</bpmn:incoming>
+      <bpmn:outgoing>Flow_From_PrepareDough</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_To_PrepareDough" sourceRef="Gateway_StartPreparation" targetRef="Task_PrepareDough" />
+    <bpmn:task id="Task_PrepareSauce" name="הכנת רוטב">
+      <bpmn:incoming>Flow_1pc39cf</bpmn:incoming>
+      <bpmn:outgoing>Flow_From_PrepareSauce</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:parallelGateway id="Gateway_JoinPreparation">
+      <bpmn:incoming>Flow_From_PrepareDough</bpmn:incoming>
+      <bpmn:incoming>Flow_From_PrepareSauce</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_AddToppings</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_From_PrepareDough" sourceRef="Task_PrepareDough" targetRef="Gateway_JoinPreparation" />
+    <bpmn:sequenceFlow id="Flow_From_PrepareSauce" sourceRef="Task_PrepareSauce" targetRef="Gateway_JoinPreparation" />
+    <bpmn:task id="Task_AddToppingsAndBake" name="הוספת תוספות ואפייה">
+      <bpmn:incoming>Flow_To_AddToppings</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_QualityControl</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_To_AddToppings" sourceRef="Gateway_JoinPreparation" targetRef="Task_AddToppingsAndBake" />
+    <bpmn:task id="Task_QualityControl" name="בקרת איכות">
+      <bpmn:incoming>Flow_To_QualityControl</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_QCGateway</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_To_QualityControl" sourceRef="Task_AddToppingsAndBake" targetRef="Task_QualityControl" />
+    <bpmn:exclusiveGateway id="Gateway_QCPassed" name="האם הפיצה עברה בקרת איכות?">
+      <bpmn:incoming>Flow_To_QCGateway</bpmn:incoming>
+      <bpmn:outgoing>Flow_QCPassed</bpmn:outgoing>
+      <bpmn:outgoing>Flow_QCFailed</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_To_QCGateway" sourceRef="Task_QualityControl" targetRef="Gateway_QCPassed" />
+    <bpmn:task id="Task_SendRefund" name="שליחת החזר כספי">
+      <bpmn:incoming>Flow_QCFailed</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_OrderFailed</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_QCFailed" name="לא" sourceRef="Gateway_QCPassed" targetRef="Task_SendRefund" />
+    <bpmn:endEvent id="EndEvent_OrderFailed" name="הזמנה נכשלה">
+      <bpmn:incoming>Flow_To_OrderFailed</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_To_OrderFailed" sourceRef="Task_SendRefund" targetRef="EndEvent_OrderFailed" />
+    <bpmn:task id="Task_PackAndSend" name="אריזה ושליחה ללקוח">
+      <bpmn:incoming>Flow_QCPassed</bpmn:incoming>
+      <bpmn:outgoing>Flow_To_OrderSent</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:sequenceFlow id="Flow_QCPassed" name="כן" sourceRef="Gateway_QCPassed" targetRef="Task_PackAndSend">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=qcPassed = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:endEvent id="EndEvent_OrderSent" name="הזמנה נשלחה">
+      <bpmn:incoming>Flow_To_OrderSent</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_To_OrderSent" sourceRef="Task_PackAndSend" targetRef="EndEvent_OrderSent" />
+    <bpmn:sequenceFlow id="Flow_1pc39cf" sourceRef="Gateway_StartPreparation" targetRef="Task_PrepareSauce" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_Process_PizzaCamundencia">
+    <bpmndi:BPMNPlane id="BPMNPlane_Process_PizzaCamundencia" bpmnElement="Process_PizzaCamundencia">
+      <bpmndi:BPMNShape id="StartEvent_OrderReceived_di" bpmnElement="StartEvent_OrderReceived">
+        <dc:Bounds x="167" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="151" y="238" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ValidateOrder_di" bpmnElement="Task_ValidateOrder">
+        <dc:Bounds x="285" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_IsOrderValid_di" bpmnElement="Gateway_IsOrderValid" isMarkerVisible="true">
+        <dc:Bounds x="460" y="195" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="456" y="158" width="58" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyCustomer_di" bpmnElement="Task_NotifyCustomer">
+        <dc:Bounds x="530" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_OrderCanceled_di" bpmnElement="EndEvent_OrderCanceled" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="692" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="681" y="408" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_StartPreparation_di" bpmnElement="Gateway_StartPreparation">
+        <dc:Bounds x="610" y="195" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PrepareDough_di" bpmnElement="Task_PrepareDough">
+        <dc:Bounds x="730" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PrepareSauce_di" bpmnElement="Task_PrepareSauce">
+        <dc:Bounds x="730" y="270" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_JoinPreparation_di" bpmnElement="Gateway_JoinPreparation">
+        <dc:Bounds x="910" y="195" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_AddToppingsAndBake_di" bpmnElement="Task_AddToppingsAndBake">
+        <dc:Bounds x="1035" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_QualityControl_di" bpmnElement="Task_QualityControl">
+        <dc:Bounds x="1185" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_QCPassed_di" bpmnElement="Gateway_QCPassed" isMarkerVisible="true">
+        <dc:Bounds x="1360" y="195" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1346" y="158" width="77" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendRefund_di" bpmnElement="Task_SendRefund">
+        <dc:Bounds x="1485" y="320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_OrderFailed_di" bpmnElement="EndEvent_OrderFailed" bioc:stroke="#831311" bioc:fill="#ffcdd2" color:background-color="#ffcdd2" color:border-color="#831311">
+        <dc:Bounds x="1667" y="342" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1655" y="378" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_PackAndSend_di" bpmnElement="Task_PackAndSend">
+        <dc:Bounds x="1485" y="180" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_OrderSent_di" bpmnElement="EndEvent_OrderSent" bioc:stroke="#205022" bioc:fill="#c8e6c9" color:background-color="#c8e6c9" color:border-color="#205022">
+        <dc:Bounds x="1667" y="202" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1655" y="238" width="61" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_To_ValidateOrder_di" bpmnElement="Flow_To_ValidateOrder">
+        <di:waypoint x="203" y="220" />
+        <di:waypoint x="285" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_OrderValidGateway_di" bpmnElement="Flow_To_OrderValidGateway">
+        <di:waypoint x="385" y="220" />
+        <di:waypoint x="460" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OrderIsInvalid_di" bpmnElement="Flow_OrderIsInvalid">
+        <di:waypoint x="485" y="245" />
+        <di:waypoint x="485" y="390" />
+        <di:waypoint x="530" y="390" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="494" y="307" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_OrderIsValid_di" bpmnElement="Flow_OrderIsValid">
+        <di:waypoint x="510" y="220" />
+        <di:waypoint x="610" y="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="556" y="195" width="8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_OrderCanceled_di" bpmnElement="Flow_To_OrderCanceled">
+        <di:waypoint x="630" y="390" />
+        <di:waypoint x="692" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_PrepareDough_di" bpmnElement="Flow_To_PrepareDough">
+        <di:waypoint x="635" y="195" />
+        <di:waypoint x="635" y="120" />
+        <di:waypoint x="730" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1pc39cf_di" bpmnElement="Flow_1pc39cf">
+        <di:waypoint x="635" y="245" />
+        <di:waypoint x="635" y="310" />
+        <di:waypoint x="730" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_From_PrepareDough_di" bpmnElement="Flow_From_PrepareDough">
+        <di:waypoint x="830" y="120" />
+        <di:waypoint x="935" y="120" />
+        <di:waypoint x="935" y="195" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_From_PrepareSauce_di" bpmnElement="Flow_From_PrepareSauce">
+        <di:waypoint x="830" y="310" />
+        <di:waypoint x="935" y="310" />
+        <di:waypoint x="935" y="245" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_AddToppings_di" bpmnElement="Flow_To_AddToppings">
+        <di:waypoint x="960" y="220" />
+        <di:waypoint x="1035" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_QualityControl_di" bpmnElement="Flow_To_QualityControl">
+        <di:waypoint x="1135" y="220" />
+        <di:waypoint x="1185" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_QCGateway_di" bpmnElement="Flow_To_QCGateway">
+        <di:waypoint x="1285" y="220" />
+        <di:waypoint x="1360" y="220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_QCFailed_di" bpmnElement="Flow_QCFailed">
+        <di:waypoint x="1385" y="245" />
+        <di:waypoint x="1385" y="360" />
+        <di:waypoint x="1485" y="360" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1394" y="293" width="12" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_QCPassed_di" bpmnElement="Flow_QCPassed">
+        <di:waypoint x="1410" y="220" />
+        <di:waypoint x="1485" y="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1444" y="195" width="8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_OrderFailed_di" bpmnElement="Flow_To_OrderFailed">
+        <di:waypoint x="1585" y="360" />
+        <di:waypoint x="1667" y="360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_To_OrderSent_di" bpmnElement="Flow_To_OrderSent">
+        <di:waypoint x="1585" y="220" />
+        <di:waypoint x="1667" y="220" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

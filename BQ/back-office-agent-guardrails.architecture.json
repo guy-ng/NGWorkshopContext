@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Back-Office Agent Architecture — Guardrails & Gatekeepers",
+    "locale": "en",
+    "output": "back-office-agent-guardrails.html",
+    "quality_profile": "showcase",
+    "viewBox": [1380, 760]
+  },
+  "components": [
+    {
+      "id": "staff_operator",
+      "type": "external",
+      "label": "Staff Operator",
+      "sublabel": "Authorized employee",
+      "pos": [20, 330],
+      "size": [140, 70]
+    },
+    {
+      "id": "backoffice_app",
+      "type": "frontend",
+      "label": "Back-Office App",
+      "sublabel": "Cases, tasks, approvals",
+      "pos": [184, 330],
+      "size": [160, 70]
+    },
+    {
+      "id": "identity_provider",
+      "type": "security",
+      "label": "Identity Provider",
+      "sublabel": "SSO, MFA, roles",
+      "tag": "Gatekeeper 1",
+      "pos": [184, 100],
+      "size": [160, 70]
+    },
+    {
+      "id": "api_gateway",
+      "type": "security",
+      "label": "API Gateway",
+      "sublabel": "AuthN/Z, quotas, tenancy",
+      "tag": "Gatekeeper 2",
+      "pos": [368, 330],
+      "size": [170, 70]
+    },
+    {
+      "id": "input_guardrails",
+      "type": "security",
+      "label": "Input Guardrails",
+      "sublabel": "Validation, PII, injection",
+      "tag": "Fail closed",
+      "pos": [562, 330],
+      "size": [180, 70]
+    },
+    {
+      "id": "agent_runtime",
+      "type": "backend",
+      "label": "Agent Runtime",
+      "sublabel": "Plan, reason, execute",
+      "tag": "Least privilege",
+      "pos": [766, 330],
+      "size": [180, 70]
+    },
+    {
+      "id": "policy_engine",
+      "type": "security",
+      "label": "Policy Engine",
+      "sublabel": "RBAC, intent, risk tier",
+      "tag": "Guardrail",
+      "pos": [766, 100],
+      "size": [180, 70]
+    },
+    {
+      "id": "approval_gate",
+      "type": "security",
+      "label": "Human Approval Gate",
+      "sublabel": "Reviewer + four-eyes",
+      "tag": "High-risk only",
+      "pos": [970, 100],
+      "size": [190, 70]
+    },
+    {
+      "id": "llm_provider",
+      "type": "external",
+      "label": "LLM Provider",
+      "sublabel": "Constrained inference",
+      "pos": [766, 570],
+      "size": [180, 70]
+    },
+    {
+      "id": "tool_gateway",
+      "type": "security",
+      "label": "Tool Gateway",
+      "sublabel": "Scopes, allowlists, limits",
+      "tag": "Gatekeeper 3",
+      "pos": [970, 330],
+      "size": [190, 70]
+    },
+    {
+      "id": "business_systems",
+      "type": "external",
+      "label": "Business Systems",
+      "sublabel": "CRM, ERP, ticketing",
+      "pos": [1200, 330],
+      "size": [170, 70]
+    },
+    {
+      "id": "audit_ledger",
+      "type": "database",
+      "label": "Immutable Audit Ledger",
+      "sublabel": "Actor, policy, action, result",
+      "tag": "Evidence",
+      "pos": [970, 570],
+      "size": [190, 70]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Trusted back-office platform",
+      "wraps": [
+        "backoffice_app",
+        "api_gateway",
+        "input_guardrails",
+        "agent_runtime",
+        "policy_engine",
+        "approval_gate",
+        "tool_gateway",
+        "audit_ledger"
+      ],
+      "pad": 24
+    },
+    {
+      "kind": "security-group",
+      "label": "Agent execution control plane",
+      "wraps": [
+        "agent_runtime",
+        "policy_engine",
+        "approval_gate",
+        "tool_gateway"
+      ],
+      "pad": 16
+    }
+  ],
+  "connections": [
+    {
+      "id": "operator_session",
+      "from": "staff_operator",
+      "to": "backoffice_app",
+      "label": "HTTPS session",
+      "variant": "emphasis",
+      "labelAt": [172, 414]
+    },
+    {
+      "id": "identity_session",
+      "from": "identity_provider",
+      "to": "backoffice_app",
+      "label": "OIDC + MFA",
+      "variant": "security",
+      "labelAt": [264, 184]
+    },
+    {
+      "id": "app_request",
+      "from": "backoffice_app",
+      "to": "api_gateway",
+      "label": "HTTPS + access token",
+      "variant": "emphasis",
+      "labelAt": [356, 414]
+    },
+    {
+      "id": "gateway_validation",
+      "from": "api_gateway",
+      "to": "input_guardrails",
+      "label": "authorized request",
+      "variant": "security",
+      "labelAt": [550, 414]
+    },
+    {
+      "id": "sanitized_task",
+      "from": "input_guardrails",
+      "to": "agent_runtime",
+      "label": "sanitized task",
+      "variant": "emphasis",
+      "labelAt": [754, 414]
+    },
+    {
+      "id": "policy_decision",
+      "from": "policy_engine",
+      "to": "agent_runtime",
+      "label": "RBAC + action policy",
+      "variant": "security",
+      "labelAt": [856, 184]
+    },
+    {
+      "id": "constrained_inference",
+      "from": "agent_runtime",
+      "to": "llm_provider",
+      "label": "redacted context",
+      "variant": "default",
+      "labelAt": [856, 414]
+    },
+    {
+      "id": "approval_proposal",
+      "from": "agent_runtime",
+      "to": "approval_gate",
+      "label": "high-risk proposal",
+      "variant": "security"
+    },
+    {
+      "id": "approved_action",
+      "from": "approval_gate",
+      "to": "tool_gateway",
+      "label": "signed approval",
+      "variant": "security",
+      "labelAt": [1065, 184]
+    },
+    {
+      "id": "scoped_tool_call",
+      "from": "agent_runtime",
+      "to": "tool_gateway",
+      "label": "scoped tool call",
+      "variant": "emphasis",
+      "labelAt": [958, 414]
+    },
+    {
+      "id": "allowlisted_action",
+      "from": "tool_gateway",
+      "to": "business_systems",
+      "label": "allowlisted API action",
+      "variant": "security",
+      "labelAt": [1180, 414]
+    },
+    {
+      "id": "audit_evidence",
+      "from": "tool_gateway",
+      "to": "audit_ledger",
+      "label": "attempt + outcome",
+      "variant": "dashed",
+      "labelAt": [1065, 414]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "rose",
+      "title": "Gatekeepers",
+      "items": [
+        "Identity establishes the actor, tenant, and role",
+        "The API gateway rejects unauthorized or excessive requests",
+        "The tool gateway is the only route to business-system actions"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Guardrails",
+      "items": [
+        "Inputs are validated, redacted, and checked for prompt injection",
+        "Every action is evaluated against role, intent, and risk policies",
+        "Tool calls carry narrow scopes, allowlists, and execution limits"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Accountability",
+      "items": [
+        "High-risk actions require a signed human approval",
+        "The immutable ledger records attempted actions and outcomes",
+        "Failures default to deny and return a reviewable reason"
+      ]
+    }
+  ]
+}

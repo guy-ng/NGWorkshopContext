@@ -1,0 +1,296 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Agent Safety Architecture — Protocol, Order & Dispense Gates",
+    "locale": "en",
+    "output": "agent-safety-architecture-from-spec.html",
+    "quality_profile": "showcase",
+    "viewBox": [1280, 720]
+  },
+  "components": [
+    {
+      "id": "user_operator",
+      "type": "external",
+      "label": "User / Operator",
+      "sublabel": "Request + confirmations",
+      "pos": [20, 110],
+      "size": [130, 70]
+    },
+    {
+      "id": "agent_service",
+      "type": "backend",
+      "label": "Agent Service",
+      "sublabel": "Propose, ask, explain",
+      "tag": "No authority",
+      "pos": [174, 110],
+      "size": [145, 70]
+    },
+    {
+      "id": "proposal_guardrails",
+      "type": "security",
+      "label": "Proposal Guardrails",
+      "sublabel": "Normalize + collect data",
+      "tag": "Conversation layer",
+      "pos": [343, 110],
+      "size": [155, 70]
+    },
+    {
+      "id": "protocol_gatekeeper",
+      "type": "security",
+      "label": "Protocol Gatekeeper",
+      "sublabel": "Conditions, meds, dose, timing",
+      "tag": "Deterministic",
+      "pos": [522, 110],
+      "size": [175, 70]
+    },
+    {
+      "id": "approval_artifact",
+      "type": "database",
+      "label": "Approval Artifact",
+      "sublabel": "Signed, immutable, versioned",
+      "tag": "Bound to user",
+      "pos": [721, 110],
+      "size": [150, 70]
+    },
+    {
+      "id": "order_gatekeeper",
+      "type": "security",
+      "label": "Order Gatekeeper",
+      "sublabel": "Scope + atomicity checks",
+      "tag": "Signed manifest",
+      "pos": [895, 110],
+      "size": [155, 70]
+    },
+    {
+      "id": "device_session",
+      "type": "external",
+      "label": "Device + Cartridge",
+      "sublabel": "Authenticated session",
+      "tag": "Physical boundary",
+      "pos": [600, 380],
+      "size": [180, 70]
+    },
+    {
+      "id": "trusted_safety_data",
+      "type": "database",
+      "label": "Trusted Safety Data",
+      "sublabel": "Profile, rules, clock, DHR",
+      "tag": "Fresh ≤ 90 days",
+      "pos": [522, 280],
+      "size": [175, 75]
+    },
+    {
+      "id": "per_pill_gatekeeper",
+      "type": "security",
+      "label": "Per-Pill Gatekeeper",
+      "sublabel": "Live profile, dose, actual time",
+      "tag": "Independent ALLOW",
+      "pos": [830, 280],
+      "size": [190, 75]
+    },
+    {
+      "id": "cartridge_gatekeeper",
+      "type": "security",
+      "label": "Cartridge Gatekeeper",
+      "sublabel": "User, manifest, lot, expiry",
+      "tag": "Independent ALLOW",
+      "pos": [830, 470],
+      "size": [190, 75]
+    },
+    {
+      "id": "pill_actuator",
+      "type": "backend",
+      "label": "Pill Actuator",
+      "sublabel": "Release exactly one pill",
+      "tag": "Both gates required",
+      "pos": [1074, 375],
+      "size": [180, 75]
+    },
+    {
+      "id": "audit_ledger",
+      "type": "database",
+      "label": "Audit & Dispense Ledger",
+      "sublabel": "Reason codes + idempotency",
+      "tag": "Append-only",
+      "pos": [1074, 570],
+      "size": [180, 75]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Safety-controlled platform",
+      "wraps": [
+        "agent_service",
+        "proposal_guardrails",
+        "protocol_gatekeeper",
+        "approval_artifact",
+        "order_gatekeeper",
+        "device_session",
+        "trusted_safety_data",
+        "per_pill_gatekeeper",
+        "cartridge_gatekeeper",
+        "pill_actuator",
+        "audit_ledger"
+      ],
+      "pad": 24
+    },
+    {
+      "kind": "security-group",
+      "label": "Deterministic authorization plane",
+      "wraps": [
+        "protocol_gatekeeper",
+        "approval_artifact",
+        "order_gatekeeper",
+        "device_session",
+        "trusted_safety_data",
+        "per_pill_gatekeeper",
+        "cartridge_gatekeeper",
+        "pill_actuator"
+      ],
+      "pad": 16
+    }
+  ],
+  "connections": [
+    {
+      "id": "user_to_agent",
+      "from": "user_operator",
+      "to": "agent_service",
+      "variant": "emphasis"
+    },
+    {
+      "id": "agent_to_guardrails",
+      "from": "agent_service",
+      "to": "proposal_guardrails",
+      "variant": "default"
+    },
+    {
+      "id": "guardrails_to_protocol",
+      "from": "proposal_guardrails",
+      "to": "protocol_gatekeeper",
+      "label": "structured proposal",
+      "variant": "security",
+      "labelAt": [510, 194]
+    },
+    {
+      "id": "protocol_to_artifact",
+      "from": "protocol_gatekeeper",
+      "to": "approval_artifact",
+      "label": "ALLOW + decision hash",
+      "variant": "security",
+      "labelAt": [709, 194]
+    },
+    {
+      "id": "artifact_to_order",
+      "from": "approval_artifact",
+      "to": "order_gatekeeper",
+      "label": "signed approval",
+      "variant": "security",
+      "labelAt": [883, 194]
+    },
+    {
+      "id": "order_to_device",
+      "from": "order_gatekeeper",
+      "to": "device_session",
+      "label": "signed manifest",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "via": [[972.5, 240], [690, 240]],
+      "labelAt": [831, 250]
+    },
+    {
+      "id": "device_to_per_pill",
+      "from": "device_session",
+      "to": "per_pill_gatekeeper",
+      "label": "pill + live state",
+      "variant": "security",
+      "labelAt": [805, 266]
+    },
+    {
+      "id": "device_to_cartridge",
+      "from": "device_session",
+      "to": "cartridge_gatekeeper",
+      "label": "user + cartridge",
+      "variant": "security",
+      "labelAt": [805, 559]
+    },
+    {
+      "id": "data_to_protocol",
+      "from": "trusted_safety_data",
+      "to": "protocol_gatekeeper",
+      "label": "profile + rules + clock",
+      "variant": "dashed"
+    },
+    {
+      "id": "data_to_per_pill",
+      "from": "trusted_safety_data",
+      "to": "per_pill_gatekeeper",
+      "label": "current profile + schedule",
+      "variant": "dashed",
+      "labelAt": [764, 369]
+    },
+    {
+      "id": "data_to_cartridge",
+      "from": "trusted_safety_data",
+      "to": "cartridge_gatekeeper",
+      "label": "DHR + lot + expiry",
+      "variant": "dashed",
+      "labelAt": [760, 459]
+    },
+    {
+      "id": "per_pill_to_actuator",
+      "from": "per_pill_gatekeeper",
+      "to": "pill_actuator",
+      "label": "single-use ALLOW",
+      "variant": "security",
+      "labelAt": [1047, 266]
+    },
+    {
+      "id": "cartridge_to_actuator",
+      "from": "cartridge_gatekeeper",
+      "to": "pill_actuator",
+      "label": "enable ALLOW",
+      "variant": "security",
+      "labelAt": [1047, 559]
+    },
+    {
+      "id": "actuator_to_audit",
+      "from": "pill_actuator",
+      "to": "audit_ledger",
+      "label": "atomic result",
+      "variant": "dashed",
+      "labelAt": [1164, 469]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Decision ownership",
+      "items": [
+        "The agent may propose, ask questions, and explain; it never authorizes",
+        "Only structured inputs and versioned deterministic rules produce a decision",
+        "Free-text model output is never accepted as an approval artifact"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Defense in depth",
+      "items": [
+        "Protocol approval checks conditions, medications, cumulative dose, and timing",
+        "Order creation verifies the unchanged approval and signs the cartridge manifest",
+        "Per-pill and cartridge gatekeepers must independently ALLOW physical release"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Fail closed & traceable",
+      "items": [
+        "Missing, stale, conflicting, unknown, or unavailable evidence blocks action",
+        "Single-use authorization and idempotency prevent duplicate dispensing",
+        "Every decision records inputs, versions, reason codes, timestamps, and outcomes"
+      ]
+    }
+  ]
+}

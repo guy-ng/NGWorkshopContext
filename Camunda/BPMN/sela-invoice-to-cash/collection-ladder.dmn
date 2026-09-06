@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_CollectionLadder" name="מדרג הגבייה" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.34.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <decision id="collection_ladder" name="מדרג הגבייה">
+    <decisionTable id="DecisionTable_CollectionLadder" hitPolicy="FIRST">
+      <input id="Input_DaysOverdue" label="ימי פיגור (שלילי = לפני מועד התשלום)">
+        <inputExpression id="InputExpression_DaysOverdue" typeRef="number">
+          <text>overdue.daysOverdue</text>
+        </inputExpression>
+      </input>
+      <input id="Input_OpenAmount" label="יתרה פתוחה (₪)">
+        <inputExpression id="InputExpression_OpenAmount" typeRef="number">
+          <text>overdue.openAmount</text>
+        </inputExpression>
+      </input>
+      <input id="Input_Step" label="מספר סבב הגבייה">
+        <inputExpression id="InputExpression_Step" typeRef="number">
+          <text>overdue.step</text>
+        </inputExpression>
+      </input>
+      <input id="Input_Segment" label="סוג לקוח">
+        <inputExpression id="InputExpression_Segment" typeRef="string">
+          <text>customerSegment</text>
+        </inputExpression>
+      </input>
+      <output id="Output_Action" label="פעולה" name="action" typeRef="string" />
+      <output id="Output_Wait" label="המתנה עד הסבב הבא" name="waitDuration" typeRef="string" />
+      <output id="Output_Owner" label="אחראי" name="owner" typeRef="string" />
+      <output id="Output_Notify" label="דיווח ליצרן" name="notifyManufacturer" typeRef="boolean" />
+      <rule id="Rule_BeforeDue">
+        <description>מוקדם מדי — רק ממתינים</description>
+        <inputEntry id="UT_1_1">
+          <text>&lt; -3</text>
+        </inputEntry>
+        <inputEntry id="UT_1_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_1_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_1_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_1_1">
+          <text>"NONE"</text>
+        </outputEntry>
+        <outputEntry id="OE_1_2">
+          <text>"P3D"</text>
+        </outputEntry>
+        <outputEntry id="OE_1_3">
+          <text>"collections"</text>
+        </outputEntry>
+        <outputEntry id="OE_1_4">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_PreReminder">
+        <description>תזכורת ידידותית לפני מועד התשלום</description>
+        <inputEntry id="UT_2_1">
+          <text>[-3..-1]</text>
+        </inputEntry>
+        <inputEntry id="UT_2_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_2_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_2_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_2_1">
+          <text>"PRE_REMINDER"</text>
+        </outputEntry>
+        <outputEntry id="OE_2_2">
+          <text>"P4D"</text>
+        </outputEntry>
+        <outputEntry id="OE_2_3">
+          <text>"collections"</text>
+        </outputEntry>
+        <outputEntry id="OE_2_4">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_FirstWeek">
+        <description>פיגור ראשוני — תזכורת בלבד</description>
+        <inputEntry id="UT_3_1">
+          <text>[0..6]</text>
+        </inputEntry>
+        <inputEntry id="UT_3_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_3_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_3_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_3_1">
+          <text>"REMINDER"</text>
+        </outputEntry>
+        <outputEntry id="OE_3_2">
+          <text>"P7D"</text>
+        </outputEntry>
+        <outputEntry id="OE_3_3">
+          <text>"collections"</text>
+        </outputEntry>
+        <outputEntry id="OE_3_4">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_TooManyRounds">
+        <description>יותר מדי סבבים ללא תוצאה — משפטי</description>
+        <inputEntry id="UT_4_1">
+          <text>&gt;= 30</text>
+        </inputEntry>
+        <inputEntry id="UT_4_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_4_3">
+          <text>&gt;= 8</text>
+        </inputEntry>
+        <inputEntry id="UT_4_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_4_1">
+          <text>"LEGAL"</text>
+        </outputEntry>
+        <outputEntry id="OE_4_2">
+          <text>"P30D"</text>
+        </outputEntry>
+        <outputEntry id="OE_4_3">
+          <text>"legal"</text>
+        </outputEntry>
+        <outputEntry id="OE_4_4">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_SmallBalance">
+        <description>סכום קטן — לא מצדיק שיחה</description>
+        <inputEntry id="UT_5_1">
+          <text>[7..20]</text>
+        </inputEntry>
+        <inputEntry id="UT_5_2">
+          <text>&lt; 25000</text>
+        </inputEntry>
+        <inputEntry id="UT_5_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_5_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_5_1">
+          <text>"REMINDER"</text>
+        </outputEntry>
+        <outputEntry id="OE_5_2">
+          <text>"P7D"</text>
+        </outputEntry>
+        <outputEntry id="OE_5_3">
+          <text>"collections"</text>
+        </outputEntry>
+        <outputEntry id="OE_5_4">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_CallEarly">
+        <description>סכום משמעותי — שיחת גבייה</description>
+        <inputEntry id="UT_6_1">
+          <text>[7..20]</text>
+        </inputEntry>
+        <inputEntry id="UT_6_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_6_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_6_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_6_1">
+          <text>"CALL"</text>
+        </outputEntry>
+        <outputEntry id="OE_6_2">
+          <text>"P5D"</text>
+        </outputEntry>
+        <outputEntry id="OE_6_3">
+          <text>"collections"</text>
+        </outputEntry>
+        <outputEntry id="OE_6_4">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_PublicPayers">
+        <description>קופות ובתי חולים — מחזור תשלום ארוך, חבל על ההסלמה</description>
+        <inputEntry id="UT_7_1">
+          <text>[21..44]</text>
+        </inputEntry>
+        <inputEntry id="UT_7_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_7_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_7_4">
+          <text>"hospital", "hmo"</text>
+        </inputEntry>
+        <outputEntry id="OE_7_1">
+          <text>"REMINDER"</text>
+        </outputEntry>
+        <outputEntry id="OE_7_2">
+          <text>"P10D"</text>
+        </outputEntry>
+        <outputEntry id="OE_7_3">
+          <text>"collections"</text>
+        </outputEntry>
+        <outputEntry id="OE_7_4">
+          <text>false</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_CallEscalated">
+        <description>פיגור בינוני — שיחה ודיווח ליצרן</description>
+        <inputEntry id="UT_8_1">
+          <text>[21..44]</text>
+        </inputEntry>
+        <inputEntry id="UT_8_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_8_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_8_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_8_1">
+          <text>"CALL"</text>
+        </outputEntry>
+        <outputEntry id="OE_8_2">
+          <text>"P7D"</text>
+        </outputEntry>
+        <outputEntry id="OE_8_3">
+          <text>"collections"</text>
+        </outputEntry>
+        <outputEntry id="OE_8_4">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_CreditHold">
+        <description>עצירת אשראי — הזמנות חדשות נעצרות</description>
+        <inputEntry id="UT_9_1">
+          <text>[45..59]</text>
+        </inputEntry>
+        <inputEntry id="UT_9_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_9_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_9_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_9_1">
+          <text>"CREDIT_HOLD"</text>
+        </outputEntry>
+        <outputEntry id="OE_9_2">
+          <text>"P7D"</text>
+        </outputEntry>
+        <outputEntry id="OE_9_3">
+          <text>"credit_control"</text>
+        </outputEntry>
+        <outputEntry id="OE_9_4">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_Legal">
+        <description>מעל 60 יום — טיפול משפטי</description>
+        <inputEntry id="UT_10_1">
+          <text>&gt;= 60</text>
+        </inputEntry>
+        <inputEntry id="UT_10_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_10_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UT_10_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="OE_10_1">
+          <text>"LEGAL"</text>
+        </outputEntry>
+        <outputEntry id="OE_10_2">
+          <text>"P30D"</text>
+        </outputEntry>
+        <outputEntry id="OE_10_3">
+          <text>"legal"</text>
+        </outputEntry>
+        <outputEntry id="OE_10_4">
+          <text>true</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_CollectionLadder">
+      <dmndi:DMNShape id="DMNShape_CollectionLadder" dmnElementRef="collection_ladder">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

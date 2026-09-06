@@ -1,0 +1,85 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "text": "### החלטת אשראי חריגה\n\nההזמנה מוחזקת עד להחלטה. הסוכן והלקוח כבר עודכנו אוטומטית.",
+      "id": "Text_Header",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_OrderId",
+      "key": "orderId",
+      "label": "מספר הזמנה",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_CustomerId",
+      "key": "customerId",
+      "label": "לקוח",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_OrderAmount",
+      "key": "orderAmount",
+      "label": "סכום ההזמנה (₪)",
+      "readonly": true,
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_Segment",
+      "key": "customerSegment",
+      "label": "סוג לקוח",
+      "readonly": true,
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "radio",
+      "id": "Field_Decision",
+      "key": "creditDecision",
+      "label": "ההחלטה",
+      "values": [
+        { "label": "שחרור מלא של ההזמנה", "value": "APPROVE" },
+        { "label": "שחרור חלקי בגובה המסגרת", "value": "PARTIAL" },
+        { "label": "לא לשחרר", "value": "REJECT" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_ApprovedAmount",
+      "key": "approvedOrderAmount",
+      "label": "הסכום המאושר לשחרור (₪)",
+      "conditional": { "hide": "=creditDecision != \"PARTIAL\"" },
+      "validate": { "min": 0 },
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_Reason",
+      "key": "decisionReason",
+      "label": "נימוק ההחלטה",
+      "validate": { "required": true, "minLength": 5 },
+      "layout": { "row": "row_5", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_LimitReview",
+      "key": "requestLimitReview",
+      "label": "להעלות לבחינה מחדש של מסגרת האשראי",
+      "layout": { "row": "row_6", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "credit-exception-decision",
+  "type": "default"
+}

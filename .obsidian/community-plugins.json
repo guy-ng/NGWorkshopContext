@@ -1,4 +1,8 @@
 [
   "obsidian42-brat",
-  "agent-client"
+  "agent-client",
+  "obsidian-rtl",
+  "obsidian-pandoc",
+  "docx-exporter",
+  "obsidian-html-plugin"
 ]

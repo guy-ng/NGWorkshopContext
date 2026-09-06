@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Style A: Nature Tech - תצוגה מקדימה</title>
+
+    <!-- Heebo for Hebrew -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           STYLE A: NATURE TECH
+           Clean, professional with organic green accents
+           Light background, glass panels, subtle patterns
+           =========================================== */
+
+        :root {
+            /* Brand Colors */
+            --primary: #8ABF3B;
+            --primary-light: #B6D66B;
+            --primary-dark: #6B9A2E;
+            --bg-cream: #FAF9F6;
+            --bg-light: #f0ede8;
+            --dark: #3E352B;
+            --text: #6B6054;
+            --text-light: #9a9189;
+            --border: #e5e1db;
+
+            /* Typography */
+            --font-primary: 'Heebo', sans-serif;
+            --title-size: clamp(2.5rem, 8vw, 5rem);
+            --subtitle-size: clamp(1rem, 2.5vw, 1.5rem);
+
+            /* Spacing */
+            --slide-padding: clamp(2rem, 5vw, 5rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background: var(--bg-cream);
+            color: var(--dark);
+        }
+
+        /* ===========================================
+           SLIDE CONTAINER
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--slide-padding);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ===========================================
+           BACKGROUND EFFECTS
+           =========================================== */
+        .gradient-mesh {
+            position: absolute;
+            inset: 0;
+            background-color: var(--bg-cream);
+            background-image:
+                radial-gradient(at 80% 0%, hsla(76, 55%, 52%, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 80%, hsla(76, 55%, 52%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 40% 40%, hsla(37, 20%, 30%, 0.03) 0px, transparent 50%);
+            z-index: 0;
+        }
+
+        .circuit-dots {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(var(--primary) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.08;
+            z-index: 1;
+        }
+
+        /* ===========================================
+           CONTENT
+           =========================================== */
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 900px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            background: var(--dark);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: white;
+            box-shadow: 0 10px 40px rgba(62, 53, 43, 0.15);
+            opacity: 0;
+            transform: scale(0.8);
+            animation: logoIn 0.8s var(--ease-out-expo) 0.2s forwards;
+        }
+
+        h1 {
+            font-size: var(--title-size);
+            font-weight: 900;
+            color: var(--dark);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            transform: translateY(40px);
+            animation: slideUp 0.8s var(--ease-out-expo) 0.4s forwards;
+        }
+
+        .highlight {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .highlight::after {
+            content: '';
+            position: absolute;
+            bottom: 0.1em;
+            right: 0;
+            width: 100%;
+            height: 0.15em;
+            background: linear-gradient(90deg, var(--primary-light), var(--primary));
+            border-radius: 2px;
+            opacity: 0.4;
+        }
+
+        .subtitle {
+            font-size: var(--subtitle-size);
+            color: var(--text);
+            font-weight: 400;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: slideUp 0.8s var(--ease-out-expo) 0.6s forwards;
+        }
+
+        /* ===========================================
+           GLASS CARD ACCENT
+           =========================================== */
+        .glass-accent {
+            position: absolute;
+            bottom: 15%;
+            left: 10%;
+            width: 200px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(138, 191, 59, 0.2);
+            border-radius: 20px;
+            opacity: 0;
+            transform: translateY(20px) rotate(-3deg);
+            animation: floatIn 1s var(--ease-out-expo) 0.8s forwards;
+        }
+
+        .glass-accent-2 {
+            position: absolute;
+            top: 20%;
+            right: 8%;
+            width: 150px;
+            height: 100px;
+            background: rgba(138, 191, 59, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(138, 191, 59, 0.15);
+            border-radius: 16px;
+            opacity: 0;
+            transform: translateY(20px) rotate(5deg);
+            animation: floatIn 1s var(--ease-out-expo) 1s forwards;
+        }
+
+        /* ===========================================
+           NEON LINE ACCENT
+           =========================================== */
+        .neon-line {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--primary-light));
+            box-shadow: 0 0 15px var(--primary), 0 0 30px var(--primary-light);
+            opacity: 0;
+            animation: lineGlow 1s var(--ease-out-expo) 1.2s forwards;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        @keyframes logoIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floatIn {
+            to {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+        }
+
+        @keyframes lineGlow {
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* ===========================================
+           STYLE LABEL
+           =========================================== */
+        .style-label {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--dark);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            z-index: 100;
+        }
+
+        .style-label span {
+            color: var(--primary-light);
+        }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-height: 600px) {
+            .logo {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+                margin-bottom: 1rem;
+            }
+            .glass-accent, .glass-accent-2 {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .glass-accent, .glass-accent-2 {
+                display: none;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-delay: 0ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="style-label">Style A: <span>Nature Tech</span></div>
+
+    <section class="slide">
+        <div class="gradient-mesh"></div>
+        <div class="circuit-dots"></div>
+
+        <div class="content">
+            <div class="logo">H</div>
+            <h1>כותרת <span class="highlight">המצגת</span> שלך</h1>
+            <p class="subtitle">תת כותרת או תיאור קצר יופיע כאן</p>
+        </div>
+
+        <div class="glass-accent"></div>
+        <div class="glass-accent-2"></div>
+        <div class="neon-line"></div>
+    </section>
+</body>
+</html>

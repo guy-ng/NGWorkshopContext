@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_DisputeRouting" name="ניתוב מחלוקת על חשבונית" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.34.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <decision id="dispute_routing" name="ניתוב מחלוקת על חשבונית">
+    <decisionTable id="DecisionTable_DisputeRouting" hitPolicy="FIRST">
+      <input id="Input_GapValue" label="שווי הפער שבמחלוקת (₪)">
+        <inputExpression id="InputExpression_GapValue" typeRef="number">
+          <text>evidence.gapValue</text>
+        </inputExpression>
+      </input>
+      <input id="Input_PodSigned" label="תעודת משלוח חתומה">
+        <inputExpression id="InputExpression_PodSigned" typeRef="boolean">
+          <text>evidence.podSigned</text>
+        </inputExpression>
+      </input>
+      <input id="Input_CarrierScan" label="קיים סריקת שילוח/ברקוד">
+        <inputExpression id="InputExpression_CarrierScan" typeRef="boolean">
+          <text>evidence.carrierScanAvailable</text>
+        </inputExpression>
+      </input>
+      <input id="Input_Segment" label="סוג לקוח">
+        <inputExpression id="InputExpression_Segment" typeRef="string">
+          <text>customerSegment</text>
+        </inputExpression>
+      </input>
+      <output id="Output_Route" label="מסלול" name="route" typeRef="string" />
+      <output id="Output_Sla" label="זמן טיפול מחייב" name="slaDuration" typeRef="string" />
+      <output id="Output_ApprovalGroup" label="קבוצת מאשרים" name="approvalGroup" typeRef="string" />
+      <rule id="Rule_Tolerance">
+        <description>פער זניח — הבירור יקר מהזיכוי</description>
+        <inputEntry id="DUT_1_1">
+          <text>&lt;= 500</text>
+        </inputEntry>
+        <inputEntry id="DUT_1_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_1_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_1_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="DOE_1_1">
+          <text>"AUTO_CREDIT"</text>
+        </outputEntry>
+        <outputEntry id="DOE_1_2">
+          <text>"PT0S"</text>
+        </outputEntry>
+        <outputEntry id="DOE_1_3">
+          <text>"system"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_NoPodSmall">
+        <description>אין תעודה חתומה ואין על מה להתווכח — מזכים</description>
+        <inputEntry id="DUT_2_1">
+          <text>&lt;= 5000</text>
+        </inputEntry>
+        <inputEntry id="DUT_2_2">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="DUT_2_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_2_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="DOE_2_1">
+          <text>"AUTO_CREDIT"</text>
+        </outputEntry>
+        <outputEntry id="DOE_2_2">
+          <text>"PT0S"</text>
+        </outputEntry>
+        <outputEntry id="DOE_2_3">
+          <text>"system"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_NoPodLarge">
+        <description>אין תעודה חתומה בסכום גדול — החלטת הנהלה</description>
+        <inputEntry id="DUT_3_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_3_2">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="DUT_3_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_3_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="DOE_3_1">
+          <text>"MANAGER_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="DOE_3_2">
+          <text>"P1D"</text>
+        </outputEntry>
+        <outputEntry id="DOE_3_3">
+          <text>"finance_managers"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_WarehouseFast">
+        <description>יש תעודה וגם סריקה — בירור מהיר במחסן</description>
+        <inputEntry id="DUT_4_1">
+          <text>&lt;= 20000</text>
+        </inputEntry>
+        <inputEntry id="DUT_4_2">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="DUT_4_3">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="DUT_4_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="DOE_4_1">
+          <text>"WAREHOUSE_CHECK"</text>
+        </outputEntry>
+        <outputEntry id="DOE_4_2">
+          <text>"P1D"</text>
+        </outputEntry>
+        <outputEntry id="DOE_4_3">
+          <text>"warehouse_supervisors"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_WarehouseStandard">
+        <description>בירור רגיל במחסן</description>
+        <inputEntry id="DUT_5_1">
+          <text>&lt;= 20000</text>
+        </inputEntry>
+        <inputEntry id="DUT_5_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_5_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_5_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="DOE_5_1">
+          <text>"WAREHOUSE_CHECK"</text>
+        </outputEntry>
+        <outputEntry id="DOE_5_2">
+          <text>"P2D"</text>
+        </outputEntry>
+        <outputEntry id="DOE_5_3">
+          <text>"warehouse_supervisors"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_ManagerReview">
+        <description>סכום גבוה — החלטת הנהלה</description>
+        <inputEntry id="DUT_6_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_6_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_6_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="DUT_6_4">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="DOE_6_1">
+          <text>"MANAGER_REVIEW"</text>
+        </outputEntry>
+        <outputEntry id="DOE_6_2">
+          <text>"P1D"</text>
+        </outputEntry>
+        <outputEntry id="DOE_6_3">
+          <text>"finance_managers"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_DisputeRouting">
+      <dmndi:DMNShape id="DMNShape_DisputeRouting" dmnElementRef="dispute_routing">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

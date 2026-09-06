@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camunda & BPMN Introduction — Maccabi Healthcare Workshop</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- BPMN Icon Font -->
+    <link rel="stylesheet" href="https://cdn.statically.io/gh/bpmn-io/bpmn-font@master/dist/css/bpmn.css">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES — CIRCUIT BOARD THEME
+           Change these to adjust the entire look
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg: #08090d;
+            --bg-card: rgba(255, 255, 255, 0.03);
+            --bg-card-hover: rgba(255, 255, 255, 0.06);
+            --text: #e8e8e8;
+            --text-dim: rgba(255, 255, 255, 0.35);
+            --text-mid: rgba(255, 255, 255, 0.55);
+            --accent: #FF6600;
+            --accent-dim: rgba(255, 102, 0, 0.25);
+            --accent-glow: rgba(255, 102, 0, 0.08);
+            --border: rgba(255, 102, 0, 0.15);
+
+            /* Typography — all clamp() for viewport fitting */
+            --font-display: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(3rem, 8vw, 6.5rem);
+            --h2-size: clamp(2rem, 5.5vw, 4rem);
+            --h3-size: clamp(1.15rem, 2.5vw, 1.75rem);
+            --body-size: clamp(0.9rem, 1.6vw, 1.25rem);
+            --small-size: clamp(0.7rem, 1.1vw, 0.95rem);
+            --mono-size: clamp(0.7rem, 1.1vw, 0.95rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1rem, 2.5vw, 2.5rem);
+            --content-gap: clamp(0.75rem, 2vw, 2rem);
+            --card-padding: clamp(0.75rem, 2vw, 1.5rem);
+
+            /* Animation */
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --dur: 0.6s;
+        }
+
+        /* ===========================================
+           BASE RESET
+           =========================================== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            height: 100%;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: var(--font-display);
+            background: var(--bg);
+            color: var(--text);
+            height: 100%;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===========================================
+           SLIDE CONTAINER
+           Each slide = exactly one viewport height
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            padding: var(--slide-padding);
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-height: 100%;
+            overflow: hidden;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        /* ===========================================
+           BACKGROUND — CIRCUIT BOARD GRID
+           =========================================== */
+        .grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 102, 0, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 102, 0, 0.04) 1px, transparent 1px);
+            background-size: clamp(30px, 5vw, 60px) clamp(30px, 5vw, 60px);
+            pointer-events: none;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 102, 0, 0.35), transparent);
+            animation: scan 5s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-size: var(--title-size);
+            font-weight: 800;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            text-align: center;
+        }
+
+        h3 {
+            font-size: var(--h3-size);
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .accent { color: var(--accent); }
+
+        .accent-underline {
+            color: var(--accent);
+            position: relative;
+        }
+        .accent-underline::after {
+            content: '';
+            position: absolute;
+            bottom: -0.1em;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .mono {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .description {
+            font-size: var(--body-size);
+            color: var(--text-mid);
+            line-height: 1.6;
+            max-width: 750px;
+            text-align: center;
+        }
+
+        /* ===========================================
+           LOGOS
+           =========================================== */
+        .logos {
+            display: flex;
+            align-items: center;
+            gap: clamp(1rem, 2.5vw, 2rem);
+        }
+
+        .logos img {
+            height: clamp(56px, 9vw, 96px);
+            object-fit: contain;
+        }
+
+        .logos img.camunda-logo {
+            height: clamp(64px, 10vw, 108px);
+        }
+
+        .mono-sep {
+            font-family: var(--font-mono);
+            color: rgba(255, 102, 0, 0.5);
+            font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+        }
+
+        /* ===========================================
+           TAGS / PILLS
+           =========================================== */
+        .tag-row {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tag {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            padding: 0.3em 0.8em;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: rgba(255, 102, 0, 0.7);
+            background: rgba(255, 102, 0, 0.05);
+        }
+
+        /* ===========================================
+           CARDS
+           =========================================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+            width: 100%;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: var(--card-padding);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            background: var(--bg-card-hover);
+            border-color: rgba(255, 102, 0, 0.35);
+        }
+
+        .card-icon {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            margin-bottom: clamp(0.4rem, 1vh, 0.75rem);
+            color: var(--accent);
+            display: block;
+        }
+
+        .card h3 {
+            margin-bottom: clamp(0.25rem, 0.5vh, 0.5rem);
+        }
+
+        .card p {
+            font-size: var(--body-size);
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        /* ===========================================
+           BPMN ICON ELEMENTS
+           =========================================== */
+        .bpmn-element {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(0.4rem, 1vh, 0.75rem);
+        }
+
+        .bpmn-icon-display {
+            width: clamp(70px, 12vw, 120px);
+            height: clamp(70px, 12vw, 120px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(255, 102, 0, 0.06);
+            border: 1.5px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .bpmn-icon-display:hover {
+            background: rgba(255, 102, 0, 0.12);
+            border-color: rgba(255, 102, 0, 0.4);
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.1);
+        }
+
+        .bpmn-icon-display [class^="bpmn-icon-"]::before {
+            font-size: clamp(2rem, 4.5vw, 3.5rem);
+            color: var(--accent);
+        }
+
+        .bpmn-label {
+            font-family: var(--font-mono);
+            font-size: var(--body-size);
+            color: var(--text-mid);
+            text-align: center;
+        }
+
+        .bpmn-sublabel {
+            font-size: clamp(0.65rem, 1vw, 0.85rem);
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            text-align: center;
+        }
+
+        /* Gateway uses diamond shape */
+        .bpmn-icon-display.diamond {
+            border-radius: 4px;
+            transform: rotate(45deg);
+        }
+        .bpmn-icon-display.diamond [class^="bpmn-icon-"]::before {
+            transform: rotate(-45deg);
+        }
+
+        /* Elements row */
+        .elements-row {
+            display: flex;
+            gap: clamp(1.5rem, 4vw, 4rem);
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        /* Connector arrow between elements */
+        .connector {
+            display: flex;
+            align-items: center;
+            color: var(--text-dim);
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            padding-top: clamp(15px, 3vw, 30px);
+        }
+
+        /* ===========================================
+           TWO-COLUMN LAYOUT
+           =========================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1.5rem, 3vw, 3rem);
+            align-items: center;
+            width: 100%;
+        }
+
+        .two-col .left {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.5rem, 1.5vh, 1.25rem);
+        }
+
+        .two-col .right {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .feature-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.3rem, 0.8vh, 0.6rem);
+        }
+
+        .feature-list li {
+            font-size: var(--body-size);
+            color: var(--text-mid);
+            line-height: 1.5;
+            padding-left: 1.2em;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '>';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-family: var(--font-mono);
+            font-weight: 600;
+        }
+
+        /* ===========================================
+           ANIMATIONS — scroll-triggered
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(15px) skewX(-1deg);
+            transition: opacity var(--dur) var(--ease),
+                        transform var(--dur) var(--ease);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0) skewX(0);
+        }
+
+        /* Stagger children */
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.35s; }
+        .reveal:nth-child(5) { transition-delay: 0.4s; }
+        .reveal:nth-child(6) { transition-delay: 0.45s; }
+
+        /* Card stagger */
+        .cards-grid .card:nth-child(1) { transition-delay: 0.2s; }
+        .cards-grid .card:nth-child(2) { transition-delay: 0.3s; }
+        .cards-grid .card:nth-child(3) { transition-delay: 0.4s; }
+
+        .elements-row .bpmn-element:nth-child(1) { transition-delay: 0.15s; }
+        .elements-row .bpmn-element:nth-child(2) { transition-delay: 0.25s; }
+        .elements-row .connector:nth-child(2) { transition-delay: 0.2s; }
+        .elements-row .connector:nth-child(4) { transition-delay: 0.3s; }
+        .elements-row .bpmn-element:nth-child(3) { transition-delay: 0.3s; }
+        .elements-row .bpmn-element:nth-child(5) { transition-delay: 0.35s; }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent);
+            z-index: 100;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px rgba(255, 102, 0, 0.5);
+        }
+
+        /* ===========================================
+           NAV DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(1rem, 2vw, 2rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(255, 102, 0, 0.4);
+        }
+
+        .nav-dot:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===========================================
+           SLIDE NUMBER
+           =========================================== */
+        .slide-number {
+            position: absolute;
+            bottom: clamp(1rem, 2vh, 2rem);
+            right: clamp(1.5rem, 3vw, 3rem);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+        }
+
+        /* ===========================================
+           RESPONSIVE BREAKPOINTS
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(1rem, 3vw, 2.5rem);
+                --content-gap: clamp(0.5rem, 1.5vw, 1rem);
+                --title-size: clamp(1.75rem, 5vw, 3rem);
+                --h2-size: clamp(1.25rem, 3.5vw, 2.25rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 2.5vw, 1.5rem);
+                --title-size: clamp(1.5rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1.1rem, 3vw, 1.75rem);
+                --body-size: clamp(0.7rem, 1.1vw, 0.9rem);
+            }
+            .nav-dots { display: none; }
+        }
+
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2vw, 1rem);
+                --title-size: clamp(1.25rem, 4vw, 2rem);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .two-col {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .two-col .left { align-items: center; }
+            .feature-list li { text-align: left; }
+            .elements-row {
+                gap: clamp(1rem, 3vw, 2rem);
+            }
+            .connector { display: none; }
+        }
+
+        @media (max-width: 600px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===========================================
+           REDUCED MOTION
+           =========================================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+            .scan-line { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation dots -->
+    <nav class="nav-dots" id="navDots"></nav>
+
+    <!-- ========================================
+         SLIDE 1: TITLE — NG Workshop + Camunda
+         ======================================== -->
+    <section class="slide" data-title="Introduction">
+        <div class="grid-bg"></div>
+        <div class="scan-line"></div>
+        <div class="slide-content">
+            <div class="logos reveal">
+                <img src="assets/ng-workshop-logo.png" alt="NG Workshop">
+                <span class="mono-sep">//</span>
+                <img src="assets/camunda-logo.png" alt="Camunda" class="camunda-logo">
+            </div>
+            <div style="height: clamp(1.5rem, 3vh, 3rem)"></div>
+            <h1 class="reveal"><span class="accent-underline">Camunda</span> & BPMN</h1>
+            <div style="height: clamp(1rem, 2vh, 2rem)"></div>
+            <p class="mono reveal">// introduction workshop &mdash; maccabi healthcare</p>
+            <div style="height: clamp(1.25rem, 2.5vh, 2.5rem)"></div>
+            <p class="description reveal">NG Workshop — Your Camunda partner,<br>helping Maccabi Healthcare get maximum results from process orchestration</p>
+            <div style="height: clamp(1.5rem, 3vh, 3rem)"></div>
+            <div class="tag-row reveal">
+                <span class="tag">process-orchestration</span>
+                <span class="tag">bpmn-2.0</span>
+                <span class="tag">partner-workshop</span>
+            </div>
+        </div>
+        <span class="slide-number">01 / 08</span>
+    </section>
+
+    <!-- ========================================
+         SLIDE 2: ABOUT NG WORKSHOP + GUY ELISHA
+         ======================================== -->
+    <section class="slide" data-title="About Us">
+        <div class="grid-bg"></div>
+        <div class="scan-line"></div>
+        <div class="slide-content">
+            <p class="mono reveal">// about-us</p>
+            <div style="height: clamp(0.4rem, 0.8vh, 0.75rem)"></div>
+            <div class="logos reveal">
+                <img src="assets/ng-workshop-logo.png" alt="NG Workshop">
+            </div>
+            <div style="height: clamp(1rem, 2vh, 2rem)"></div>
+            <h2 class="reveal"><span class="accent">NG Workshop</span></h2>
+            <div style="height: clamp(0.5rem, 1vh, 1rem)"></div>
+            <p class="description reveal">Official Camunda Partner in Israel — helping enterprises design, implement, and optimize business process automation</p>
+            <div style="height: clamp(1.5rem, 3vh, 3rem)"></div>
+            <div class="card reveal" style="max-width:500px;width:100%;text-align:center">
+                <h3 style="margin-bottom:clamp(0.3rem,0.6vh,0.5rem)">Guy Elisha</h3>
+                <p style="color:var(--accent);font-family:var(--font-mono);font-size:var(--small-size);letter-spacing:.05em;margin-bottom:clamp(0.3rem,0.6vh,0.5rem)">Founder & Process Orchestration Consultant</p>
+                <p style="font-family:var(--font-mono);font-size:var(--small-size)"><a href="mailto:guy@ngworkshop.co.il" style="color:var(--text-mid);text-decoration:none;border-bottom:1px solid var(--border)">guy@ngworkshop.co.il</a></p>
+            </div>
+            <div style="height: clamp(1rem, 2vh, 2rem)"></div>
+            <div class="tag-row reveal">
+                <span class="tag">camunda-partner</span>
+                <span class="tag">process-automation</span>
+                <span class="tag">israel</span>
+            </div>
+        </div>
+        <span class="slide-number">02 / 08</span>
+    </section>
+
+    <!-- ========================================
+         SLIDE 3: WHAT IS CAMUNDA?
+         ======================================== -->
+    <section class="slide" data-title="What is Camunda?">
+        <div class="grid-bg"></div>
+        <div class="scan-line"></div>
+        <div class="slide-content">
+            <p class="mono reveal">// what-is</p>
+            <div style="height: clamp(0.4rem, 0.8vh, 0.75rem)"></div>
+            <h2 class="reveal">What is <span class="accent">Camunda</span>?</h2>
+            <div style="height: var(--content-gap)"></div>
+            <div class="two-col reveal">
+                <div class="left">
+                    <p class="description" style="text-align:left;max-width:none">
+                        Camunda is a <strong style="color:var(--text)">process orchestration platform</strong> that enables organizations to design, automate, and optimize complex business workflows.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Model processes visually with BPMN 2.0</li>
+                        <li>Automate human & system tasks end-to-end</li>
+                        <li>Monitor and optimize in real-time</li>
+                        <li>Connect microservices, APIs, and people</li>
+                        <li>Enterprise-grade with horizontal scaling</li>
+                    </ul>
+                </div>
+                <div class="right">
+                    <div class="cards-grid" style="grid-template-columns:1fr">
+                        <div class="card reveal">
+                            <span class="card-icon">&#9998;</span>
+                            <h3>Modeler</h3>
+                            <p>Visual BPMN diagram editor</p>
+                        </div>
+                        <div class="card reveal">
+                            <span class="card-icon">&#9881;</span>
+                            <h3>Zeebe Engine</h3>
+                            <p>High-performance workflow engine</p>
+                        </div>
+                        <div class="card reveal">
+                            <span class="card-icon">&#9776;</span>
+                            <h3>Operate & Optimize</h3>
+                            <p>Monitoring and analytics dashboards</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">03 / 08</span>
+    </section>
+
+    <!-- ========================================
+         SLIDE 3: WHAT IS BPMN?
+         ======================================== -->
+    <section class="slide" data-title="What is BPMN?">
+        <div class="grid-bg"></div>
+        <div class="scan-line"></div>
+        <div class="slide-content">
+            <p class="mono reveal">// standard</p>
+            <div style="height: clamp(0.4rem, 0.8vh, 0.75rem)"></div>
+            <h2 class="reveal">What is <span class="accent">BPMN</span>?</h2>
+            <div style="height: clamp(0.5rem, 1vh, 1rem)"></div>
+            <p class="description reveal">
+                <strong style="color:var(--text)">Business Process Model and Notation</strong> — an international standard (ISO 19510) for graphically representing business processes in a workflow.
+            </p>
+            <div style="height: var(--content-gap)"></div>
+            <div class="cards-grid reveal" style="max-width:1200px">
+                <div class="card reveal">
+                    <span class="card-icon">&#9998;</span>
+                    <h3>Visual Language</h3>
+                    <p>A shared diagram notation that both business and technical teams can understand</p>
+                </div>
+                <div class="card reveal">
+                    <span class="card-icon">&#9881;</span>
+                    <h3>Executable</h3>
+                    <p>BPMN diagrams can be directly executed by process engines like Camunda</p>
+                </div>
+                <div class="card reveal">
+                    <span class="card-icon">&#8984;</span>
+                    <h3>Universal Standard</h3>
+                    <p>Used worldwide across industries — healthcare, finance, government, and more</p>
+                </div>
+            </div>
+            <div style="height: clamp(0.5rem, 1vh, 1rem)"></div>
+            <div class="tag-row reveal">
+                <span class="tag">events</span>
+                <span class="tag">tasks</span>
+                <span class="tag">gateways</span>
+                <span class="tag">flows</span>
+            </div>
+        </div>
+        <span class="slide-number">04 / 08</span>
+    </section>
+
+    <!-- ========================================
+         SLIDE 4: START & END EVENTS
+         ======================================== -->
+    <section class="slide" data-title="Start & End Events">
+        <div class="grid-bg"></div>
+        <div class="scan-line"></div>
+        <div class="slide-content">
+            <p class="mono reveal">// bpmn-elements.events</p>
+            <div style="height: clamp(0.4rem, 0.8vh, 0.75rem)"></div>
+            <h2 class="reveal">Start & End <span class="accent">Events</span></h2>
+            <div style="height: clamp(0.5rem, 1vh, 1rem)"></div>
+            <p class="description reveal">Events define <strong style="color:var(--text)">when a process begins</strong> and <strong style="color:var(--text)">when it completes</strong>. Every BPMN process must have at least one start and one end event.</p>
+            <div style="height: var(--content-gap)"></div>
+            <div class="elements-row reveal">
+                <div class="bpmn-element reveal">
+                    <div class="bpmn-icon-display">
+                        <span class="bpmn-icon-start-event-none"></span>
+                    </div>
+                    <span class="bpmn-label">Start Event</span>
+                    <span class="bpmn-sublabel">Triggers process initiation</span>
+                </div>
+                <div class="connector reveal">&rarr; &mdash; &mdash; &rarr;</div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:clamp(0.3rem,0.6vh,0.5rem);padding-top:clamp(5px,1vw,12px)">
+                    <span style="font-family:var(--font-mono);font-size:var(--small-size);color:var(--text-dim);letter-spacing:.1em">PROCESS FLOW</span>
+                    <div style="width:clamp(80px,12vw,140px);height:clamp(30px,5vw,50px);border:1px dashed var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center">
+                        <span style="font-family:var(--font-mono);font-size:var(--small-size);color:var(--text-dim)">tasks, gateways...</span>
+                    </div>
+                </div>
+                <div class="connector reveal">&rarr; &mdash; &mdash; &rarr;</div>
+                <div class="bpmn-element reveal">
+                    <div class="bpmn-icon-display" style="border-width:3px">
+                        <span class="bpmn-icon-end-event-none"></span>
+                    </div>
+                    <span class="bpmn-label">End Event</span>
+                    <span class="bpmn-sublabel">Marks process completion</span>
+                </div>
+            </div>
+            <div style="height: var(--content-gap)"></div>
+            <div class="tag-row reveal">
+                <span class="tag">thin circle = start</span>
+                <span class="tag">thick circle = end</span>
+            </div>
+        </div>
+        <span class="slide-number">05 / 08</span>
+    </section>
+
+    <!-- ========================================
+         SLIDE 5: TASKS
+         ======================================== -->
+    <section class="slide" data-title="Tasks">
+        <div class="grid-bg"></div>
+        <div class="scan-line"></div>
+        <div class="slide-content">
+            <p class="mono reveal">// bpmn-elements.tasks</p>
+            <div style="height: clamp(0.4rem, 0.8vh, 0.75rem)"></div>
+            <h2 class="reveal">BPMN <span class="accent">Tasks</span></h2>
+            <div style="height: clamp(0.5rem, 1vh, 1rem)"></div>
+            <p class="description reveal">Tasks represent <strong style="color:var(--text)">work to be done</strong> within a process. Different task types indicate who or what performs the work.</p>
+            <div style="height: var(--content-gap)"></div>
+            <div class="elements-row reveal">
+                <div class="bpmn-element reveal">
+                    <div class="bpmn-icon-display" style="border-radius:10px">
+                        <span class="bpmn-icon-task"></span>
+                    </div>
+                    <span class="bpmn-label">Task</span>
+                    <span class="bpmn-sublabel">Generic work unit</span>
+                </div>
+                <div class="bpmn-element reveal">
+                    <div class="bpmn-icon-display" style="border-radius:10px">
+                        <span class="bpmn-icon-manual-task"></span>
+                    </div>
+                    <span class="bpmn-label">Manual Task</span>
+                    <span class="bpmn-sublabel">Performed by a person<br>without system aid</span>
+                </div>
+                <div class="bpmn-element reveal">
+                    <div class="bpmn-icon-display" style="border-radius:10px">
+                        <span class="bpmn-icon-service-task"></span>
+                    </div>
+                    <span class="bpmn-label">Service Task</span>
+                    <span class="bpmn-sublabel">Automated execution<br>by software / API</span>
+                </div>
+            </div>
+            <div style="height: var(--content-gap)"></div>
+            <div class="tag-row reveal">
+                <span class="tag">rounded rectangle</span>
+                <span class="tag">icon = task type</span>
+            </div>
+        </div>
+        <span class="slide-number">06 / 08</span>
+    </section>
+
+    <!-- ========================================
+         SLIDE 6: GATEWAYS
+         ======================================== -->
+    <section class="slide" data-title="Gateways">
+        <div class="grid-bg"></div>
+        <div class="scan-line"></div>
+        <div class="slide-content">
+            <p class="mono reveal">// bpmn-elements.gateways</p>
+            <div style="height: clamp(0.4rem, 0.8vh, 0.75rem)"></div>
+            <h2 class="reveal">BPMN <span class="accent">Gateways</span></h2>
+            <div style="height: clamp(0.5rem, 1vh, 1rem)"></div>
+            <p class="description reveal">Gateways control <strong style="color:var(--text)">the flow of a process</strong> — they split, merge, and route paths based on conditions or events.</p>
+            <div style="height: var(--content-gap)"></div>
+            <div class="two-col reveal">
+                <div class="left" style="align-items:center">
+                    <div class="bpmn-element reveal">
+                        <div class="bpmn-icon-display diamond" style="width:clamp(80px,14vw,130px);height:clamp(80px,14vw,130px)">
+                            <span class="bpmn-icon-gateway-none"></span>
+                        </div>
+                        <div style="height:clamp(0.5rem,1vh,0.75rem)"></div>
+                        <span class="bpmn-label">Exclusive Gateway</span>
+                        <span class="bpmn-sublabel">Diamond shape</span>
+                    </div>
+                </div>
+                <div class="left">
+                    <ul class="feature-list">
+                        <li><strong style="color:var(--text)">Exclusive (XOR)</strong> — One path based on condition</li>
+                        <li><strong style="color:var(--text)">Parallel (AND)</strong> — All paths simultaneously</li>
+                        <li><strong style="color:var(--text)">Inclusive (OR)</strong> — One or more paths</li>
+                        <li><strong style="color:var(--text)">Event-Based</strong> — Wait for events to decide</li>
+                    </ul>
+                    <div style="height: clamp(0.5rem, 1vh, 0.75rem)"></div>
+                    <div class="tag-row" style="justify-content:flex-start">
+                        <span class="tag">decision-points</span>
+                        <span class="tag">flow-control</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <span class="slide-number">07 / 08</span>
+    </section>
+
+    <!-- ========================================
+         SLIDE 8: LIVE DEMO & RESOURCES
+         ======================================== -->
+    <section class="slide" data-title="Live Demo">
+        <div class="grid-bg"></div>
+        <div class="scan-line"></div>
+        <div class="slide-content">
+            <p class="mono reveal">// live-demo</p>
+            <div style="height: clamp(0.4rem, 0.8vh, 0.75rem)"></div>
+            <h2 class="reveal"><span class="accent">Live</span> Demo</h2>
+            <div style="height: var(--content-gap)"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(0.75rem,2vw,1.5rem);max-width:800px;width:100%">
+                <a href="https://camunda.io" target="_blank" class="card reveal" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;text-align:center">
+                    <img src="assets/camunda-square-white.png" alt="Camunda" style="height:clamp(48px,8vw,80px);object-fit:contain;margin-bottom:clamp(0.4rem,0.8vh,0.6rem)">
+                    <h3>Camunda Platform</h3>
+                    <p style="margin-bottom:clamp(0.4rem,0.8vh,0.6rem)">camunda.io</p>
+                    <span class="tag" style="font-size:clamp(0.55rem,0.8vw,0.7rem)">SSO access for all Maccabi employees</span>
+                </a>
+                <a href="#" class="card reveal" style="text-decoration:none;color:inherit;cursor:default;display:flex;flex-direction:column;align-items:center;text-align:center">
+                    <div style="height:clamp(48px,8vw,80px);display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.9);border-radius:8px;padding:clamp(4px,0.5vw,8px) clamp(8px,1.5vw,16px);margin-bottom:clamp(0.4rem,0.8vh,0.6rem)">
+                        <img src="assets/camunda-academy.png" alt="Camunda Academy" style="height:clamp(32px,5vw,56px);object-fit:contain">
+                    </div>
+                    <h3>Camunda Academy</h3>
+                    <p style="margin-bottom:clamp(0.4rem,0.8vh,0.6rem)">Free training & certification</p>
+                    <span class="tag" style="font-size:clamp(0.55rem,0.8vw,0.7rem)">Link will be sent by email</span>
+                </a>
+            </div>
+            <div style="height: var(--content-gap)"></div>
+            <p class="description reveal">Let's see Camunda in action!</p>
+        </div>
+        <span class="slide-number">08 / 08</span>
+    </section>
+
+    <!-- ========================================
+       JAVASCRIPT — Navigation & Animations
+       ======================================== -->
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           Handles keyboard nav, scroll detection,
+           progress bar, nav dots, and animations
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.isScrolling = false;
+
+                this.initNavDots();
+                this.initObserver();
+                this.initKeyboard();
+                this.initWheel();
+                this.initTouch();
+                this.updateProgress();
+
+                // Mark first slide visible
+                this.slides[0].classList.add('visible');
+            }
+
+            /* --- Navigation Dots --- */
+            initNavDots() {
+                const nav = document.getElementById('navDots');
+                this.slides.forEach((slide, i) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    nav.appendChild(dot);
+                });
+                this.dots = nav.querySelectorAll('.nav-dot');
+            }
+
+            /* --- Intersection Observer for scroll-triggered animations --- */
+            initObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            const index = Array.from(this.slides).indexOf(entry.target);
+                            if (index !== -1) {
+                                this.currentSlide = index;
+                                this.updateDots();
+                                this.updateProgress();
+                            }
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            /* --- Keyboard Navigation --- */
+            initKeyboard() {
+                document.addEventListener('keydown', (e) => {
+                    switch (e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.totalSlides - 1);
+                            break;
+                    }
+                });
+            }
+
+            /* --- Mouse Wheel Navigation --- */
+            initWheel() {
+                let wheelTimeout;
+                document.addEventListener('wheel', (e) => {
+                    if (this.isScrolling) return;
+                    clearTimeout(wheelTimeout);
+                    wheelTimeout = setTimeout(() => {
+                        if (e.deltaY > 30) this.nextSlide();
+                        else if (e.deltaY < -30) this.prevSlide();
+                    }, 50);
+                }, { passive: true });
+            }
+
+            /* --- Touch / Swipe Navigation --- */
+            initTouch() {
+                let startY = 0;
+                document.addEventListener('touchstart', (e) => {
+                    startY = e.touches[0].clientY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    const deltaY = startY - e.changedTouches[0].clientY;
+                    if (Math.abs(deltaY) > 50) {
+                        if (deltaY > 0) this.nextSlide();
+                        else this.prevSlide();
+                    }
+                }, { passive: true });
+            }
+
+            /* --- Slide Navigation --- */
+            goToSlide(index) {
+                if (index < 0 || index >= this.totalSlides) return;
+                this.isScrolling = true;
+                this.currentSlide = index;
+                this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                this.updateDots();
+                this.updateProgress();
+                setTimeout(() => { this.isScrolling = false; }, 800);
+            }
+
+            nextSlide() {
+                this.goToSlide(this.currentSlide + 1);
+            }
+
+            prevSlide() {
+                this.goToSlide(this.currentSlide - 1);
+            }
+
+            /* --- Update UI --- */
+            updateDots() {
+                this.dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentSlide);
+                });
+            }
+
+            updateProgress() {
+                const progress = ((this.currentSlide + 1) / this.totalSlides) * 100;
+                document.getElementById('progressBar').style.width = progress + '%';
+            }
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new SlidePresentation();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### אישור רגולטורי\n\nיש לאמת את פרטי המוצר מול העלון ומאגר משרד הבריאות.",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_TradeName",
+      "key": "tradeName",
+      "label": "שם מסחרי",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_RegistryStatus",
+      "key": "registryStatus",
+      "label": "סטטוס במאגר התרופות",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "select",
+      "id": "Field_RegulatoryClassification",
+      "key": "regulatoryClassification",
+      "label": "סיווג רגולטורי",
+      "values": [
+        { "label": "רגיל", "value": "STANDARD" },
+        { "label": "מבוקר", "value": "CONTROLLED" },
+        { "label": "קירור", "value": "COLD_CHAIN" },
+        { "label": "מבוקר וקירור", "value": "CONTROLLED_COLD_CHAIN" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_FormalRelease",
+      "key": "formalReleaseRequired",
+      "label": "נדרש שחרור פורמלי לכל אצווה",
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_HebrewLabel",
+      "key": "hebrewLabelVerified",
+      "label": "דרישות התווית בעברית אומתו",
+      "validate": { "required": true },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_RegulatoryNotes",
+      "key": "regulatoryNotes",
+      "label": "הערות QA / רוקחות",
+      "rows": 4,
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_RegulatoryApproved",
+      "key": "regulatoryApproved",
+      "label": "מאשר/ת את פתיחת המוצר",
+      "layout": { "row": "row_5", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "sku-regulatory-approval",
+  "type": "default"
+}

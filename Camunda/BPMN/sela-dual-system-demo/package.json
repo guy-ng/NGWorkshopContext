@@ -1,0 +1,12 @@
+{
+  "name": "sela-dual-system-demo",
+  "private": true,
+  "scripts": {
+    "validate:forms": "node validate-forms.cjs"
+  },
+  "devDependencies": {
+    "@bpmn-io/form-json-schema": "^1.18.0",
+    "ajv": "^8.17.1",
+    "ajv-errors": "^3.0.0"
+  }
+}

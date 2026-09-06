@@ -1,0 +1,75 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### אזור אחסון ומפרט תפעולי",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_TradeName",
+      "key": "tradeName",
+      "label": "מוצר",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "select",
+      "id": "Field_TemperatureZone",
+      "key": "temperatureZone",
+      "label": "אזור טמפרטורה",
+      "values": [
+        { "label": "טמפרטורת חדר", "value": "AMBIENT" },
+        { "label": "2–8°C", "value": "COLD_2_8" },
+        { "label": "הקפאה", "value": "FROZEN" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "select",
+      "id": "Field_LocationType",
+      "key": "locationType",
+      "label": "סוג מיקום",
+      "values": [
+        { "label": "מדף ליקוט", "value": "PICK_FACE" },
+        { "label": "משטח", "value": "PALLET" },
+        { "label": "כספת מבוקרים", "value": "CONTROLLED_SAFE" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_PickingEquipment",
+      "key": "pickingEquipment",
+      "label": "התאמת ציוד ליקוט",
+      "rows": 3,
+      "validate": { "required": true },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_ShippingSpecification",
+      "key": "shippingSpecification",
+      "label": "מפרט אריזה לשילוח",
+      "rows": 3,
+      "validate": { "required": true },
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_StorageApproved",
+      "key": "storageApproved",
+      "label": "המפרט התפעולי אושר",
+      "layout": { "row": "row_5", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "sku-storage-specification",
+  "type": "default"
+}

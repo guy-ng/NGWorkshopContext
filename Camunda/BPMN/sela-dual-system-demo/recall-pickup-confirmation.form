@@ -1,0 +1,73 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### אישור איסוף מוצר שנכלל בריקול\n\nיש לתעד את הכמות שנאספה ואת פרטי האוסף.",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_DestinationName",
+      "key": "destinationName",
+      "label": "יעד",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ProductName",
+      "key": "productName",
+      "label": "מוצר",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_BatchNumber",
+      "key": "batchNumber",
+      "label": "מספר אצווה",
+      "readonly": true,
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_CollectedQuantity",
+      "key": "collectedQuantity",
+      "label": "כמות שנאספה",
+      "validate": { "required": true, "min": 0 },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_CollectorName",
+      "key": "collectorName",
+      "label": "שם האוסף",
+      "validate": { "required": true, "minLength": 2 },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "datetime",
+      "id": "Field_CollectionTime",
+      "key": "collectionTime",
+      "label": "מועד האיסוף",
+      "timeSerializingFormat": "utc_offset",
+      "validate": { "required": true },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_CollectionNotes",
+      "key": "collectionNotes",
+      "label": "הערות",
+      "rows": 3,
+      "layout": { "row": "row_4", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "recall-pickup-confirmation",
+  "type": "default"
+}

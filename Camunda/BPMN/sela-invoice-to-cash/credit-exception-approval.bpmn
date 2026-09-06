@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_CreditExceptionApproval" targetNamespace="http://bpmn.io/schema/bpmn" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:process id="CreditExceptionApproval" name="החלטת אשראי חריגה בזמן ההזמנה" isExecutable="true">
+    <bpmn:startEvent id="Start_CreditBreach" name="הזמנה חורגת ממסגרת האשראי">
+      <bpmn:outgoing>Flow_StartToHold</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_CreditBreach" messageRef="Message_CreditLimitBreached" />
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_HoldOrder" name="החזקת ההזמנה ועדכון הסוכן והלקוח">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="hold-order-in-erp" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=orderId" target="orderId" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_StartToHold</bpmn:incoming>
+      <bpmn:outgoing>Flow_HoldToExposure</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_BuildExposureView" name="ריכוז תמונת חשיפה: חוב פתוח, הזמנות בליקוט ומלאי קונסיגנציה">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="build-customer-exposure" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=customerId" target="customerId" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_HoldToExposure</bpmn:incoming>
+      <bpmn:outgoing>Flow_ExposureToRules</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:businessRuleTask id="Rules_CreditRouting" name="מי מאשר ותוך כמה זמן">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="credit_exception_routing" resultVariable="creditRoute" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ExposureToRules</bpmn:incoming>
+      <bpmn:outgoing>Flow_RulesToRoute</bpmn:outgoing>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="Gateway_CreditRoute" name="מסלול ההחלטה" default="Flow_RouteManual">
+      <bpmn:incoming>Flow_RulesToRoute</bpmn:incoming>
+      <bpmn:outgoing>Flow_RouteAutoApprove</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RouteAutoReject</bpmn:outgoing>
+      <bpmn:outgoing>Flow_RouteManual</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_CreditDecision" name="החלטת אשראי חריגה">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="credit-exception-decision" />
+        <zeebe:assignmentDefinition candidateGroups="=[creditRoute.approverGroup]" />
+        <zeebe:taskSchedule dueDate="=string(now() + duration(creditRoute.slaDuration))" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_RouteManual</bpmn:incoming>
+      <bpmn:outgoing>Flow_DecisionMade</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="Boundary_CreditSla" name="חריגת SLA" attachedToRef="Task_CreditDecision" cancelActivity="false">
+      <bpmn:outgoing>Flow_CreditSlaBreach</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_CreditSla">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">=duration(creditRoute.slaDuration)</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="Task_EscalateToCfo" name="הסלמה לסמנכ&quot;ל הכספים ועדכון הסוכן">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="escalate-credit-decision" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_CreditSlaBreach</bpmn:incoming>
+      <bpmn:outgoing>Flow_CfoToEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_SlaEscalated" name="ההסלמה נשלחה">
+      <bpmn:incoming>Flow_CfoToEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_Decision" name="מה הוחלט?" default="Flow_DecisionRejected">
+      <bpmn:incoming>Flow_DecisionMade</bpmn:incoming>
+      <bpmn:outgoing>Flow_DecisionApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_DecisionPartial</bpmn:outgoing>
+      <bpmn:outgoing>Flow_DecisionRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_ReleasePartial" name="שחרור חלקי של ההזמנה בגובה המסגרת">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="release-order-partially" retries="3" />
+        <zeebe:ioMapping>
+          <zeebe:input source="=approvedOrderAmount" target="approvedOrderAmount" />
+        </zeebe:ioMapping>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_DecisionPartial</bpmn:incoming>
+      <bpmn:outgoing>Flow_PartialToRelease</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_ReleaseEntry" name="שחרור ההזמנה">
+      <bpmn:incoming>Flow_RouteAutoApprove</bpmn:incoming>
+      <bpmn:incoming>Flow_DecisionApproved</bpmn:incoming>
+      <bpmn:incoming>Flow_PartialToRelease</bpmn:incoming>
+      <bpmn:outgoing>Flow_ReleaseEntryToRelease</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_ReleaseOrder" name="שחרור ההזמנה לליקוט ועדכון הלקוח והסוכן">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="release-order-to-fulfilment" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ReleaseEntryToRelease</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToReleasedEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_OrderReleased" name="ההזמנה שוחררה">
+      <bpmn:incoming>Flow_ToReleasedEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_RejectEntry" name="ההזמנה לא משוחררת">
+      <bpmn:incoming>Flow_RouteAutoReject</bpmn:incoming>
+      <bpmn:incoming>Flow_DecisionRejected</bpmn:incoming>
+      <bpmn:outgoing>Flow_RejectEntryToNotify</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Task_NotifyRejection" name="עדכון הלקוח והסוכן וסגירת ההזמנה">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="notify-order-not-released" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_RejectEntryToNotify</bpmn:incoming>
+      <bpmn:outgoing>Flow_ToNotReleasedEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_OrderNotReleased" name="ההזמנה לא שוחררה">
+      <bpmn:incoming>Flow_ToNotReleasedEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_StartToHold" sourceRef="Start_CreditBreach" targetRef="Task_HoldOrder" />
+    <bpmn:sequenceFlow id="Flow_HoldToExposure" sourceRef="Task_HoldOrder" targetRef="Task_BuildExposureView" />
+    <bpmn:sequenceFlow id="Flow_ExposureToRules" sourceRef="Task_BuildExposureView" targetRef="Rules_CreditRouting" />
+    <bpmn:sequenceFlow id="Flow_RulesToRoute" sourceRef="Rules_CreditRouting" targetRef="Gateway_CreditRoute" />
+    <bpmn:sequenceFlow id="Flow_RouteAutoApprove" name="אישור אוטומטי" sourceRef="Gateway_CreditRoute" targetRef="Gateway_ReleaseEntry">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=creditRoute.decision = "AUTO_APPROVE"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_RouteAutoReject" name="דחייה אוטומטית" sourceRef="Gateway_CreditRoute" targetRef="Gateway_RejectEntry">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=creditRoute.decision = "AUTO_REJECT"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_RouteManual" name="החלטה אנושית" sourceRef="Gateway_CreditRoute" targetRef="Task_CreditDecision" />
+    <bpmn:sequenceFlow id="Flow_CreditSlaBreach" sourceRef="Boundary_CreditSla" targetRef="Task_EscalateToCfo" />
+    <bpmn:sequenceFlow id="Flow_CfoToEnd" sourceRef="Task_EscalateToCfo" targetRef="End_SlaEscalated" />
+    <bpmn:sequenceFlow id="Flow_DecisionMade" sourceRef="Task_CreditDecision" targetRef="Gateway_Decision" />
+    <bpmn:sequenceFlow id="Flow_DecisionApproved" name="אושר" sourceRef="Gateway_Decision" targetRef="Gateway_ReleaseEntry">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=creditDecision = "APPROVE"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_DecisionPartial" name="שחרור חלקי" sourceRef="Gateway_Decision" targetRef="Task_ReleasePartial">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=creditDecision = "PARTIAL"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_DecisionRejected" name="נדחה" sourceRef="Gateway_Decision" targetRef="Gateway_RejectEntry" />
+    <bpmn:sequenceFlow id="Flow_PartialToRelease" sourceRef="Task_ReleasePartial" targetRef="Gateway_ReleaseEntry" />
+    <bpmn:sequenceFlow id="Flow_ReleaseEntryToRelease" sourceRef="Gateway_ReleaseEntry" targetRef="Task_ReleaseOrder" />
+    <bpmn:sequenceFlow id="Flow_ToReleasedEnd" sourceRef="Task_ReleaseOrder" targetRef="End_OrderReleased" />
+    <bpmn:sequenceFlow id="Flow_RejectEntryToNotify" sourceRef="Gateway_RejectEntry" targetRef="Task_NotifyRejection" />
+    <bpmn:sequenceFlow id="Flow_ToNotReleasedEnd" sourceRef="Task_NotifyRejection" targetRef="End_OrderNotReleased" />
+  </bpmn:process>
+  <bpmn:message id="Message_CreditLimitBreached" name="credit-limit-breached" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="CreditExceptionApproval">
+      <bpmndi:BPMNShape id="Start_CreditBreach_di" bpmnElement="Start_CreditBreach">
+        <dc:Bounds x="152" y="222" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="130" y="265" width="85" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_HoldOrder_di" bpmnElement="Task_HoldOrder">
+        <dc:Bounds x="240" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_BuildExposureView_di" bpmnElement="Task_BuildExposureView">
+        <dc:Bounds x="400" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Rules_CreditRouting_di" bpmnElement="Rules_CreditRouting">
+        <dc:Bounds x="560" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CreditRoute_di" bpmnElement="Gateway_CreditRoute" isMarkerVisible="true">
+        <dc:Bounds x="720" y="215" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="710" y="185" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreditDecision_di" bpmnElement="Task_CreditDecision">
+        <dc:Bounds x="820" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Boundary_CreditSla_di" bpmnElement="Boundary_CreditSla">
+        <dc:Bounds x="852" y="262" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="780" y="272" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EscalateToCfo_di" bpmnElement="Task_EscalateToCfo">
+        <dc:Bounds x="820" y="340" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_SlaEscalated_di" bpmnElement="End_SlaEscalated">
+        <dc:Bounds x="940" y="362" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="926" y="405" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_Decision_di" bpmnElement="Gateway_Decision" isMarkerVisible="true">
+        <dc:Bounds x="980" y="215" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="973" y="185" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReleasePartial_di" bpmnElement="Task_ReleasePartial">
+        <dc:Bounds x="1080" y="460" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ReleaseEntry_di" bpmnElement="Gateway_ReleaseEntry" isMarkerVisible="true">
+        <dc:Bounds x="1240" y="95" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1230" y="65" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ReleaseOrder_di" bpmnElement="Task_ReleaseOrder">
+        <dc:Bounds x="1340" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_OrderReleased_di" bpmnElement="End_OrderReleased">
+        <dc:Bounds x="1500" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1482" y="145" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_RejectEntry_di" bpmnElement="Gateway_RejectEntry" isMarkerVisible="true">
+        <dc:Bounds x="1240" y="595" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1224" y="565" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyRejection_di" bpmnElement="Task_NotifyRejection">
+        <dc:Bounds x="1340" y="580" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_OrderNotReleased_di" bpmnElement="End_OrderNotReleased">
+        <dc:Bounds x="1500" y="602" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1480" y="645" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_StartToHold_di" bpmnElement="Flow_StartToHold">
+        <di:waypoint x="188" y="240" />
+        <di:waypoint x="240" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_HoldToExposure_di" bpmnElement="Flow_HoldToExposure">
+        <di:waypoint x="340" y="240" />
+        <di:waypoint x="400" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ExposureToRules_di" bpmnElement="Flow_ExposureToRules">
+        <di:waypoint x="500" y="240" />
+        <di:waypoint x="560" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RulesToRoute_di" bpmnElement="Flow_RulesToRoute">
+        <di:waypoint x="660" y="240" />
+        <di:waypoint x="720" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RouteAutoApprove_di" bpmnElement="Flow_RouteAutoApprove">
+        <di:waypoint x="745" y="215" />
+        <di:waypoint x="745" y="120" />
+        <di:waypoint x="1240" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="760" y="96" width="85" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RouteAutoReject_di" bpmnElement="Flow_RouteAutoReject">
+        <di:waypoint x="745" y="265" />
+        <di:waypoint x="745" y="620" />
+        <di:waypoint x="1240" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="752" y="596" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RouteManual_di" bpmnElement="Flow_RouteManual">
+        <di:waypoint x="770" y="240" />
+        <di:waypoint x="820" y="240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="762" y="216" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreditSlaBreach_di" bpmnElement="Flow_CreditSlaBreach">
+        <di:waypoint x="870" y="298" />
+        <di:waypoint x="870" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CfoToEnd_di" bpmnElement="Flow_CfoToEnd">
+        <di:waypoint x="920" y="380" />
+        <di:waypoint x="940" y="380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DecisionMade_di" bpmnElement="Flow_DecisionMade">
+        <di:waypoint x="920" y="240" />
+        <di:waypoint x="980" y="240" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DecisionApproved_di" bpmnElement="Flow_DecisionApproved">
+        <di:waypoint x="1005" y="215" />
+        <di:waypoint x="1005" y="120" />
+        <di:waypoint x="1240" y="120" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1012" y="140" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DecisionPartial_di" bpmnElement="Flow_DecisionPartial">
+        <di:waypoint x="1005" y="265" />
+        <di:waypoint x="1005" y="500" />
+        <di:waypoint x="1080" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1012" y="476" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DecisionRejected_di" bpmnElement="Flow_DecisionRejected">
+        <di:waypoint x="1030" y="240" />
+        <di:waypoint x="1060" y="240" />
+        <di:waypoint x="1060" y="620" />
+        <di:waypoint x="1240" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1067" y="596" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PartialToRelease_di" bpmnElement="Flow_PartialToRelease">
+        <di:waypoint x="1180" y="500" />
+        <di:waypoint x="1265" y="500" />
+        <di:waypoint x="1265" y="145" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ReleaseEntryToRelease_di" bpmnElement="Flow_ReleaseEntryToRelease">
+        <di:waypoint x="1290" y="120" />
+        <di:waypoint x="1340" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToReleasedEnd_di" bpmnElement="Flow_ToReleasedEnd">
+        <di:waypoint x="1440" y="120" />
+        <di:waypoint x="1500" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RejectEntryToNotify_di" bpmnElement="Flow_RejectEntryToNotify">
+        <di:waypoint x="1290" y="620" />
+        <di:waypoint x="1340" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ToNotReleasedEnd_di" bpmnElement="Flow_ToNotReleasedEnd">
+        <di:waypoint x="1440" y="620" />
+        <di:waypoint x="1500" y="620" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

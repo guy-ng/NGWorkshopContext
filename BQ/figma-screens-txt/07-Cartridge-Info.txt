@@ -1,0 +1,37 @@
+SCR-06: Cartridge Info — BQ Technician App
+
+390×844, Material Design 3. Primary #1B3A5C, Success #2E7D32, Error #C62828, Warning #F57F17.
+
+Purpose
+Display cartridge identification, status, pill inventory, and medication metadata.
+
+Layout
+
+Cartridge Identity Card (top, prominent)
+Large cartridge icon (64dp) with type badge: Standard (blue) | Extended (purple) | Custom (teal)
+UUID in mono font (truncated with "...", full on tap)
+Manufacturing Date + Expiration Date with calendar icons
+Expiry warning: within 30 days = amber "Expiring Soon" banner; past = red "Expired" banner
+Total slots count
+
+Status Section
+Status badge: Not Inserted (gray) | Valid (green) | Expired (red) | Error (red + code)
+Stats row: Total Extractions | Successful Extractions | Success Rate %
+Progress bar for success rate, colored by value
+
+Pill Inventory Grid
+12-slot circular/grid layout matching physical cartridge
+Each slot: numbered circle, pill count (0–255), mini fill bar
+Color: full = green, low (<3) = amber, empty = red/gray
+Summary: "42 pills total"
+
+Medication Info Card
+Medication Name (title style)
+NDC Code (mono)
+Dosage: value + unit (mg / mcg / IU)
+
+States
+Valid Cartridge: all sections populated, green status
+Expired: red banner, status badge red, extraction warnings
+Not Inserted: single card "No Cartridge Detected" with gray icon, all sections hidden
+Error: red status + error code display

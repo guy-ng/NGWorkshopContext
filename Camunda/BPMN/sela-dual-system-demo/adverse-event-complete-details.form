@@ -1,0 +1,102 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### השלמת פרטי תופעת לוואי\n\nהספירה להעברה לבעל הרישום כבר החלה. יש להשלים את המידע החסר ללא דיחוי.",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ReportId",
+      "key": "reportId",
+      "label": "מספר דיווח",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ReporterName",
+      "key": "reporterName",
+      "label": "שם המדווח",
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ReporterPhone",
+      "key": "reporterPhone",
+      "label": "טלפון לחזרה",
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ProductCode",
+      "key": "productCode",
+      "label": "קוד מוצר",
+      "validate": { "required": true },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_BatchNumber",
+      "key": "batchNumber",
+      "label": "מספר אצווה",
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_PatientAge",
+      "key": "patientAge",
+      "label": "גיל המטופל/ת",
+      "validate": { "required": true, "min": 0, "max": 130 },
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "select",
+      "id": "Field_Seriousness",
+      "key": "seriousness",
+      "label": "חומרת האירוע",
+      "values": [
+        { "label": "לא חמור", "value": "NON_SERIOUS" },
+        { "label": "חמור", "value": "SERIOUS" },
+        { "label": "מסכן חיים", "value": "LIFE_THREATENING" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "datetime",
+      "id": "Field_OccurredAt",
+      "key": "occurredAt",
+      "label": "מועד האירוע",
+      "timeSerializingFormat": "utc_offset",
+      "validate": { "required": true },
+      "layout": { "row": "row_5", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_EventDescription",
+      "key": "eventDescription",
+      "label": "תיאור תופעת הלוואי",
+      "rows": 5,
+      "validate": { "required": true, "minLength": 10 },
+      "layout": { "row": "row_6", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_DetailsComplete",
+      "key": "detailsComplete",
+      "label": "כל פרטי החובה הושלמו",
+      "validate": { "required": true },
+      "layout": { "row": "row_7", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "adverse-event-complete-details",
+  "type": "default"
+}

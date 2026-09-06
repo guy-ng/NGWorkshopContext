@@ -1,0 +1,70 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### יעד לא אישר קבלת הודעת ריקול\n\nיש לבצע מעקב טלפוני ולתעד את תוצאת השיחה.",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_DestinationName",
+      "key": "destinationName",
+      "label": "שם היעד",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_BatchNumber",
+      "key": "batchNumber",
+      "label": "מספר אצווה",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ContactName",
+      "key": "contactName",
+      "label": "איש קשר",
+      "readonly": true,
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ContactPhone",
+      "key": "contactPhone",
+      "label": "טלפון",
+      "readonly": true,
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "select",
+      "id": "Field_CallOutcome",
+      "key": "callOutcome",
+      "label": "תוצאת השיחה",
+      "values": [
+        { "label": "ההודעה התקבלה", "value": "ACKNOWLEDGED" },
+        { "label": "נדרש ניסיון נוסף", "value": "RETRY_REQUIRED" },
+        { "label": "הועבר למנהל בית החולים", "value": "MANAGEMENT_ESCALATION" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_CallNotes",
+      "key": "callNotes",
+      "label": "תיעוד השיחה",
+      "rows": 4,
+      "validate": { "required": true, "minLength": 5 },
+      "layout": { "row": "row_4", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "recall-escalation-call",
+  "type": "default"
+}

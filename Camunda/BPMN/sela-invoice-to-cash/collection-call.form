@@ -1,0 +1,73 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "text": "### שיחת גבייה\n\nהמשימה נפתחה על ידי מדרג הגבייה. כל מה שיירשם כאן נשמר בתיק הלקוח ומזין את הסבב הבא.",
+      "id": "Text_Header",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_InvoiceId",
+      "key": "invoiceId",
+      "label": "מספר חשבונית",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_CustomerId",
+      "key": "customerId",
+      "label": "לקוח",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "select",
+      "id": "Field_Outcome",
+      "key": "callOutcome",
+      "label": "תוצאת השיחה",
+      "values": [
+        { "label": "התחייבות לתשלום", "value": "promise_to_pay" },
+        { "label": "התחייבות לתשלום חלקי", "value": "partial_promise" },
+        { "label": "הלקוח מעלה מחלוקת", "value": "dispute_claimed" },
+        { "label": "אין מענה", "value": "no_answer" },
+        { "label": "סירוב לשלם", "value": "refusal" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "datetime",
+      "id": "Field_PromisedDate",
+      "key": "promisedPaymentDate",
+      "subtype": "date",
+      "dateLabel": "תאריך התשלום שהובטח",
+      "conditional": { "hide": "=not(callOutcome in (\"promise_to_pay\", \"partial_promise\"))" },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_PromisedAmount",
+      "key": "promisedAmount",
+      "label": "הסכום שהובטח (₪)",
+      "conditional": { "hide": "=not(callOutcome in (\"promise_to_pay\", \"partial_promise\"))" },
+      "validate": { "min": 0 },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_Notes",
+      "key": "callNotes",
+      "label": "סיכום השיחה",
+      "validate": { "required": true, "minLength": 5 },
+      "layout": { "row": "row_4", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "collection-call",
+  "type": "default"
+}

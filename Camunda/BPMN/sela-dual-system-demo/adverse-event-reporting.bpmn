@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_AdverseEventReporting" targetNamespace="http://bpmn.io/schema/bpmn" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:message id="Message_AdverseEventReported" name="adverse-event-reported">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=reportId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_HolderAcknowledged" name="registration-holder-acknowledged">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="=reportId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:process id="AdverseEventReporting" name="דיווח תופעת לוואי" isExecutable="true">
+    <bpmn:startEvent id="Start_AdverseEventReported" name="דיווח מהמוקד">
+      <bpmn:outgoing>Flow_StartToHandling</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_AdverseEvent" messageRef="Message_AdverseEventReported" />
+    </bpmn:startEvent>
+    <bpmn:subProcess id="SubProcess_HandleReport" name="טיפול והעברה לבעל הרישום">
+      <bpmn:incoming>Flow_StartToHandling</bpmn:incoming>
+      <bpmn:outgoing>Flow_HandlingToEvidence</bpmn:outgoing>
+      <bpmn:startEvent id="Start_HandleReport" name="תחילת הטיפול">
+        <bpmn:outgoing>Flow_InternalStartToLoopJoin</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:exclusiveGateway id="Gateway_DetailsLoopJoin" name="חזרה לבדיקת הפרטים">
+        <bpmn:incoming>Flow_InternalStartToLoopJoin</bpmn:incoming>
+        <bpmn:incoming>Flow_CompleteToLoopJoin</bpmn:incoming>
+        <bpmn:outgoing>Flow_LoopJoinToIdentify</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="Task_IdentifyProductHolder" name="זיהוי המוצר ובעל הרישום">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="identify-product-registration-holder" retries="3" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_LoopJoinToIdentify</bpmn:incoming>
+        <bpmn:outgoing>Flow_IdentifyToCompleteness</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="Gateway_DetailsComplete" name="הפרטים מלאים?" default="Flow_DetailsMissing">
+        <bpmn:incoming>Flow_IdentifyToCompleteness</bpmn:incoming>
+        <bpmn:outgoing>Flow_DetailsComplete</bpmn:outgoing>
+        <bpmn:outgoing>Flow_DetailsMissing</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="Task_CompleteDetails" name="השלמת פרטים מהמוקד">
+        <bpmn:extensionElements>
+          <zeebe:userTask />
+          <zeebe:formDefinition formId="adverse-event-complete-details" bindingType="deployment" />
+          <zeebe:assignmentDefinition candidateGroups="contact_center" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_DetailsMissing</bpmn:incoming>
+        <bpmn:outgoing>Flow_CompleteToLoopJoin</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:serviceTask id="Task_SendStructuredReport" name="העברה מובנית לבעל הרישום">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="send-adverse-event-to-holder" retries="3" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_DetailsComplete</bpmn:incoming>
+        <bpmn:outgoing>Flow_SendToAckWait</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:eventBasedGateway id="Gateway_WaitForAcknowledgement" name="המתנה לאישור קבלה">
+        <bpmn:incoming>Flow_SendToAckWait</bpmn:incoming>
+        <bpmn:outgoing>Flow_WaitForMessage</bpmn:outgoing>
+        <bpmn:outgoing>Flow_WaitForTimer</bpmn:outgoing>
+      </bpmn:eventBasedGateway>
+      <bpmn:intermediateCatchEvent id="Catch_HolderAcknowledged" name="אישור קבלה">
+        <bpmn:incoming>Flow_WaitForMessage</bpmn:incoming>
+        <bpmn:outgoing>Flow_AckToMerge</bpmn:outgoing>
+        <bpmn:messageEventDefinition id="MessageEventDefinition_HolderAck" messageRef="Message_HolderAcknowledged" />
+      </bpmn:intermediateCatchEvent>
+      <bpmn:intermediateCatchEvent id="Catch_FourHourSla" name="חלפו 4 שעות">
+        <bpmn:incoming>Flow_WaitForTimer</bpmn:incoming>
+        <bpmn:outgoing>Flow_TimerToEscalation</bpmn:outgoing>
+        <bpmn:timerEventDefinition id="TimerEventDefinition_FourHours">
+          <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">="PT4H"</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:serviceTask id="Task_EscalateFourHours" name="אסקלציה לרוקח האחראי">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="escalate-adverse-event-acknowledgement" retries="3" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_TimerToEscalation</bpmn:incoming>
+        <bpmn:outgoing>Flow_EscalationToMerge</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="Gateway_AcknowledgementMerge" name="סיום ההמתנה">
+        <bpmn:incoming>Flow_AckToMerge</bpmn:incoming>
+        <bpmn:incoming>Flow_EscalationToMerge</bpmn:incoming>
+        <bpmn:outgoing>Flow_MergeToRecord</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="Task_RecordEvidence" name="תיעוד וחותמת זמן">
+        <bpmn:extensionElements>
+          <zeebe:taskDefinition type="record-adverse-event-evidence" retries="3" />
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_MergeToRecord</bpmn:incoming>
+        <bpmn:outgoing>Flow_RecordToInternalEnd</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="End_ReportHandled" name="הדיווח הועבר">
+        <bpmn:incoming>Flow_RecordToInternalEnd</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_InternalStartToLoopJoin" sourceRef="Start_HandleReport" targetRef="Gateway_DetailsLoopJoin" />
+      <bpmn:sequenceFlow id="Flow_LoopJoinToIdentify" sourceRef="Gateway_DetailsLoopJoin" targetRef="Task_IdentifyProductHolder" />
+      <bpmn:sequenceFlow id="Flow_IdentifyToCompleteness" sourceRef="Task_IdentifyProductHolder" targetRef="Gateway_DetailsComplete" />
+      <bpmn:sequenceFlow id="Flow_DetailsComplete" name="כן" sourceRef="Gateway_DetailsComplete" targetRef="Task_SendStructuredReport">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=detailsComplete = true</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:sequenceFlow id="Flow_DetailsMissing" name="לא" sourceRef="Gateway_DetailsComplete" targetRef="Task_CompleteDetails" />
+      <bpmn:sequenceFlow id="Flow_CompleteToLoopJoin" sourceRef="Task_CompleteDetails" targetRef="Gateway_DetailsLoopJoin" />
+      <bpmn:sequenceFlow id="Flow_SendToAckWait" sourceRef="Task_SendStructuredReport" targetRef="Gateway_WaitForAcknowledgement" />
+      <bpmn:sequenceFlow id="Flow_WaitForMessage" sourceRef="Gateway_WaitForAcknowledgement" targetRef="Catch_HolderAcknowledged" />
+      <bpmn:sequenceFlow id="Flow_WaitForTimer" sourceRef="Gateway_WaitForAcknowledgement" targetRef="Catch_FourHourSla" />
+      <bpmn:sequenceFlow id="Flow_AckToMerge" sourceRef="Catch_HolderAcknowledged" targetRef="Gateway_AcknowledgementMerge" />
+      <bpmn:sequenceFlow id="Flow_TimerToEscalation" sourceRef="Catch_FourHourSla" targetRef="Task_EscalateFourHours" />
+      <bpmn:sequenceFlow id="Flow_EscalationToMerge" sourceRef="Task_EscalateFourHours" targetRef="Gateway_AcknowledgementMerge" />
+      <bpmn:sequenceFlow id="Flow_MergeToRecord" sourceRef="Gateway_AcknowledgementMerge" targetRef="Task_RecordEvidence" />
+      <bpmn:sequenceFlow id="Flow_RecordToInternalEnd" sourceRef="Task_RecordEvidence" targetRef="End_ReportHandled" />
+    </bpmn:subProcess>
+    <bpmn:boundaryEvent id="Boundary_TwentyFourHourSla" name="חלפו 24 שעות" cancelActivity="false" attachedToRef="SubProcess_HandleReport">
+      <bpmn:outgoing>Flow_24HourToEscalation</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_TwentyFourHours">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">="P1D"</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="Task_EscalateContractSla" name="התרעת חריגת SLA חוזי">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="escalate-adverse-event-contract-sla" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_24HourToEscalation</bpmn:incoming>
+      <bpmn:outgoing>Flow_ContractEscalationToEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_ContractEscalated" name="החריגה תועדה">
+      <bpmn:incoming>Flow_ContractEscalationToEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_EvidenceExists" name="הראיה קיימת">
+      <bpmn:incoming>Flow_HandlingToEvidence</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_StartToHandling" sourceRef="Start_AdverseEventReported" targetRef="SubProcess_HandleReport" />
+    <bpmn:sequenceFlow id="Flow_HandlingToEvidence" sourceRef="SubProcess_HandleReport" targetRef="End_EvidenceExists" />
+    <bpmn:sequenceFlow id="Flow_24HourToEscalation" sourceRef="Boundary_TwentyFourHourSla" targetRef="Task_EscalateContractSla" />
+    <bpmn:sequenceFlow id="Flow_ContractEscalationToEnd" sourceRef="Task_EscalateContractSla" targetRef="End_ContractEscalated" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_AdverseEventReporting">
+    <bpmndi:BPMNPlane id="BPMNPlane_AdverseEventReporting" bpmnElement="AdverseEventReporting">
+      <bpmndi:BPMNShape id="Start_AdverseEventReported_di" bpmnElement="Start_AdverseEventReported">
+        <dc:Bounds x="80" y="322" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="58" y="365" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SubProcess_HandleReport_di" bpmnElement="SubProcess_HandleReport" isExpanded="true">
+        <dc:Bounds x="200" y="60" width="1370" height="560" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_HandleReport_di" bpmnElement="Start_HandleReport">
+        <dc:Bounds x="250" y="322" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="228" y="365" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DetailsLoopJoin_di" bpmnElement="Gateway_DetailsLoopJoin" isMarkerVisible="true">
+        <dc:Bounds x="320" y="315" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="295" y="285" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_IdentifyProductHolder_di" bpmnElement="Task_IdentifyProductHolder">
+        <dc:Bounds x="400" y="300" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_DetailsComplete_di" bpmnElement="Gateway_DetailsComplete" isMarkerVisible="true">
+        <dc:Bounds x="520" y="315" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="500" y="285" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CompleteDetails_di" bpmnElement="Task_CompleteDetails">
+        <dc:Bounds x="650" y="460" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_SendStructuredReport_di" bpmnElement="Task_SendStructuredReport">
+        <dc:Bounds x="650" y="300" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_WaitForAcknowledgement_di" bpmnElement="Gateway_WaitForAcknowledgement">
+        <dc:Bounds x="810" y="315" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="785" y="285" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_HolderAcknowledged_di" bpmnElement="Catch_HolderAcknowledged">
+        <dc:Bounds x="930" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="908" y="205" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_FourHourSla_di" bpmnElement="Catch_FourHourSla">
+        <dc:Bounds x="930" y="442" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="908" y="485" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EscalateFourHours_di" bpmnElement="Task_EscalateFourHours">
+        <dc:Bounds x="1040" y="420" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AcknowledgementMerge_di" bpmnElement="Gateway_AcknowledgementMerge" isMarkerVisible="true">
+        <dc:Bounds x="1200" y="315" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1175" y="285" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RecordEvidence_di" bpmnElement="Task_RecordEvidence">
+        <dc:Bounds x="1320" y="300" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_ReportHandled_di" bpmnElement="End_ReportHandled">
+        <dc:Bounds x="1480" y="322" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1458" y="365" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Boundary_TwentyFourHourSla_di" bpmnElement="Boundary_TwentyFourHourSla">
+        <dc:Bounds x="867" y="602" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="842" y="645" width="86" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_EscalateContractSla_di" bpmnElement="Task_EscalateContractSla">
+        <dc:Bounds x="835" y="700" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_ContractEscalated_di" bpmnElement="End_ContractEscalated">
+        <dc:Bounds x="1010" y="722" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="988" y="765" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_EvidenceExists_di" bpmnElement="End_EvidenceExists">
+        <dc:Bounds x="1650" y="322" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1628" y="365" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_StartToHandling_di" bpmnElement="Flow_StartToHandling">
+        <di:waypoint x="116" y="340" />
+        <di:waypoint x="200" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_InternalStartToLoopJoin_di" bpmnElement="Flow_InternalStartToLoopJoin">
+        <di:waypoint x="286" y="340" />
+        <di:waypoint x="320" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_LoopJoinToIdentify_di" bpmnElement="Flow_LoopJoinToIdentify">
+        <di:waypoint x="370" y="340" />
+        <di:waypoint x="400" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_IdentifyToCompleteness_di" bpmnElement="Flow_IdentifyToCompleteness">
+        <di:waypoint x="500" y="340" />
+        <di:waypoint x="520" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DetailsComplete_di" bpmnElement="Flow_DetailsComplete">
+        <di:waypoint x="570" y="340" />
+        <di:waypoint x="650" y="340" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="600" y="320" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_DetailsMissing_di" bpmnElement="Flow_DetailsMissing">
+        <di:waypoint x="545" y="365" />
+        <di:waypoint x="545" y="500" />
+        <di:waypoint x="650" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="550" y="425" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CompleteToLoopJoin_di" bpmnElement="Flow_CompleteToLoopJoin">
+        <di:waypoint x="650" y="520" />
+        <di:waypoint x="345" y="520" />
+        <di:waypoint x="345" y="365" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_SendToAckWait_di" bpmnElement="Flow_SendToAckWait">
+        <di:waypoint x="750" y="340" />
+        <di:waypoint x="810" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WaitForMessage_di" bpmnElement="Flow_WaitForMessage">
+        <di:waypoint x="835" y="315" />
+        <di:waypoint x="835" y="180" />
+        <di:waypoint x="930" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WaitForTimer_di" bpmnElement="Flow_WaitForTimer">
+        <di:waypoint x="835" y="365" />
+        <di:waypoint x="835" y="460" />
+        <di:waypoint x="930" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AckToMerge_di" bpmnElement="Flow_AckToMerge">
+        <di:waypoint x="966" y="180" />
+        <di:waypoint x="1225" y="180" />
+        <di:waypoint x="1225" y="315" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_TimerToEscalation_di" bpmnElement="Flow_TimerToEscalation">
+        <di:waypoint x="966" y="460" />
+        <di:waypoint x="1040" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_EscalationToMerge_di" bpmnElement="Flow_EscalationToMerge">
+        <di:waypoint x="1140" y="460" />
+        <di:waypoint x="1225" y="460" />
+        <di:waypoint x="1225" y="365" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_MergeToRecord_di" bpmnElement="Flow_MergeToRecord">
+        <di:waypoint x="1250" y="340" />
+        <di:waypoint x="1320" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RecordToInternalEnd_di" bpmnElement="Flow_RecordToInternalEnd">
+        <di:waypoint x="1420" y="340" />
+        <di:waypoint x="1480" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_HandlingToEvidence_di" bpmnElement="Flow_HandlingToEvidence">
+        <di:waypoint x="1570" y="340" />
+        <di:waypoint x="1650" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_24HourToEscalation_di" bpmnElement="Flow_24HourToEscalation">
+        <di:waypoint x="885" y="638" />
+        <di:waypoint x="885" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ContractEscalationToEnd_di" bpmnElement="Flow_ContractEscalationToEnd">
+        <di:waypoint x="935" y="740" />
+        <di:waypoint x="1010" y="740" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

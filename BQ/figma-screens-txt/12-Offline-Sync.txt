@@ -1,0 +1,33 @@
+SCR-11: Offline Data Sync — BQ Technician App
+
+390×844, Material Design 3.
+
+Purpose
+Sync offline device data (extraction logs, telemetry, errors) to app for analysis and export.
+
+Layout
+
+Sync Status Card (top)
+State badge: Idle (gray) | Syncing (blue animated) | Paused (amber) | Error (red)
+Progress ring: percentage in center, "142 / 380 records" below
+Last sync: relative timestamp
+
+Sync Controls
+"Start Sync" primary button (default state)
+Date/time picker: "Sync from" (default = last sync time)
+During sync: "Pause" and "Abort" buttons replace Start
+When paused: "Resume" button appears
+
+Synced Data Preview (scrollable)
+Filter tabs: All | Extractions | Errors | Telemetry | State Changes
+Compact record cards: timestamp, type icon, summary line
+Extraction: position, result, duration, battery
+Telemetry: temp, humidity, battery, motor status
+Export button (CSV or JSON)
+
+States
+Idle: controls visible, no progress
+Syncing: progress ring animating, real-time record count
+Paused: amber badge, resume button
+Complete: "All synced" with checkmark, data preview populated
+Error: red badge, retry button

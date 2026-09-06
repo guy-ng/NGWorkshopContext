@@ -1,0 +1,43 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### תיקון נתוני קליטת מוצר\n\nאחד או יותר מהגורמים לא אישרו את הבקשה. יש לתקן ולהחזיר לסבב אישורים מקבילי.",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_RegulatoryNotes",
+      "key": "regulatoryNotes",
+      "label": "הערות QA / רוקחות",
+      "readonly": true,
+      "rows": 3,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_StorageNotes",
+      "key": "shippingSpecification",
+      "label": "הערות תפעול",
+      "readonly": true,
+      "rows": 3,
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_CorrectionSummary",
+      "key": "correctionSummary",
+      "label": "מה תוקן",
+      "rows": 4,
+      "validate": { "required": true, "minLength": 5 },
+      "layout": { "row": "row_3", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "sku-correction",
+  "type": "default"
+}

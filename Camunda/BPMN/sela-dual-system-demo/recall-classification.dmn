@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_RecallClassification" name="סיווג רמת ריקול" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.34.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <decision id="recall_classification" name="סיווג רמת ריקול">
+    <decisionTable id="DecisionTable_RecallClassification" hitPolicy="FIRST">
+      <input id="Input_DefectType" label="סוג הפגם">
+        <inputExpression id="InputExpression_DefectType" typeRef="string">
+          <text>defectType</text>
+        </inputExpression>
+      </input>
+      <input id="Input_TargetPopulation" label="אוכלוסיית יעד">
+        <inputExpression id="InputExpression_TargetPopulation" typeRef="string">
+          <text>targetPopulation</text>
+        </inputExpression>
+      </input>
+      <output id="Output_RecallLevel" label="רמת ריקול" name="recallLevel" typeRef="string" />
+      <output id="Output_TargetSla" label="SLA לאישור יעד" name="targetSlaDuration" typeRef="string" />
+      <output id="Output_DistributionList" label="רשימת תפוצה" name="distributionList" />
+      <rule id="Rule_LevelI">
+        <description>סיכון חיים או פגיעה בלתי הפיכה</description>
+        <inputEntry id="InputEntry_I_Defect"><text>"LIFE_THREATENING"</text></inputEntry>
+        <inputEntry id="InputEntry_I_Population"><text>-</text></inputEntry>
+        <outputEntry id="OutputEntry_I_Level"><text>"I"</text></outputEntry>
+        <outputEntry id="OutputEntry_I_Sla"><text>"PT4H"</text></outputEntry>
+        <outputEntry id="OutputEntry_I_Distribution"><text>["quality", "responsible_pharmacist", "distribution_management", "executive_management"]</text></outputEntry>
+      </rule>
+      <rule id="Rule_LevelII_Defect">
+        <description>פגם העלול לגרום למחלה או טיפול לקוי</description>
+        <inputEntry id="InputEntry_II_Defect"><text>"SERIOUS"</text></inputEntry>
+        <inputEntry id="InputEntry_II_Population"><text>-</text></inputEntry>
+        <outputEntry id="OutputEntry_II_Level"><text>"II"</text></outputEntry>
+        <outputEntry id="OutputEntry_II_Sla"><text>"PT24H"</text></outputEntry>
+        <outputEntry id="OutputEntry_II_Distribution"><text>["quality", "responsible_pharmacist", "distribution_management"]</text></outputEntry>
+      </rule>
+      <rule id="Rule_LevelII_Population">
+        <description>אוכלוסייה רגישה מחייבת החמרת הסיווג</description>
+        <inputEntry id="InputEntry_Vulnerable_Defect"><text>-</text></inputEntry>
+        <inputEntry id="InputEntry_Vulnerable_Population"><text>"VULNERABLE"</text></inputEntry>
+        <outputEntry id="OutputEntry_Vulnerable_Level"><text>"II"</text></outputEntry>
+        <outputEntry id="OutputEntry_Vulnerable_Sla"><text>"PT24H"</text></outputEntry>
+        <outputEntry id="OutputEntry_Vulnerable_Distribution"><text>["quality", "responsible_pharmacist", "distribution_management"]</text></outputEntry>
+      </rule>
+      <rule id="Rule_LevelIII">
+        <description>ללא סיכון בריאותי משמעותי</description>
+        <inputEntry id="InputEntry_III_Defect"><text>-</text></inputEntry>
+        <inputEntry id="InputEntry_III_Population"><text>-</text></inputEntry>
+        <outputEntry id="OutputEntry_III_Level"><text>"III"</text></outputEntry>
+        <outputEntry id="OutputEntry_III_Sla"><text>"P3D"</text></outputEntry>
+        <outputEntry id="OutputEntry_III_Distribution"><text>["quality", "responsible_pharmacist"]</text></outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_RecallClassification">
+      <dmndi:DMNShape id="DMNShape_RecallClassification" dmnElementRef="recall_classification">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

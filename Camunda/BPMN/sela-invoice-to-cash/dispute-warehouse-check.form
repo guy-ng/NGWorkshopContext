@@ -1,0 +1,64 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "text": "### בירור מול המחסן\n\nהלקוח טוען שקיבל פחות ממה שחויב. תעודת המשלוח ותיעוד הליקוט מצורפים לתיק המחלוקת.",
+      "id": "Text_Header",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_InvoiceId",
+      "key": "invoiceId",
+      "label": "מספר חשבונית",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_CustomerId",
+      "key": "customerId",
+      "label": "לקוח",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_CountedQuantity",
+      "key": "countedQuantity",
+      "label": "כמות שנספרה בפועל ביציאה מהמחסן",
+      "validate": { "required": true, "min": 0 },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "checkbox",
+      "id": "Field_ClaimJustified",
+      "key": "claimJustified",
+      "label": "טענת הלקוח מוצדקת",
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "number",
+      "id": "Field_CreditAmount",
+      "key": "approvedCreditAmount",
+      "label": "סכום הזיכוי המומלץ (₪)",
+      "conditional": { "hide": "=claimJustified != true" },
+      "validate": { "min": 0 },
+      "layout": { "row": "row_4", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_Notes",
+      "key": "warehouseNotes",
+      "label": "ממצאי הבירור",
+      "validate": { "required": true, "minLength": 5 },
+      "layout": { "row": "row_5", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "dispute-warehouse-check",
+  "type": "default"
+}

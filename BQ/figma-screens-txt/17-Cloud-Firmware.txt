@@ -1,0 +1,42 @@
+SCR-17: Cloud Firmware Browser — BQ Technician App
+
+390×844, Material Design 3. Primary #1B3A5C, Success #2E7D32, Warning #F57F17.
+
+Purpose
+Browse, download, and manage firmware versions from cloud. Primary firmware source (local file = fallback).
+
+Layout
+
+Header (sticky, 80dp)
+Device info bar: model, serial, current FW version, HW revision
+"Compatible only" filter toggle (default ON — filters by HW match)
+
+Channel Tabs
+3 tabs: Stable | Beta | Dev
+Badge on each tab: count of versions newer than current device FW
+
+Firmware Version List (scrollable cards)
+Each card:
+Left: large "v2.1.0" (title), channel chip below (Stable=green, Beta=amber, Dev=gray)
+Center: release date, file size ("1.2 MB"), HW compat tag ("HW Rev 2.x")
+Right: status icon — "New" (blue badge) | "Current" (green) | "Older" (gray) | "Downloaded" (checkmark)
+Expand on tap: changelog text, download count, SHA256 hash (mono, truncated)
+Sorted by version, newest first
+
+Download & Flash
+"Download" outlined button per card (non-cached versions)
+Downloading: inline progress bar replaces button, "45% — 320 KB/s"
+Downloaded: button becomes "Flash to Device" (primary filled): navigates to OTA screen with firmware pre-loaded
+Overflow menu (3 dots): "Delete Local Copy" for cached items
+
+Auto-Update Banner
+Blue banner top: "Firmware v2.1.0 available" + "Download" action (if newer stable exists)
+Dismissible with X
+
+States
+Loading: skeleton shimmer cards
+Populated: version cards with download/flash buttons
+Downloading: active card shows inline progress
+Downloaded: green checkmark, "Flash" button ready
+Offline: banner "Offline — cached only", only downloaded versions visible, no download buttons
+No Device: "Connect a device to check compatibility" message

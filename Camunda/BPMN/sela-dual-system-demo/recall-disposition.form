@@ -1,0 +1,61 @@
+{
+  "components": [
+    {
+      "type": "text",
+      "id": "Text_Header",
+      "text": "### החלטת דיספוזיציה\n\nהרוקח האחראי קובע כיצד לטפל במלאי שנאסף.",
+      "layout": { "row": "row_0", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_ProductName",
+      "key": "productName",
+      "label": "מוצר",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_BatchNumber",
+      "key": "batchNumber",
+      "label": "מספר אצווה",
+      "readonly": true,
+      "layout": { "row": "row_1", "columns": null }
+    },
+    {
+      "type": "radio",
+      "id": "Field_Disposition",
+      "key": "disposition",
+      "label": "החלטה",
+      "values": [
+        { "label": "השמדה", "value": "DESTROY" },
+        { "label": "החזרה ליצרן", "value": "RETURN_TO_MANUFACTURER" }
+      ],
+      "validate": { "required": true },
+      "layout": { "row": "row_2", "columns": null }
+    },
+    {
+      "type": "textfield",
+      "id": "Field_WasteVendor",
+      "key": "wasteVendor",
+      "label": "ספק פסולת מאושר",
+      "conditional": { "hide": "=disposition != \"DESTROY\"" },
+      "layout": { "row": "row_3", "columns": null }
+    },
+    {
+      "type": "textarea",
+      "id": "Field_Rationale",
+      "key": "dispositionRationale",
+      "label": "נימוק והנחיות",
+      "rows": 4,
+      "validate": { "required": true, "minLength": 5 },
+      "layout": { "row": "row_4", "columns": null }
+    }
+  ],
+  "executionPlatform": "Camunda Cloud",
+  "executionPlatformVersion": "8.8.0",
+  "exporter": { "name": "Camunda Modeler", "version": "5.34.0" },
+  "schemaVersion": 18,
+  "id": "recall-disposition",
+  "type": "default"
+}

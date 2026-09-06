@@ -1,0 +1,35 @@
+SCR-12: Sound Manager — BQ Technician App
+
+390×844, Material Design 3.
+
+Purpose
+Manage device audio: play sounds, upload custom audio, configure event mappings, control volume.
+
+Layout
+
+Volume Control (top, sticky)
+Horizontal slider 0–100 with speaker icon (changes by level)
+Mute toggle button (speaker-off icon)
+Current level number next to slider
+
+Sound Library List
+Each item:
+Sound name (title), duration ("1.2s"), type badge: System (blue) | Alert (amber) | Custom (teal)
+Play button (triangle): sends play; becomes Stop (square) while playing
+Swipe to delete on Custom only (with confirmation); System = swipe disabled
+
+Upload Section
+"Upload Sound" FAB at bottom
+File picker: converts to PCM 8kHz 8-bit mono
+Upload progress bar during transfer
+
+Event Sound Config (card below list)
+Dropdown per event: Reminder, Success, Error, Low Battery, Extraction
+Each dropdown lists sounds by name
+Preview button (play icon) next to each dropdown
+
+States
+Normal: sound list populated, volume active
+Playing: active item shows stop button, waveform indicator
+Uploading: progress bar visible, list dimmed
+Empty: "No custom sounds" message, system sounds still listed

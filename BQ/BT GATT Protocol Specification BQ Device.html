@@ -1,0 +1,3662 @@
+<!doctype html>
+<html>
+    <head>
+        <title>BT GATT Protocol Specification BQ Device</title>
+        <meta charset='utf-8'/>
+        <style>
+ .ͼ1.cm-focused {outline: 1px dotted #212121;}
+.ͼ1 {position: relative !important; box-sizing: border-box; display: flex !important; flex-direction: column;}
+.ͼ1 .cm-scroller {display: flex !important; align-items: flex-start !important; font-family: monospace; line-height: 1.4; height: 100%; overflow-x: auto; position: relative; z-index: 0; overflow-anchor: none;}
+.ͼ1 .cm-content[contenteditable=true] {-webkit-user-modify: read-write-plaintext-only;}
+.ͼ1 .cm-content {margin: 0; flex-grow: 2; flex-shrink: 0; display: block; white-space: pre; word-wrap: normal; box-sizing: border-box; min-height: 100%; padding: 4px 0; outline: none;}
+.ͼ1 .cm-lineWrapping {white-space: pre-wrap; white-space: break-spaces; word-break: break-word; overflow-wrap: anywhere; flex-shrink: 1;}
+.ͼ2 .cm-content {caret-color: black;}
+.ͼ3 .cm-content {caret-color: white;}
+.ͼ1 .cm-line {display: block; padding: 0 2px 0 6px;}
+.ͼ1 .cm-layer > * {position: absolute;}
+.ͼ1 .cm-layer {position: absolute; left: 0; top: 0; contain: size style;}
+.ͼ2 .cm-selectionBackground {background: #d9d9d9;}
+.ͼ3 .cm-selectionBackground {background: #222;}
+.ͼ2.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {background: #d7d4f0;}
+.ͼ3.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground {background: #233;}
+.ͼ1 .cm-cursorLayer {pointer-events: none;}
+.ͼ1.cm-focused > .cm-scroller > .cm-cursorLayer {animation: steps(1) cm-blink 1.2s infinite;}
+@keyframes cm-blink {50% {opacity: 0;}}
+@keyframes cm-blink2 {50% {opacity: 0;}}
+.ͼ1 .cm-cursor, .ͼ1 .cm-dropCursor {border-left: 1.2px solid black; margin-left: -0.6px; pointer-events: none;}
+.ͼ1 .cm-cursor {display: none;}
+.ͼ3 .cm-cursor {border-left-color: #ddd;}
+.ͼ1 .cm-dropCursor {position: absolute;}
+.ͼ1.cm-focused > .cm-scroller > .cm-cursorLayer .cm-cursor {display: block;}
+.ͼ1 .cm-iso {unicode-bidi: isolate;}
+.ͼ1 .cm-announced {position: fixed; top: -10000px;}
+@media print {.ͼ1 .cm-announced {display: none;}}
+.ͼ2 .cm-activeLine {background-color: #cceeff44;}
+.ͼ3 .cm-activeLine {background-color: #99eeff33;}
+.ͼ2 .cm-specialChar {color: red;}
+.ͼ3 .cm-specialChar {color: #f78;}
+.ͼ1 .cm-gutters {flex-shrink: 0; display: flex; height: 100%; box-sizing: border-box; z-index: 200;}
+.ͼ1 .cm-gutters-before {inset-inline-start: 0;}
+.ͼ1 .cm-gutters-after {inset-inline-end: 0;}
+.ͼ2 .cm-gutters.cm-gutters-before {border-right-width: 1px;}
+.ͼ2 .cm-gutters.cm-gutters-after {border-left-width: 1px;}
+.ͼ2 .cm-gutters {background-color: #f5f5f5; color: #6c6c6c; border: 0px solid #ddd;}
+.ͼ3 .cm-gutters {background-color: #333338; color: #ccc;}
+.ͼ1 .cm-gutter {display: flex !important; flex-direction: column; flex-shrink: 0; box-sizing: border-box; min-height: 100%; overflow: hidden;}
+.ͼ1 .cm-gutterElement {box-sizing: border-box;}
+.ͼ1 .cm-lineNumbers .cm-gutterElement {padding: 0 3px 0 5px; min-width: 20px; text-align: right; white-space: nowrap;}
+.ͼ2 .cm-activeLineGutter {background-color: #e2f2ff;}
+.ͼ3 .cm-activeLineGutter {background-color: #222227;}
+.ͼ1 .cm-panels {box-sizing: border-box; position: sticky; left: 0; right: 0; z-index: 300;}
+.ͼ2 .cm-panels {background-color: #f5f5f5; color: black;}
+.ͼ2 .cm-panels-top {border-bottom: 1px solid #ddd;}
+.ͼ2 .cm-panels-bottom {border-top: 1px solid #ddd;}
+.ͼ3 .cm-panels {background-color: #333338; color: white;}
+.ͼ1 .cm-dialog label {font-size: 80%;}
+.ͼ1 .cm-dialog {padding: 2px 19px 4px 6px; position: relative;}
+.ͼ1 .cm-dialog-close {position: absolute; top: 3px; right: 4px; background-color: inherit; border: none; font: inherit; font-size: 14px; padding: 0;}
+.ͼ1 .cm-tab {display: inline-block; overflow: hidden; vertical-align: bottom;}
+.ͼ1 .cm-widgetBuffer {vertical-align: text-top; height: 1em; width: 0; display: inline;}
+.ͼ1 .cm-placeholder {color: #888; display: inline-block; vertical-align: top; user-select: none;}
+.ͼ1 .cm-highlightSpace {background-image: radial-gradient(circle at 50% 55%, #aaa 20%, transparent 5%); background-position: center;}
+.ͼ1 .cm-highlightTab {background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="20"><path stroke="%23888" stroke-width="1" fill="none" d="M1 10H196L190 5M190 15L196 10M197 4L197 16"/></svg>'); background-size: auto 100%; background-position: right 90%; background-repeat: no-repeat;}
+.ͼ1 .cm-trailingSpace {background-color: #ff332255;}
+.ͼ1 .cm-button {vertical-align: middle; color: inherit; font-size: 70%; padding: .2em 1em; border-radius: 1px;}
+.ͼ2 .cm-button:active {background-image: linear-gradient(#b4b4b4, #d0d3d6);}
+.ͼ2 .cm-button {background-image: linear-gradient(#eff1f5, #d9d9df); border: 1px solid #888;}
+.ͼ3 .cm-button:active {background-image: linear-gradient(#111, #333);}
+.ͼ3 .cm-button {background-image: linear-gradient(#393939, #111); border: 1px solid #888;}
+.ͼ1 .cm-textfield {vertical-align: middle; color: inherit; font-size: 70%; border: 1px solid silver; padding: .2em .5em;}
+.ͼ2 .cm-textfield {background-color: white;}
+.ͼ3 .cm-textfield {border: 1px solid #555; background-color: inherit;}
+.ͼ1 .cm-foldPlaceholder {background-color: #eee; border: 1px solid #ddd; color: #888; border-radius: .2em; margin: 0 1px; padding: 0 1px; cursor: pointer;}
+.ͼ1 .cm-foldGutter span {padding: 0 1px; cursor: pointer;}
+ .brat-modal .modal-button-container {
+  margin-top: 5px !important;
+}
+
+.brat-modal .disabled-setting {
+  opacity: 0.5;
+}
+
+.brat-modal .disabled-setting:hover {
+  cursor: not-allowed;
+}
+
+/* Input validation styles */
+.brat-settings .valid-input,
+.brat-modal .valid-repository {
+  border-color: var(--color-green) !important;
+}
+.brat-settings .invalid-input,
+.brat-modal .invalid-repository {
+  border-color: var(--color-red) !important;
+}
+.brat-settings .validation-error,
+.brat-modal .validation-error {
+  border-color: var(--color-orange) !important;
+}
+
+/* Version selector */
+.brat-version-selector {
+  width: 100%;
+  max-width: 400px;
+  justify-content: left;
+}
+
+.brat-token-input {
+  min-width: 33%;
+}
+
+/* Token info container styles */
+.brat-token-info {
+  margin-top: 8px;
+  font-size: 0.8em;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: var(--background-secondary);
+}
+
+/* Token status indicators */
+.brat-token-info.valid,
+.brat-token-status.valid {
+  color: var(--color-green);
+}
+
+.brat-token-info.invalid,
+.brat-token-status.invalid {
+  color: var(--color-red);
+}
+
+.brat-token-info.valid {
+  border-left: 3px solid var(--color-green);
+}
+
+.brat-token-info.invalid {
+  border-left: 3px solid var(--color-red);
+}
+
+/* Token details and status */
+.brat-token-status {
+  margin-bottom: 4px;
+}
+
+.brat-token-details {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+/* Token warnings */
+.brat-token-warning {
+  color: var(--color-orange);
+  margin-top: 4px;
+}
+
+/* Token additional info */
+.brat-token-scopes,
+.brat-token-rate {
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Flex break utility */
+.brat-modal .break {
+  flex-basis: 100%;
+  height: 0;
+}
+
+/* Validation status */
+.brat-modal .validation-status-error {
+  color: var(--text-error);
+}
+
+.brat-modal .validation-status {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  font-size: 0.8em;
+  text-align: left;
+}
+
+.confirm-modal .ok-button {
+  margin-right: 10px;
+  margin-top: 20px;
+}
+
+/* Hide filtered plugin items */
+.brat-plugin-item[hidden] {
+  display: none !important;
+}
+
+/* Hide filtered theme items */
+.brat-theme-item[hidden] {
+  display: none !important;
+}
+
+/* Filter and button layout */
+.brat-filter-and-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0.75em 0;
+}
+
+.brat-filter-input {
+  max-width: 300px;
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 4px;
+  background-color: var(--background-secondary);
+  color: var(--text-normal);
+}
+
+.brat-filter-input:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
+}
+
+.brat-filter-and-button .setting-item {
+  border: none;
+  padding: 0;
+}
+
+.brat-filter-and-button .setting-item-control {
+  justify-content: flex-end;
+}
+ /*
+
+This CSS file will be included with your plugin, and
+available in the app when your plugin is enabled.
+
+If your plugin does not need CSS, delete this file.
+
+*/
+
+/* ===== Settings Tab Documentation Link ===== */
+.agent-client-doc-link {
+	padding: 12px 16px;
+	margin-bottom: 16px;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	font-size: 14px;
+	color: var(--text-muted);
+}
+
+.agent-client-doc-link a {
+	color: var(--text-accent);
+	text-decoration: none;
+}
+
+.agent-client-doc-link a:hover {
+	text-decoration: underline;
+}
+
+/* ===== Settings Tab Custom Agent Block ===== */
+.agent-client-custom-agent {
+	padding: 16px;
+	margin-bottom: 24px;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+}
+
+/* ===== Loading Indicator ===== */
+.agent-client-loading-indicator {
+	display: flex;
+	align-items: center;
+	padding: 16px;
+	margin: 4px 0;
+}
+
+.agent-client-loading-dots {
+	display: grid;
+	grid-template-columns: repeat(3, 4px);
+	grid-template-rows: repeat(3, 5px);
+	gap: 3px;
+	width: 18px;
+	height: 21px;
+	will-change: transform;
+}
+
+.agent-client-loading-dot {
+	width: 4px;
+	height: 5px;
+	background-color: var(--background-modifier-border);
+	border-radius: 50%;
+	animation: dotPulse 1.2s ease-in-out infinite;
+}
+
+.agent-client-loading-dot:nth-child(1) {
+	animation-delay: 0s;
+}
+
+.agent-client-loading-dot:nth-child(2) {
+	animation-delay: 0.15s;
+}
+
+.agent-client-loading-dot:nth-child(3) {
+	animation-delay: 0.3s;
+}
+
+.agent-client-loading-dot:nth-child(4) {
+	animation-delay: 0.9s;
+}
+
+.agent-client-loading-dot:nth-child(5) {
+	animation-delay: 0s;
+}
+
+.agent-client-loading-dot:nth-child(6) {
+	animation-delay: 0.15s;
+}
+
+.agent-client-loading-dot:nth-child(7) {
+	animation-delay: 0.6s;
+}
+
+.agent-client-loading-dot:nth-child(8) {
+	animation-delay: 0.45s;
+}
+
+.agent-client-loading-dot:nth-child(9) {
+	animation-delay: 0.3s;
+}
+
+@keyframes dotPulse {
+	0%,
+	100% {
+		background-color: var(--background-modifier-border);
+	}
+	25% {
+		background-color: var(--interactive-accent);
+	}
+}
+
+/* ===== Header Button Component ===== */
+.agent-client-header-button {
+	width: 20px;
+	height: 20px;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+	border-radius: 0 !important;
+	background-color: transparent !important;
+	color: var(--text-muted);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 16px;
+	outline: none !important;
+	appearance: none;
+	box-shadow: none !important;
+	transition: background-color 0.2s ease;
+	min-width: unset !important;
+	min-height: unset !important;
+}
+
+.agent-client-header-button svg {
+	color: var(--text-muted);
+	transition: color 0.2s ease;
+}
+
+.agent-client-header-button:hover {
+	background-color: var(--background-modifier-hover) !important;
+}
+
+.agent-client-header-button:hover svg {
+	color: var(--interactive-accent);
+}
+
+/* ===== Message Content Components ===== */
+
+/* Tool Call */
+.agent-client-message-tool-call {
+	padding: 8px;
+	margin-top: 4px;
+	background-color: transparent;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	font-size: 12px;
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	max-width: 100%;
+}
+
+.agent-client-message-tool-call-title {
+	font-weight: bold;
+	margin-bottom: 4px;
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.agent-client-message-tool-call-locations {
+	color: var(--text-muted);
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.agent-client-message-tool-call-location {
+	display: block;
+	font-family: var(--font-monospace);
+	font-size: 0.9em;
+}
+
+.agent-client-message-tool-call-status {
+	color: var(--text-muted);
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+/* Plan */
+.agent-client-message-plan {
+	padding: 8px;
+	margin-top: 4px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	font-size: 12px;
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	max-width: 100%;
+}
+
+.agent-client-message-plan-title {
+	font-weight: bold;
+	margin-bottom: 4px;
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.agent-client-message-plan-entry {
+	margin: 2px 0;
+	padding: 2px 4px;
+	border-left: 2px solid var(--text-muted);
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.agent-client-message-plan-entry-icon.agent-client-status-completed {
+	color: var(--color-green);
+	user-select: text;
+}
+
+.agent-client-message-plan-entry-icon.agent-client-status-in_progress {
+	color: var(--color-orange);
+	user-select: text;
+}
+
+.agent-client-message-plan-entry-icon.agent-client-status-pending {
+	color: var(--text-muted);
+	user-select: text;
+}
+
+/* Permission Request */
+.agent-client-message-permission-request {
+	padding: 6px 0px;
+	margin-top: 4px;
+	background-color: var(--background-secondary);
+	font-size: 14px;
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	max-width: 100%;
+}
+
+.agent-client-message-permission-request-title {
+	font-weight: bold;
+	margin-bottom: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.agent-client-message-permission-request-description {
+	margin-bottom: 12px;
+	color: var(--text-normal);
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.agent-client-message-permission-request-options {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	justify-content: flex-end;
+}
+
+.agent-client-message-permission-request-result {
+	padding: 8px;
+	background-color: var(--background-primary);
+	border-radius: 4px;
+	font-size: 13px;
+	user-select: text;
+}
+
+.agent-client-message-permission-request-result.agent-client-selected {
+	color: var(--text-accent);
+}
+
+.agent-client-message-permission-request-result.agent-client-cancelled {
+	color: var(--color-orange);
+}
+
+/* ===== Permission Request Buttons ===== */
+.agent-client-permission-option {
+	padding: 8px 16px !important;
+	border: 1px solid var(--background-modifier-border) !important;
+	border-radius: 6px !important;
+	background-color: var(--background-primary) !important;
+	color: var(--text-normal) !important;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	min-width: 80px;
+	text-align: center;
+	opacity: 1;
+}
+
+.agent-client-permission-option.agent-client-selected {
+	background-color: var(--interactive-accent) !important;
+	color: white !important;
+	font-weight: 600;
+}
+
+.agent-client-permission-option.agent-client-disabled {
+	background-color: var(--background-modifier-border) !important;
+	color: var(--text-muted) !important;
+	cursor: not-allowed !important;
+}
+
+.agent-client-permission-option.agent-client-disabled:not(
+		.agent-client-selected
+	) {
+	opacity: 0.5;
+}
+
+/* Special kinds */
+.agent-client-permission-option.agent-client-permission-kind-allow_always:not(
+		.agent-client-selected
+	):not(.agent-client-disabled) {
+	background-color: var(--color-green) !important;
+	color: white !important;
+	border-color: var(--color-green) !important;
+}
+
+.agent-client-permission-option.agent-client-permission-kind-reject_once:not(
+		.agent-client-selected
+	):not(.agent-client-disabled) {
+	background-color: var(--color-red) !important;
+	color: white !important;
+	border-color: var(--color-red) !important;
+}
+
+.agent-client-permission-option.agent-client-permission-kind-allow_once:not(
+		.agent-client-selected
+	):not(.agent-client-disabled) {
+	background-color: var(--color-orange) !important;
+	color: white !important;
+	border-color: var(--color-orange) !important;
+}
+
+/* Normal option button hover (no kind specified) */
+.agent-client-permission-option:not(
+		.agent-client-permission-kind-allow_always
+	):not(.agent-client-permission-kind-reject_once):not(
+		.agent-client-permission-kind-allow_once
+	):not(.agent-client-disabled):not(.agent-client-selected):hover {
+	background-color: var(--background-modifier-hover) !important;
+}
+
+/* ===== Chat View Components ===== */
+
+/* Main container */
+.agent-client-chat-view-container {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	padding: 0;
+}
+
+/* Header */
+.agent-client-chat-view-header {
+	padding: 16px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.agent-client-chat-view-header-title {
+	margin: 0 !important;
+}
+
+.agent-client-chat-view-header-update {
+	margin: 0 10px 0 auto !important;
+	padding: 2px 8px;
+	font-size: 11px;
+	color: var(--text-muted);
+	background-color: var(--background-modifier-hover);
+	border-radius: 4px;
+	font-weight: 500;
+}
+
+.agent-client-chat-view-header-actions {
+	display: flex;
+	gap: 8px;
+}
+
+/* Messages container */
+.agent-client-chat-view-messages {
+	flex: 1;
+	padding: 16px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+/* Error display */
+.agent-client-chat-error-container {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 20px;
+	background-color: var(--background-secondary);
+	border-radius: 8px;
+	border: 1px solid var(--color-red);
+	max-width: 100%;
+	overflow: hidden;
+}
+
+.agent-client-chat-error-title {
+	margin: 0 0 8px 0 !important;
+	color: var(--color-red) !important;
+}
+
+.agent-client-chat-error-message {
+	margin: 0 !important;
+	color: var(--text-normal);
+	font-size: 14px;
+	line-height: 1.4;
+	word-wrap: break-word;
+	word-break: break-all;
+	overflow-wrap: anywhere;
+}
+
+.agent-client-chat-error-suggestion {
+	margin: 8px 0 0 0 !important;
+	color: var(--text-muted);
+	font-size: 13px;
+	font-style: italic;
+	line-height: 1.4;
+	word-wrap: break-word;
+	word-break: break-all;
+	overflow-wrap: anywhere;
+}
+
+.agent-client-chat-error-button {
+	padding: 8px 16px !important;
+	border: 1px solid var(--background-modifier-border) !important;
+	border-radius: 6px !important;
+	background-color: transparent !important;
+	color: var(--text-muted) !important;
+	cursor: pointer;
+	font-size: 14px;
+}
+
+/* Empty state */
+.agent-client-chat-empty-state {
+	color: var(--text-muted);
+	text-align: center;
+	margin-top: 20px;
+}
+
+/* Input area */
+.agent-client-chat-input-container {
+	flex-shrink: 0;
+	position: relative;
+}
+
+/* Input box - outer container with border and background */
+.agent-client-chat-input-box {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	background-color: var(--background-primary);
+	overflow: hidden;
+	transition: box-shadow 0.15s ease;
+}
+
+.agent-client-chat-input-box:focus-within {
+	box-shadow: 0 0 0 1.5px var(--background-modifier-border);
+}
+
+.agent-client-chat-input-box.agent-client-dragging-over {
+	background-color: var(--background-secondary);
+}
+
+/* Auto-mention inline display */
+.agent-client-auto-mention-inline {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 4px;
+	padding: 6px 12px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	background-color: transparent;
+}
+
+.agent-client-mention-badge {
+	background-color: transparent;
+	color: var(--interactive-accent-hover);
+	border-radius: 3px;
+	font-size: var(--font-text-size);
+	font-weight: 500;
+	line-height: var(--line-height-normal);
+	cursor: default;
+	user-select: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: calc(100% - 24px);
+}
+
+.agent-client-mention-badge.agent-client-disabled {
+	color: var(--text-faint);
+	text-decoration: line-through;
+}
+
+.agent-client-auto-mention-toggle-btn {
+	background: none;
+	background-color: transparent !important;
+	border: none !important;
+	color: var(--text-muted);
+	cursor: pointer;
+	padding: 0 !important;
+	margin: 0 !important;
+	pointer-events: auto;
+	transition: color 0.2s;
+	outline: none !important;
+	appearance: none;
+	box-shadow: none !important;
+	width: 16px;
+	height: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.agent-client-auto-mention-toggle-btn svg {
+	width: 14px;
+	height: 14px;
+	color: inherit;
+}
+
+.agent-client-auto-mention-toggle-btn:hover {
+	background: none;
+	box-shadow: none;
+	color: var(--interactive-accent);
+}
+
+.agent-client-auto-mention-toggle-btn:active,
+.agent-client-auto-mention-toggle-btn:focus {
+	background: none;
+	box-shadow: none;
+	outline: none;
+}
+
+.agent-client-chat-input-textarea {
+	width: 100%;
+	padding: 12px;
+	border: none;
+	background-color: transparent;
+	color: var(--text-normal);
+	resize: none;
+	min-height: 80px;
+	max-height: 300px;
+	font-family: inherit;
+	font-size: var(--font-text-size);
+	line-height: var(--line-height-normal);
+	box-sizing: border-box;
+	outline: none;
+	overflow-y: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+.agent-client-chat-input-textarea::-webkit-scrollbar {
+	display: none;
+}
+
+.agent-client-chat-input-textarea:hover {
+	border: none !important;
+	background-color: transparent !important;
+}
+
+.agent-client-chat-input-textarea:focus {
+	border: none !important;
+	outline: none !important;
+	box-shadow: none !important;
+}
+
+/* Dynamic textarea height management */
+.agent-client-chat-input-textarea.agent-client-textarea-auto-height {
+	height: auto;
+}
+
+.agent-client-chat-input-textarea.agent-client-textarea-expanded {
+	height: var(--textarea-height, auto);
+}
+
+/* Textarea wrapper for hint overlay */
+.agent-client-textarea-wrapper {
+	position: relative;
+	flex: 1;
+	min-height: 80px;
+}
+
+/* Hint overlay for slash commands */
+.agent-client-hint-overlay {
+	/* Positioning - exact overlay on textarea */
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	pointer-events: none;
+	/* Match textarea properties exactly */
+	padding: 12px;
+	box-sizing: border-box;
+	font-family: inherit;
+	font-size: var(--font-text-size);
+	line-height: var(--line-height-normal);
+	/* Text wrapping */
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow: hidden;
+}
+
+.agent-client-hint-overlay .agent-client-invisible {
+	visibility: hidden;
+}
+
+.agent-client-hint-overlay .agent-client-hint-text {
+	color: var(--text-faint);
+}
+
+/* Input Actions Container */
+.agent-client-chat-input-actions {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px;
+	padding: 4px 12px 8px 12px;
+}
+
+/* Mode Selector */
+.agent-client-mode-selector {
+	display: inline-flex;
+	align-items: center;
+	padding: 0 4px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.1s ease;
+	height: 20px;
+	max-width: 120px;
+}
+
+.agent-client-mode-selector:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.agent-client-mode-selector-icon {
+	display: flex;
+	align-items: center;
+	pointer-events: none;
+	color: var(--text-faint);
+	margin-left: 2px;
+	order: 2;
+}
+
+.agent-client-mode-selector-icon svg {
+	width: 12px;
+	height: 12px;
+}
+
+.agent-client-mode-selector select.dropdown {
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+	border-radius: 0 !important;
+	background: none !important;
+	background-color: transparent !important;
+	background-image: none !important;
+	box-shadow: none !important;
+	color: var(--text-faint) !important;
+	font-size: 11px !important;
+	cursor: pointer !important;
+	outline: none !important;
+	appearance: none !important;
+	-webkit-appearance: none !important;
+	-moz-appearance: none !important;
+	order: 1;
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.agent-client-mode-selector select.dropdown:hover,
+.agent-client-mode-selector select.dropdown:focus {
+	color: var(--text-faint) !important;
+	background-color: transparent !important;
+	box-shadow: none !important;
+}
+
+/* Model Selector (experimental) */
+.agent-client-model-selector {
+	display: inline-flex;
+	align-items: center;
+	padding: 0 4px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.1s ease;
+	height: 20px;
+	max-width: 120px;
+}
+
+.agent-client-model-selector:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.agent-client-model-selector-icon {
+	display: flex;
+	align-items: center;
+	pointer-events: none;
+	color: var(--text-faint);
+	margin-left: 2px;
+	order: 2;
+}
+
+.agent-client-model-selector-icon svg {
+	width: 12px;
+	height: 12px;
+}
+
+.agent-client-model-selector select.dropdown {
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+	border-radius: 0 !important;
+	background: none !important;
+	background-color: transparent !important;
+	background-image: none !important;
+	box-shadow: none !important;
+	color: var(--text-faint) !important;
+	font-size: 11px !important;
+	cursor: pointer !important;
+	outline: none !important;
+	appearance: none !important;
+	-webkit-appearance: none !important;
+	-moz-appearance: none !important;
+	order: 1;
+	max-width: 100px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.agent-client-model-selector select.dropdown:hover,
+.agent-client-model-selector select.dropdown:focus {
+	color: var(--text-faint) !important;
+	background-color: transparent !important;
+	box-shadow: none !important;
+}
+
+/* Send button */
+.agent-client-chat-send-button {
+	width: 20px;
+	height: 20px;
+	padding: 0 !important;
+	margin: 0 !important;
+	border: none !important;
+	border-radius: 0 !important;
+	background-color: transparent !important;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 16px;
+	outline: none !important;
+	appearance: none;
+	box-shadow: none !important;
+	transition: all 0.2s ease;
+}
+
+.agent-client-chat-send-button.agent-client-disabled {
+	cursor: not-allowed !important;
+}
+
+/* Send button icon states */
+.agent-client-chat-send-button svg {
+	transition: color 0.2s ease;
+}
+
+.agent-client-chat-send-button svg.agent-client-icon-sending {
+	color: var(--color-red);
+}
+
+.agent-client-chat-send-button svg.agent-client-icon-active {
+	color: var(--interactive-accent);
+}
+
+.agent-client-chat-send-button svg.agent-client-icon-inactive {
+	color: var(--text-muted);
+}
+
+/* ===== Other Chat Components ===== */
+
+/* Collapsible Thought */
+.agent-client-collapsible-thought {
+	font-style: italic;
+	color: var(--text-muted);
+	background-color: transparent;
+	font-size: 0.9em;
+	cursor: pointer;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	max-width: 100%;
+	margin-top: 8px;
+}
+
+.agent-client-collapsible-thought-header {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.agent-client-collapsible-thought-icon {
+	font-size: 0.8em;
+	opacity: 0.7;
+	margin-left: auto;
+}
+
+.agent-client-collapsible-thought-content {
+	margin-top: 8px;
+	padding-left: 16px;
+	user-select: text;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+/* Mention Dropdown */
+.agent-client-mention-dropdown {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	right: 0;
+	max-height: 250px;
+	background-color: var(--background-secondary);
+	border: 2px solid var(--background-modifier-border);
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	overflow-y: auto;
+	font-size: 14px;
+	margin-bottom: 8px;
+	z-index: 1000;
+}
+
+.agent-client-mention-dropdown-item {
+	padding: 4px 16px;
+	cursor: pointer;
+	background-color: transparent;
+	user-select: none;
+	transition: background-color 0.1s ease;
+}
+
+.agent-client-mention-dropdown-item.agent-client-selected {
+	background-color: var(--background-primary);
+}
+
+.agent-client-mention-dropdown-item.agent-client-has-border {
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.agent-client-mention-dropdown-item-name {
+	font-weight: 500;
+	color: var(--text-normal);
+	margin-bottom: 2px;
+}
+
+.agent-client-mention-dropdown-item-path {
+	font-size: 12px;
+	color: var(--text-muted);
+	opacity: 0.8;
+}
+
+/* Terminal Renderer */
+.agent-client-terminal-renderer {
+	padding: 12px;
+	margin-top: 4px;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+	font-size: 12px;
+	font-family: var(--font-monospace);
+	user-select: text;
+}
+
+.agent-client-terminal-renderer-header {
+	font-weight: bold;
+	margin-bottom: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-family: var(--font-interface);
+	user-select: text;
+}
+
+.agent-client-terminal-status {
+	font-size: 10px;
+	user-select: text;
+}
+
+.agent-client-terminal-status.agent-client-running {
+	color: var(--color-green);
+}
+
+.agent-client-terminal-status.agent-client-cancelled {
+	color: var(--color-orange);
+}
+
+.agent-client-terminal-status.agent-client-finished {
+	color: var(--text-muted);
+}
+
+.agent-client-terminal-renderer-output {
+	background-color: var(--background-primary);
+	padding: 8px;
+	border-radius: 4px;
+	border: 1px solid var(--background-modifier-border);
+	min-height: 100px;
+	max-height: 400px;
+	overflow: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+	user-select: text;
+}
+
+.agent-client-terminal-renderer-exit {
+	margin-top: 8px;
+	padding: 4px 8px;
+	color: white;
+	border-radius: 4px;
+	font-size: 11px;
+	font-family: var(--font-interface);
+	user-select: text;
+}
+
+.agent-client-terminal-renderer-exit.agent-client-success {
+	background-color: var(--color-green);
+}
+
+.agent-client-terminal-renderer-exit.agent-client-error {
+	background-color: var(--color-red);
+}
+
+/* Message Renderer */
+.agent-client-message-renderer {
+	padding: 0px 16px;
+	width: 100%;
+	margin: 4px 0;
+	/* Prevent long strings from overflowing */
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+.agent-client-message-renderer.agent-client-message-user {
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 8px;
+}
+
+.agent-client-message-renderer.agent-client-message-assistant {
+	background-color: transparent;
+	border: none;
+	border-radius: 0;
+}
+
+/* Text with Mentions */
+.agent-client-text-with-mentions {
+	user-select: text;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	word-break: break-word;
+	overflow-wrap: break-word;
+	margin: 1em 0;
+	font-size: var(--font-text-size);
+	max-width: 100%;
+}
+
+.agent-client-text-mention {
+	background-color: transparent;
+	color: var(--interactive-accent-hover);
+	border-radius: 3px;
+	font-size: 0.9em;
+	font-weight: 500;
+	cursor: pointer;
+}
+
+/* Markdown Text Renderer */
+.agent-client-markdown-text-renderer {
+	user-select: text;
+	font-size: var(--font-text-size);
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	max-width: 100%;
+}
+
+.agent-client-markdown-text-renderer .markdown-rendered {
+	font-size: inherit;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+/* Tool Call Diff Renderer */
+.agent-client-tool-call-diff {
+	margin-top: 8px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	overflow: hidden;
+	font-family: var(--font-monospace);
+	font-size: 12px;
+}
+
+.agent-client-tool-call-diff-content {
+	background-color: var(--background-primary);
+	overflow: auto;
+}
+
+.agent-client-diff-line-info {
+	padding: 4px 12px;
+	background-color: var(--background-secondary);
+	color: var(--text-muted);
+	font-size: 11px;
+	font-style: italic;
+}
+
+.agent-client-diff-line {
+	display: flex;
+	align-items: flex-start;
+	line-height: 1.5;
+	user-select: text;
+}
+
+.agent-client-diff-line-number {
+	display: inline-block;
+	width: 40px;
+	padding: 2px 8px;
+	text-align: right;
+	flex-shrink: 0;
+	color: var(--text-muted);
+	user-select: none;
+	font-size: 11px;
+}
+
+.agent-client-diff-line-number-old {
+	border-right: 1px solid var(--background-modifier-border);
+}
+
+.agent-client-diff-line-number-new {
+	border-right: 1px solid var(--background-modifier-border);
+}
+
+.agent-client-diff-line-marker {
+	display: inline-block;
+	width: 20px;
+	padding: 2px 4px;
+	flex-shrink: 0;
+	font-weight: bold;
+	user-select: none;
+	text-align: center;
+}
+
+.agent-client-diff-line-content {
+	flex: 1;
+	padding: 2px 12px;
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.agent-client-diff-line-added {
+	background-color: rgba(46, 160, 67, 0.15);
+}
+
+.agent-client-diff-line-added .agent-client-diff-line-marker {
+	color: var(--color-green);
+}
+
+.agent-client-diff-line-removed {
+	background-color: rgba(248, 81, 73, 0.15);
+}
+
+.agent-client-diff-line-removed .agent-client-diff-line-marker {
+	color: var(--color-red);
+}
+
+.agent-client-diff-line-context {
+	background-color: transparent;
+}
+
+.agent-client-diff-line-context .agent-client-diff-line-marker {
+	color: var(--text-faint);
+}
+
+/* Hunk header styling */
+.agent-client-diff-hunk-header {
+	padding: 4px 12px;
+	background-color: var(--background-secondary-alt);
+	color: var(--text-muted);
+	font-size: 11px;
+	border-top: 1px solid var(--background-modifier-border);
+	border-bottom: 1px solid var(--background-modifier-border);
+	font-weight: 500;
+}
+
+/* Word-level diff highlighting */
+.agent-client-diff-word-added {
+	background-color: rgba(46, 160, 67, 0.4);
+	font-weight: 600;
+}
+
+.agent-client-diff-word-removed {
+	background-color: rgba(248, 81, 73, 0.4);
+	font-weight: 600;
+	text-decoration: line-through;
+}
+
+/* Tool Call Details */
+.agent-client-tool-call-read-details,
+.agent-client-tool-call-edit-details,
+.agent-client-tool-call-delete-details,
+.agent-client-tool-call-move-details,
+.agent-client-tool-call-search-details,
+.agent-client-tool-call-execute-details,
+.agent-client-tool-call-fetch-details {
+	padding: 4px 0;
+	font-size: 12px;
+	color: var(--text-muted);
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+	max-width: 100%;
+}
+
+.agent-client-tool-call-location {
+	padding: 2px 0;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.agent-client-tool-call-line {
+	color: var(--text-accent);
+	font-weight: 500;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.agent-client-tool-call-content {
+	padding: 8px 0;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+/* ===== Image Preview Strip ===== */
+.agent-client-image-preview-strip {
+	display: flex;
+	gap: 8px;
+	padding: 8px 12px;
+	background-color: transparent;
+	overflow-x: auto;
+	scrollbar-width: thin;
+	-ms-overflow-style: none;
+}
+
+.agent-client-image-preview-strip::-webkit-scrollbar {
+	height: 4px;
+}
+
+.agent-client-image-preview-strip::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.agent-client-image-preview-strip::-webkit-scrollbar-thumb {
+	background-color: var(--background-modifier-border);
+	border-radius: 2px;
+}
+
+.agent-client-image-preview-item {
+	position: relative;
+	flex-shrink: 0;
+	width: 64px;
+	height: 64px;
+}
+
+.agent-client-image-preview-thumbnail {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: center;
+	border-radius: 8px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.agent-client-image-preview-remove {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
+	background-color: var(--background-secondary);
+	color: var(--text-muted);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity 0.15s ease;
+	box-shadow: none !important;
+}
+
+.agent-client-image-preview-remove svg {
+	width: 12px;
+	height: 12px;
+}
+
+.agent-client-image-preview-item:hover .agent-client-image-preview-remove {
+	opacity: 1;
+}
+
+/* ===== Message Image (in chat history) ===== */
+.agent-client-message-image {
+	display: inline-block;
+	margin: 4px 4px 4px 0;
+}
+
+.agent-client-message-image-thumbnail {
+	width: 120px;
+	height: 120px;
+	object-fit: cover;
+	object-position: center;
+	border-radius: 8px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+/* ===== Message Images Strip (horizontal scroll in chat history) ===== */
+.agent-client-message-images-strip {
+	display: flex;
+	gap: 8px;
+	padding: 8px 0;
+	overflow-x: auto;
+	scrollbar-width: thin;
+	-ms-overflow-style: none;
+}
+
+.agent-client-message-images-strip::-webkit-scrollbar {
+	height: 4px;
+}
+
+.agent-client-message-images-strip::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.agent-client-message-images-strip::-webkit-scrollbar-thumb {
+	background-color: var(--background-modifier-border);
+	border-radius: 2px;
+}
+
+.agent-client-message-images-strip .agent-client-message-image {
+	flex-shrink: 0;
+	margin: 0;
+}
+ @media print {
+	/* span.cm-tab { */
+	/* 	width: 50px !important; */
+	/* 	display: inline-block; */
+	/* } */
+
+	/* .is-ltr { */
+	/* 	direction: ltr; */
+	/* 	text-align-last: left; */
+	/* } */
+
+	/* .is-rtl { */
+	/* 	direction: rtl; */
+	/* 	text-align: right; */
+	/* } */
+}
+
+/* /1* List indent fix *1/ */
+/* .is-mobile .is-rtl .HyperMD-list-line, */
+/* .is-mobile .HyperMD-list-line[dir="rtl"] { */
+/* 	text-indent: 0px !important; */
+/* 	padding-left: 0 !important; */
+/* } */
+
+/* .CodeMirror-rtl pre { */
+/* 	text-indent: 0px !important; */
+/* } */
+
+/* /1* Embedded links always LTR *1/ */
+/* .embedded-backlinks { */
+/* 	direction: ltr; */
+/* } */
+
+/* /1* Patch YAML RTL *1/ */
+/* /1* In a preview that is strictly RTL (is-rtl) and the settings ask to right-aline YAML (rtl-yaml), set a YAML block to RTL. *1/ */
+/* .is-rtl.rtl-yaml code.language-yaml { */
+/* 	text-align: right; */
+/* } */
+/* /1* Then move the 'copy' button to the left *1/ */
+/* .is-rtl.rtl-yaml code.language-yaml + button.copy-code-button { */
+/* 	right: unset; */
+/* 	left: 0; */
+/* } */
+/* /1* In a preview that is auto (is-auto), and the YAML was detected as RTL (esm-rtl), set the 'copy' button to the left *1/ */
+/* .is-auto .esm-rtl.language-yaml + button.copy-code-button { */
+/* 	right: unset; */
+/* 	left: 0; */
+/* } */
+
+/* /1* In RTL, or in Auto with a first line that is RTL, set the flair (where it says e.g. 'yaml' in Edit mode) to the left *1/ */
+/* .is-rtl div:has(.HyperMD-codeblock-begin) .code-block-flair, */
+/* .is-auto div:has(.HyperMD-codeblock-begin + .HyperMD-codeblock[dir="rtl"]) .code-block-flair { */
+/* 	right: unset; */
+/* 	left: 6px; */
+/* } */
+
+.is-ltr div,
+.is-ltr li,
+.is-ltr p {
+	direction: ltr;
+	unicode-bidi: unset;
+}
+
+.is-rtl div,
+.is-rtl li,
+.is-rtl p {
+	direction: rtl;
+	unicode-bidi: unset;
+}
+
+/* Use to force frontmatter to be LTR-directioned when "Prevent Frontmatter to be RTL-directioned" was enabled. */
+.cm-content>.cm-line:has(>.cm-hmd-frontmatter):not([dir]) {
+	direction: ltr;
+}
+
+/* /1* RTL and Auto callout titles that are detected as RTL - set to the right *1/ */
+/* .is-rtl .callout-title:has(.esm-rtl), */
+/* .is-auto .callout-title:has(.esm-rtl) { */
+/* 	direction: rtl; */
+/* } */
+/* .is-auto .callout-content .esm-rtl { */
+/* 	direction: rtl; */
+/* } */
+/* /1* When an RTL callout title was set to the right, left-justify its edit block button *1/ */
+/* .is-rtl div.cm-callout:has(.callout-title .esm-rtl) .edit-block-button, */
+/* .is-auto div.cm-callout:has(.callout-title .esm-rtl) .edit-block-button { */
+/* 	right: unset; */
+/* 	left: var(--size-2-2); */
+/* } */
+
+/* .markdown-source-view .cm-line[dir="rtl"] .task-list-label { */
+/* 	margin-left: 0; */
+/* 	margin-right: -3px; */
+/* } */
+
+/* /1* Better spacing between bullet and text *1/ */
+/* .outliner-plugin-better-bullets .markdown-source-view.is-rtl .cm-formatting-list-ul, */
+/* .outliner-plugin-better-bullets .markdown-source-view .cm-line[dir="rtl"] .cm-formatting-list-ul { */
+/* 	margin-right: 0; */
+/* 	margin-left: 0.3em; */
+/* } */
+
+/* .markdown-source-view.is-rtl .is-collapsed .collapse-indicator svg.svg-icon, */
+/* .markdown-source-view .cm-line[dir="rtl"] .is-collapsed .collapse-indicator svg.svg-icon { */
+/* 	transform: rotate(90deg); */
+/* } */
+
+/* /1* Styling for collapse indicator on the headings *1/ */
+/* .markdown-source-view.is-rtl .cm-line .cm-fold-indicator .collapse-indicator, */
+/* .markdown-source-view .cm-line[dir="rtl"] .cm-fold-indicator .collapse-indicator { */
+/* 	padding-right: 0; */
+/* 	padding-left: 6px; */
+/* 	right: -16px; */
+/* } */
+
+/* /1* Styling for collapse indicator on the lists *1/ */
+/* .markdown-source-view.is-rtl .cm-line:not(.cm-active):not(.HyperMD-header):not(.HyperMD-task-line) .cm-fold-indicator .collapse-indicator, */
+/* .markdown-source-view .cm-line[dir="rtl"]:not(.cm-active):not(.HyperMD-header):not(.HyperMD-task-line) .cm-fold-indicator .collapse-indicator { */
+/* 	padding-right: 0; */
+/* 	padding-left: 18px; */
+/* 	right: -16px; */
+/* } */
+
+/* /1* Styling for tags in RTL *1/ */
+/* .markdown-source-view.is-rtl .cm-line .cm-hashtag.cm-hashtag-begin, */
+/* .markdown-source-view .cm-line[dir="rtl"] .cm-hashtag.cm-hashtag-begin { */
+/* 	border-top-right-radius: var(--tag-radius); */
+/* 	border-bottom-right-radius: var(--tag-radius); */
+/* 	border-top-left-radius: 0; */
+/* 	border-bottom-left-radius: 0; */
+/* 	border-left: none; */
+/* 	border-right: var(--tag-border-width) solid var(--tag-border-color); */
+/* 	padding-right: var(--tag-padding-x); */
+/* 	padding-left: 0; */
+/* } */
+/* .markdown-source-view.is-rtl .cm-line .cm-hashtag.cm-hashtag-end, */
+/* .markdown-source-view .cm-line[dir="rtl"] .cm-hashtag.cm-hashtag-end { */
+/* 	border-top-left-radius: var(--tag-radius); */
+/* 	border-bottom-left-radius: var(--tag-radius); */
+/* 	border-top-right-radius: 0; */
+/* 	border-bottom-right-radius: 0; */
+/* 	border-right: none; */
+/* 	border-left: var(--tag-border-width) solid var(--tag-border-color); */
+/* 	padding-left: var(--tag-padding-x); */
+/* 	padding-right: 0; */
+/* } */
+
+/* .markdown-preview-view.is-auto .esm-rtl, */
+/* .kanban-plugin__board .esm-rtl, */
+/* .kanban-plugin__drag-container .esm-rtl, */
+/* .markdown-source-view.is-auto .table-cell-wrapper.esm-rtl { */
+/* 	direction: rtl; */
+/* 	text-align: right; */
+/* } */
+
+/* /1* Moving bullets to right side of the page and adding enough space between the bullet and the text *1/ */
+/* .markdown-preview-view.is-auto .esm-rtl > .list-bullet, */
+/* .markdown-preview-view.is-rtl .list-bullet { */
+/* 	float: right; */
+/* 	margin-right: -12px; */
+/* } */
+
+/* /1* Fixing indentation guides in nested lists *1/ */
+/* .markdown-preview-view.is-auto.show-indentation-guide li.esm-rtl > ul::before, */
+/* .markdown-preview-view.is-auto.show-indentation-guide li.esm-rtl > ol::before { */
+/* 	left: auto; */
+/* 	right: -15px; */
+/* } */
+
+/* /1* Moving the collapse indicator to right side of the page *1/ */
+/* .markdown-preview-view.is-auto .esm-rtl > .collapse-indicator, */
+/* .markdown-preview-view.is-rtl .collapse-indicator { */
+/* 	float: right; */
+/* } */
+
+/* /1* Moving the collapse indicator icon on the right of the text with enough space between *1/ */
+/* .markdown-preview-view.is-auto .esm-rtl > .list-collapse-indicator, */
+/* .markdown-preview-view.is-rtl .list-collapse-indicator { */
+/* 	margin-right: -48px; */
+/* 	padding-left: 18px; */
+/* } */
+
+/* /1* Moving the heading collapse indicator on the right of the text. Without */
+/* This the collapse indicator will be over the heading text *1/ */
+/* .markdown-preview-view.is-auto .esm-rtl > .heading-collapse-indicator, */
+/* .markdown-preview-view.is-rtl .heading-collapse-indicator { */
+/* 	margin-right: -22px; */
+/* } */
+
+/* /1* Mirroring collapse icon for nested lists so it points to rtl text not outside of page *1/ */
+/* .markdown-preview-view.is-auto .esm-rtl > .collapse-icon .is-collapsed svg.svg-icon, */
+/* .markdown-preview-view.is-auto .esm-rtl.is-collapsed > .collapse-icon svg.svg-icon, */
+/* .markdown-preview-view.is-rtl .collapse-icon .is-collapsed svg.svg-icon { */
+/* 	transform: rotate(90deg); */
+/* } */
+
+/* /1* Mirroring collapse icon for headings so it points to rtl text not outside of page *1/ */
+/* .markdown-preview-view .is-collapsed .esm-rtl > .collapse-icon svg.svg-icon, */
+/* .markdown-preview-view.is-rtl .collapse-icon svg.svg-icon { */
+/* 	transform: rotate(90deg); */
+/* } */
+
+/* /1* Reverting the margin so the text won't stick to the checkbox *1/ */
+/* .markdown-preview-view.is-auto .esm-rtl > .task-list-item-checkbox, */
+/* .markdown-preview-view.is-rtl .task-list-item-checkbox { */
+/* 	margin-left: 6px; */
+/* 	margin-right: 0; */
+/* } */
+
+/* .markdown-preview-view.is-auto .esm-ltr { */
+/* 	direction: ltr; */
+/* 	text-align-last: left; */
+/* } */
+
+/* /1* If the table first header cell is RTL render the table on the right side of page but dont make every cell RTL *1/ */
+/* .is-auto .cm-table-widget:has(thead tr:first-of-type th:first-of-type .table-cell-wrapper.esm-rtl), */ 
+/* .is-auto .cm-table-widget:has(thead tr:first-of-type th:first-of-type .table-cell-wrapper .cm-line[dir="rtl"]) { */
+/* 	direction: rtl; */
+/* } */
+/* .is-auto .cm-table-widget .table-cell-wrapper.esm-ltr { */
+/* 	direction: ltr; */
+/* } */
+/* .is-auto .cm-table-widget:has(thead tr:first-of-type th:first-of-type .table-cell-wrapper.esm-rtl) .table-col-btn { */
+/* 	left: -16px; */
+/* 	border-left: inherit; */
+/* 	cursor: w-resize; */
+/* } */
+
+/* /1* Similarly to the above, decide on the table direction for Reading View based on the first header cell *1/ */
+/* .markdown-preview-view.is-auto div:has(table thead tr:first-of-type th:first-of-type.esm-rtl) { */
+/* 	direction: rtl; */
+/* } */
+/* .markdown-preview-view.is-auto div:has(table thead tr:first-of-type th:first-of-type.esm-ltr) { */
+/* 	direction: ltr; */
+/* } */
+
+/* Helper styles for debugging */
+/* .cm-line[dir="rtl"] { */
+/*     border-right: dashed; */
+/*     border-right-color: blue; */
+/* } */
+/* .cm-line[dir="ltr"] { */
+/*     border-right: dashed; */
+/*     border-right-color: red; */
+/* } */
+ 
+.pandoc-plugin-error {
+    color: red;
+}
+ undefined
+</style>
+    </head>
+    <body>
+<h1 data-heading="BT GATT Protocol Specification - BQ Device" dir="auto">BT GATT Protocol Specification - BQ Device</h1>
+<h2 data-heading="Overview" dir="auto">Overview</h2>
+<p dir="auto">This document defines the Bluetooth Low Energy (BLE) GATT services and characteristics for the BQ pill dispenser device. Uses the <a data-tooltip-position="top" aria-label="https://github.com/gb88/BLEOTA" rel="noopener nofollow" class="external-link" href="https://github.com/gb88/BLEOTA" target="_blank">BLEOTA</a> library for OTA firmware updates.</p>
+<p dir="auto">Custom services use 128-bit UUIDs with the base format: <code>XXXXXXXX-0000-1000-8000-00805F9B34FB</code>.</p>
+<h2 data-heading="Service Summary" dir="auto">Service Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Service Name</th>
+<th>Service UUID</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Device Information (DIS)</td>
+<td><code>0x180A</code></td>
+<td>Device identification (standard BLE DIS)</td>
+</tr>
+<tr>
+<td>BLE OTA</td>
+<td><code>00008018-0000-1000-8000-00805f9b34fb</code></td>
+<td>Firmware update via BLEOTA protocol</td>
+</tr>
+<tr>
+<td>Time Sync</td>
+<td><code>0x1802</code></td>
+<td>Device clock synchronization</td>
+</tr>
+<tr>
+<td>Terminal Command</td>
+<td><code>0x1803</code></td>
+<td>Debug/diagnostic terminal</td>
+</tr>
+<tr>
+<td>Device Sensors</td>
+<td><code>0x1804</code></td>
+<td>Sensor status monitoring</td>
+</tr>
+<tr>
+<td>Device Control</td>
+<td><code>0x1805</code></td>
+<td>Movement and control commands</td>
+</tr>
+<tr>
+<td>Extract Pill</td>
+<td><code>0x1806</code></td>
+<td>Pill extraction operations</td>
+</tr>
+<tr>
+<td>Sub Drive</td>
+<td><code>0x1807</code></td>
+<td>Sub drive information</td>
+</tr>
+<tr>
+<td>Notifications</td>
+<td><code>0x1808</code></td>
+<td>Event notifications</td>
+</tr>
+<tr>
+<td>Offline Sync</td>
+<td><code>0x1809</code></td>
+<td>Offline data synchronization</td>
+</tr>
+<tr>
+<td>Battery</td>
+<td><code>0x180F</code></td>
+<td>Battery level (standard BLE)</td>
+</tr>
+<tr>
+<td>Sound File</td>
+<td><code>0x180B</code></td>
+<td>Audio file management</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 data-heading="1. Device Information Service (DIS)" dir="auto">1. Device Information Service (DIS)</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x180A</code> (Standard BLE DIS)</p>
+<p dir="auto">Provides device identification and status information. Uses the standard Bluetooth Device Information Service combined with BLEOTA library methods.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+<th>API Method</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model Number</td>
+<td><code>0x2A24</code></td>
+<td>Read</td>
+<td>Device model string</td>
+<td><code>setModel()</code></td>
+</tr>
+<tr>
+<td>Serial Number</td>
+<td><code>0x2A25</code></td>
+<td>Read</td>
+<td>Device serial number</td>
+<td><code>setSerialNumber()</code></td>
+</tr>
+<tr>
+<td>Firmware Revision</td>
+<td><code>0x2A26</code></td>
+<td>Read</td>
+<td>Firmware version string</td>
+<td><code>setFWVersion()</code></td>
+</tr>
+<tr>
+<td>Hardware Revision</td>
+<td><code>0x2A27</code></td>
+<td>Read</td>
+<td>Hardware revision string</td>
+<td><code>setHWVersion()</code></td>
+</tr>
+<tr>
+<td>Manufacturer Name</td>
+<td><code>0x2A29</code></td>
+<td>Read</td>
+<td>Manufacturer identifier</td>
+<td><code>setManufactuer()</code></td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Battery Service" dir="auto">Battery Service</h3>
+<p dir="auto">Battery level is provided via a separate standard Battery Service (<code>0x180F</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Battery Level</td>
+<td><code>0x2A19</code></td>
+<td>Read, Notify</td>
+<td>Current battery percentage (0-100)</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Battery Level Format" dir="auto">Battery Level Format</h3>
+<pre><code>Byte 0: Battery percentage (0x00 - 0x64)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Firmware Version Format" dir="auto">Firmware Version Format</h3>
+<pre><code>Bytes 0-N: Major.Minor.Patch as ASCII string (null-terminated)
+Example: "1.2.3"
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="2. BLE OTA Service (BLEOTA)" dir="auto">2. BLE OTA Service (BLEOTA)</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>00008018-0000-1000-8000-00805f9b34fb</code></p>
+<p dir="auto"><strong>Reference:</strong> <a data-tooltip-position="top" aria-label="https://github.com/gb88/BLEOTA" rel="noopener nofollow" class="external-link" href="https://github.com/gb88/BLEOTA" target="_blank">github.com/gb88/BLEOTA</a></p>
+<p dir="auto">Handles over-the-air (OTA) firmware and SPIFFS filesystem updates using the BLEOTA protocol. Supports zlib compression (~30% faster transfers) and RSA-2048 signature verification.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Firmware Receive</td>
+<td><code>00008020-0000-1000-8000-00805f9b34fb</code></td>
+<td>Write, WriteNR, Notify</td>
+<td>Firmware data reception with ACK</td>
+</tr>
+<tr>
+<td>Command</td>
+<td><code>00008022-0000-1000-8000-00805f9b34fb</code></td>
+<td>Write, WriteNR, Notify</td>
+<td>OTA commands and responses</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Command Packet Format" dir="auto">Command Packet Format</h3>
+<pre><code>Bytes 0-1: Command ID (uint16, little-endian)
+Bytes 2-17: Payload (16 bytes, zero-padded if unused)
+Bytes 18-19: CRC16 checksum
+
+Total: 20 bytes
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Command Codes" dir="auto">Command Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>ID</th>
+<th>Payload</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Start Flash OTA</td>
+<td><code>0x0001</code></td>
+<td>Bytes 2-5: Firmware size (uint32)</td>
+<td>Initialize firmware update</td>
+</tr>
+<tr>
+<td>Start SPIFFS OTA</td>
+<td><code>0x0004</code></td>
+<td>Bytes 2-5: Filesystem size (uint32)</td>
+<td>Initialize SPIFFS update</td>
+</tr>
+<tr>
+<td>Stop OTA</td>
+<td><code>0x0002</code></td>
+<td>None</td>
+<td>Abort current update</td>
+</tr>
+<tr>
+<td>Response</td>
+<td><code>0x0003</code></td>
+<td>Status code</td>
+<td>Device response to commands</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Command Response Status Codes" dir="auto">Command Response Status Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accept</td>
+<td><code>0x0000</code></td>
+<td>Command accepted, OTA started</td>
+</tr>
+<tr>
+<td>Reject</td>
+<td><code>0x0001</code></td>
+<td>Command rejected</td>
+</tr>
+<tr>
+<td>Signature Error</td>
+<td><code>0x0003</code></td>
+<td>RSA signature verification failed</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Firmware Data Packet Format (App → Device)" dir="auto">Firmware Data Packet Format (App → Device)</h3>
+<pre><code>Bytes 0-1: Sector Index (uint16, little-endian)
+Byte 2: Packet Sequence (0x00-0xFE for data, 0xFF for final packet)
+Bytes 3-N: Payload data (MTU - 4 bytes, typically up to 243 bytes)
+
+Note: When Packet_Seq = 0xFF, the final 2 bytes contain CRC16 of the sector
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Firmware ACK Format (Device → App via Notify)" dir="auto">Firmware ACK Format (Device → App via Notify)</h3>
+<pre><code>Bytes 0-1: Sector Index (uint16, little-endian)
+Bytes 2-3: ACK Status (uint16, little-endian)
+Bytes 4-5: CRC16 checksum
+
+Total: 6 bytes
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="ACK Status Codes" dir="auto">ACK Status Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Status</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Success</td>
+<td><code>0x0000</code></td>
+<td>Sector received successfully</td>
+</tr>
+<tr>
+<td>CRC Error</td>
+<td><code>0x0001</code></td>
+<td>CRC verification failed</td>
+</tr>
+<tr>
+<td>Sector Mismatch</td>
+<td><code>0x0002</code></td>
+<td>Unexpected sector index</td>
+</tr>
+<tr>
+<td>Length Error</td>
+<td><code>0x0003</code></td>
+<td>Invalid payload length</td>
+</tr>
+<tr>
+<td>OTA Start Failure</td>
+<td><code>0x0005</code></td>
+<td>Failed to initialize OTA</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="OTA Update Flow" dir="auto">OTA Update Flow</h3>
+<pre><code>┌─────────────────────────────────────────────────────────────────┐
+│                        OTA UPDATE FLOW                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  APP                                    DEVICE                  │
+│   │                                        │                    │
+│   │─── Write Command: Start OTA ──────────&gt;│                    │
+│   │    (0x0001, size=firmware_size)        │                    │
+│   │                                        │                    │
+│   │&lt;── Notify Response: Accept ────────────│                    │
+│   │    (0x0003, status=0x0000)             │                    │
+│   │                                        │                    │
+│   │    ┌─── FOR EACH SECTOR (4KB) ───────┐ │                    │
+│   │    │                                 │ │                    │
+│   │    │  Write FW Data: Packet 0        │ │                    │
+│   │────│──(sector_idx, seq=0, data)──────│─&gt;                    │
+│   │    │                                 │ │                    │
+│   │    │  Write FW Data: Packet 1...N-1  │ │                    │
+│   │────│──(sector_idx, seq=1..N-1, data)─│─&gt;                    │
+│   │    │                                 │ │                    │
+│   │    │  Write FW Data: Final Packet    │ │                    │
+│   │────│──(sector_idx, seq=0xFF, CRC16)──│─&gt;                    │
+│   │    │                                 │ │                    │
+│   │&lt;───│── Notify ACK ───────────────────│─│                    │
+│   │    │   (sector_idx, status, CRC)     │ │                    │
+│   │    │                                 │ │                    │
+│   │    └─────────────────────────────────┘ │                    │
+│   │                                        │                    │
+│   │    [All sectors transmitted]           │                    │
+│   │                                        │                    │
+│   │&lt;── Device resets (500ms delay) ────────│                    │
+│   │                                        │                    │
+└─────────────────────────────────────────────────────────────────┘
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Sector Transmission Details" dir="auto">Sector Transmission Details</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sector Size</td>
+<td>4096 bytes (4KB)</td>
+</tr>
+<tr>
+<td>Packet Size</td>
+<td>MTU - 4 bytes (typically 243 bytes with MTU=247)</td>
+</tr>
+<tr>
+<td>Packets per Sector</td>
+<td>~17 packets for 4KB sector</td>
+</tr>
+<tr>
+<td>Sequence Numbers</td>
+<td>0x00 to 0xFE for data, 0xFF signals final packet</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Security Features" dir="auto">Security Features</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CRC16</td>
+<td>Per-sector integrity check</td>
+</tr>
+<tr>
+<td>RSA-2048</td>
+<td>Firmware signature verification using SHA256 hash</td>
+</tr>
+<tr>
+<td>Compression</td>
+<td>Optional zlib compression for faster transfer (~30% improvement)</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Post-Update Behavior" dir="auto">Post-Update Behavior</h3>
+<p dir="auto">After successful OTA completion:</p>
+<ol>
+<li dir="auto">Device validates firmware signature (if enabled)</li>
+<li dir="auto">Device waits 500ms (configurable)</li>
+<li dir="auto">Device resets and boots new firmware</li>
+</ol>
+<h3 data-heading="Error Recovery" dir="auto">Error Recovery</h3>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Recovery</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CRC Error</td>
+<td>Retransmit current sector</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>Restart from last ACK'd sector</td>
+</tr>
+<tr>
+<td>Signature Fail</td>
+<td>OTA rejected, device unchanged</td>
+</tr>
+<tr>
+<td>Connection Lost</td>
+<td>Resume from last successful sector</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Example: Calculate Transfer Time" dir="auto">Example: Calculate Transfer Time</h3>
+<pre><code>Firmware size: 1MB (1,048,576 bytes)
+Sector size: 4KB
+Total sectors: 256
+Packets per sector: ~17
+Connection interval: 30ms
+Packets per interval: 6 (conservative)
+
+Time per sector: 17 / 6 * 30ms ≈ 85ms
+Total time: 256 * 85ms ≈ 22 seconds
+
+With zlib compression (~30% reduction):
+Compressed size: ~734KB
+Total time: ≈ 15 seconds
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="3. Time Sync Service" dir="auto">3. Time Sync Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x1802</code></p>
+<p dir="auto">Synchronizes device clock with mobile app/server time.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Current Time</td>
+<td><code>0x2C01</code></td>
+<td>Read, Write</td>
+<td>Device current time</td>
+</tr>
+<tr>
+<td>Time Zone</td>
+<td><code>0x2C02</code></td>
+<td>Read, Write</td>
+<td>Timezone offset</td>
+</tr>
+<tr>
+<td>DST Offset</td>
+<td><code>0x2C03</code></td>
+<td>Read, Write</td>
+<td>Daylight saving offset</td>
+</tr>
+<tr>
+<td>Last Sync</td>
+<td><code>0x2C04</code></td>
+<td>Read</td>
+<td>Timestamp of last sync</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Current Time Format" dir="auto">Current Time Format</h3>
+<pre><code>Bytes 0-3: Unix timestamp (uint32, little-endian, seconds since 1970)
+Bytes 4-5: Milliseconds (uint16, little-endian)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Time Zone Format" dir="auto">Time Zone Format</h3>
+<pre><code>Byte 0: Timezone offset in 15-minute increments (int8)
+        Example: UTC+2 = 0x08 (8 * 15 = 120 minutes)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="DST Offset Format" dir="auto">DST Offset Format</h3>
+<pre><code>Byte 0: DST offset in minutes (uint8)
+        0x00 = No DST
+        0x3C = 60 minutes DST
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="4. Terminal Command Service" dir="auto">4. Terminal Command Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x1803</code></p>
+<p dir="auto">Provides debug and diagnostic terminal access.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TX (Device→App)</td>
+<td><code>0x2D01</code></td>
+<td>Notify</td>
+<td>Terminal output from device</td>
+</tr>
+<tr>
+<td>RX (App→Device)</td>
+<td><code>0x2D02</code></td>
+<td>Write</td>
+<td>Terminal input to device</td>
+</tr>
+<tr>
+<td>Command Status</td>
+<td><code>0x2D03</code></td>
+<td>Read, Notify</td>
+<td>Command execution status</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Command Format" dir="auto">Command Format</h3>
+<pre><code>Bytes 0-N: ASCII command string (null-terminated, max 200 bytes)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Response Format" dir="auto">Response Format</h3>
+<pre><code>Byte 0: Response type
+  0x00 = Output line
+  0x01 = Command complete (success)
+  0x02 = Command complete (error)
+  0x03 = Command in progress
+Bytes 1-N: ASCII response data
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Common Terminal Commands" dir="auto">Common Terminal Commands</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>help</code></td>
+<td>List available commands</td>
+</tr>
+<tr>
+<td><code>status</code></td>
+<td>Device status summary</td>
+</tr>
+<tr>
+<td><code>reset</code></td>
+<td>Soft reset device</td>
+</tr>
+<tr>
+<td><code>factory</code></td>
+<td>Factory reset (requires confirmation)</td>
+</tr>
+<tr>
+<td><code>log [level]</code></td>
+<td>Set/get log level</td>
+</tr>
+<tr>
+<td><code>diag</code></td>
+<td>Run diagnostics</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 data-heading="5. Device Sensors Service" dir="auto">5. Device Sensors Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x1804</code></p>
+<p dir="auto">Monitors device sensor status and readings.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sensor Status</td>
+<td><code>0x2E01</code></td>
+<td>Read, Notify</td>
+<td>Combined sensor status bitmap</td>
+</tr>
+<tr>
+<td>Temperature</td>
+<td><code>0x2E02</code></td>
+<td>Read, Notify</td>
+<td>Internal temperature</td>
+</tr>
+<tr>
+<td>Humidity</td>
+<td><code>0x2E03</code></td>
+<td>Read, Notify</td>
+<td>Internal humidity</td>
+</tr>
+<tr>
+<td>Motor Status</td>
+<td><code>0x2E04</code></td>
+<td>Read, Notify</td>
+<td>Motor position and status</td>
+</tr>
+<tr>
+<td>Lid Status</td>
+<td><code>0x2E05</code></td>
+<td>Read, Notify</td>
+<td>Lid open/closed status</td>
+</tr>
+<tr>
+<td>Pill Detection</td>
+<td><code>0x2E06</code></td>
+<td>Read, Notify</td>
+<td>Pill presence sensors</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Sensor Status Bitmap" dir="auto">Sensor Status Bitmap</h3>
+<pre><code>Byte 0: Status flags
+  Bit 0: Temperature sensor OK
+  Bit 1: Humidity sensor OK
+  Bit 2: Motor encoder OK
+  Bit 3: Lid sensor OK
+  Bit 4: Pill sensors OK
+  Bit 5: Battery sensor OK
+  Bit 6-7: Reserved
+Byte 1: Error flags
+  Bit 0: Temperature out of range
+  Bit 1: Humidity out of range
+  Bit 2: Motor fault
+  Bit 3: Lid jam detected
+  Bit 4: Pill sensor fault
+  Bit 5-7: Reserved
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Temperature Format" dir="auto">Temperature Format</h3>
+<pre><code>Bytes 0-1: Temperature in 0.01°C (int16, little-endian)
+           Example: 2350 = 23.50°C
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Motor Status Format" dir="auto">Motor Status Format</h3>
+<pre><code>Byte 0: Current position (0-11 for 12 slots)
+Byte 1: Target position
+Byte 2: Motor state
+  0x00 = Idle
+  0x01 = Moving
+  0x02 = Homing
+  0x03 = Error
+Byte 3: Error code (if state = 0x03)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Pill Detection Format" dir="auto">Pill Detection Format</h3>
+<pre><code>Bytes 0-1: Pill presence bitmap (uint16)
+           Bit N = 1 if pill present in slot N
+           Example: 0x0FFF = all 12 slots have pills
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="6. Device Control Service" dir="auto">6. Device Control Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x1805</code></p>
+<p dir="auto">Controls device movement and operations.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Control Command</td>
+<td><code>0x2F01</code></td>
+<td>Write, Indicate</td>
+<td>Issue control commands</td>
+</tr>
+<tr>
+<td>Control Status</td>
+<td><code>0x2F02</code></td>
+<td>Read, Notify</td>
+<td>Current operation status</td>
+</tr>
+<tr>
+<td>Position</td>
+<td><code>0x2F03</code></td>
+<td>Read, Write, Notify</td>
+<td>Current/target position</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Control Commands" dir="auto">Control Commands</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Value</th>
+<th>Parameters</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Home</td>
+<td><code>0x01</code></td>
+<td>None</td>
+<td>Return to home position</td>
+</tr>
+<tr>
+<td>Rotate</td>
+<td><code>0x02</code></td>
+<td>Position (1 byte)</td>
+<td>Rotate to position 0-11</td>
+</tr>
+<tr>
+<td>Extract</td>
+<td><code>0x03</code></td>
+<td>Position (1 byte)</td>
+<td>Extract pill at position</td>
+</tr>
+<tr>
+<td>Stop</td>
+<td><code>0x04</code></td>
+<td>None</td>
+<td>Emergency stop</td>
+</tr>
+<tr>
+<td>Calibrate</td>
+<td><code>0x05</code></td>
+<td>None</td>
+<td>Run calibration sequence</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Command Request Format" dir="auto">Command Request Format</h3>
+<pre><code>Byte 0: Command code
+Bytes 1-N: Command parameters (varies by command)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Command Response Format (Indicate)" dir="auto">Command Response Format (Indicate)</h3>
+<pre><code>Byte 0: Original command code
+Byte 1: Result code
+  0x00 = Success
+  0x01 = Invalid command
+  0x02 = Invalid parameter
+  0x03 = Busy
+  0x04 = Hardware error
+  0x05 = Timeout
+Bytes 2-N: Result data (varies by command)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Control Status Format" dir="auto">Control Status Format</h3>
+<pre><code>Byte 0: Device state
+  0x00 = Idle
+  0x01 = Executing command
+  0x02 = Error state
+  0x03 = Calibrating
+Byte 1: Last command code
+Byte 2: Last command result
+Byte 3: Current position (0-11)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="7. Extract Pill Service" dir="auto">7. Extract Pill Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x1806</code></p>
+<p dir="auto">Manages pill extraction operations.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Extract Command</td>
+<td><code>0x3001</code></td>
+<td>Write, Indicate</td>
+<td>Initiate extraction</td>
+</tr>
+<tr>
+<td>Extract Status</td>
+<td><code>0x3002</code></td>
+<td>Read, Notify</td>
+<td>Extraction operation status</td>
+</tr>
+<tr>
+<td>Extract History</td>
+<td><code>0x3003</code></td>
+<td>Read</td>
+<td>Recent extraction records</td>
+</tr>
+<tr>
+<td>Schedule</td>
+<td><code>0x3004</code></td>
+<td>Read, Write</td>
+<td>Scheduled extractions</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Extract Command Format" dir="auto">Extract Command Format</h3>
+<pre><code>Byte 0: Command type
+  0x01 = Extract from position
+  0x02 = Extract next scheduled
+  0x03 = Cancel extraction
+Byte 1: Position (0-11, for type 0x01)
+Byte 2: Confirmation flag (0x5A = confirmed)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Extract Status Format" dir="auto">Extract Status Format</h3>
+<pre><code>Byte 0: Extraction state
+  0x00 = Idle
+  0x01 = Rotating to position
+  0x02 = Extracting
+  0x03 = Verifying
+  0x04 = Complete (success)
+  0x05 = Complete (failed)
+Byte 1: Current position
+Byte 2: Target position
+Byte 3: Error code (if failed)
+  0x00 = No error
+  0x01 = No pill detected
+  0x02 = Jam detected
+  0x03 = Motor error
+  0x04 = Timeout
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Extract History Format" dir="auto">Extract History Format</h3>
+<pre><code>Each record (8 bytes):
+  Bytes 0-3: Timestamp (uint32, Unix time)
+  Byte 4: Position extracted
+  Byte 5: Result (0x00 = success, other = error code)
+  Bytes 6-7: Reserved
+
+Max 10 records returned
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Schedule Format" dir="auto">Schedule Format</h3>
+<pre><code>Each schedule entry (6 bytes):
+  Byte 0: Day mask (bit 0 = Sunday, bit 6 = Saturday)
+  Byte 1: Hour (0-23)
+  Byte 2: Minute (0-59)
+  Byte 3: Position (0-11)
+  Byte 4: Enabled flag (0x00 = disabled, 0x01 = enabled)
+  Byte 5: Reserved
+
+Max 14 schedule entries
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="8. Sub Drive Service" dir="auto">8. Sub Drive Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x1807</code></p>
+<p dir="auto">Provides sub drive (cartridge) information.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sub Drive Info</td>
+<td><code>0x3101</code></td>
+<td>Read, Notify</td>
+<td>Cartridge identification</td>
+</tr>
+<tr>
+<td>Sub Drive Status</td>
+<td><code>0x3102</code></td>
+<td>Read, Notify</td>
+<td>Cartridge status</td>
+</tr>
+<tr>
+<td>Pill Count</td>
+<td><code>0x3103</code></td>
+<td>Read, Notify</td>
+<td>Pills remaining per slot</td>
+</tr>
+<tr>
+<td>Medication Info</td>
+<td><code>0x3104</code></td>
+<td>Read</td>
+<td>Medication metadata</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Sub Drive Info Format" dir="auto">Sub Drive Info Format</h3>
+<pre><code>Bytes 0-15: Cartridge UUID (128-bit)
+Bytes 16-19: Manufacturing date (uint32, Unix time)
+Bytes 20-23: Expiration date (uint32, Unix time)
+Byte 24: Total slots (typically 12)
+Byte 25: Cartridge type
+  0x01 = Standard
+  0x02 = Extended
+  0x03 = Custom
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Sub Drive Status Format" dir="auto">Sub Drive Status Format</h3>
+<pre><code>Byte 0: Status
+  0x00 = Not inserted
+  0x01 = Inserted, valid
+  0x02 = Inserted, expired
+  0x03 = Inserted, error
+Byte 1: Error code (if status = 0x03)
+Bytes 2-3: Total extractions (uint16)
+Bytes 4-5: Successful extractions (uint16)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Pill Count Format" dir="auto">Pill Count Format</h3>
+<pre><code>Bytes 0-11: Pill count per slot (1 byte each, 0-255)
+            Slot 0 at byte 0, slot 11 at byte 11
+Byte 12: Total pills remaining
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Medication Info Format" dir="auto">Medication Info Format</h3>
+<pre><code>Bytes 0-31: Medication name (UTF-8, null-terminated)
+Bytes 32-47: NDC code (ASCII, null-terminated)
+Bytes 48-51: Dosage (uint32, micrograms)
+Byte 52: Dosage unit
+  0x01 = mg
+  0x02 = mcg
+  0x03 = IU
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="9. Notifications Service" dir="auto">9. Notifications Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x1808</code></p>
+<p dir="auto">Handles event notifications and alerts.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Notification</td>
+<td><code>0x3201</code></td>
+<td>Notify</td>
+<td>Push notifications to app</td>
+</tr>
+<tr>
+<td>Notification Config</td>
+<td><code>0x3202</code></td>
+<td>Read, Write</td>
+<td>Notification settings</td>
+</tr>
+<tr>
+<td>Alert Status</td>
+<td><code>0x3203</code></td>
+<td>Read, Notify</td>
+<td>Active alert status</td>
+</tr>
+<tr>
+<td>Acknowledge</td>
+<td><code>0x3204</code></td>
+<td>Write</td>
+<td>Acknowledge alerts</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Notification Format" dir="auto">Notification Format</h3>
+<pre><code>Byte 0: Notification type
+  0x01 = Scheduled extraction reminder
+  0x02 = Extraction complete
+  0x03 = Extraction failed
+  0x04 = Low battery
+  0x05 = Cartridge empty
+  0x06 = Cartridge expiring
+  0x07 = Device error
+  0x08 = Connectivity lost
+Bytes 1-4: Timestamp (uint32, Unix time)
+Byte 5: Priority (0x01 = low, 0x02 = normal, 0x03 = high)
+Bytes 6-N: Payload (varies by type, max 100 bytes)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Notification Config Format" dir="auto">Notification Config Format</h3>
+<pre><code>Byte 0: Enabled notifications bitmap
+  Bit 0: Scheduled reminders
+  Bit 1: Extraction events
+  Bit 2: Battery alerts
+  Bit 3: Cartridge alerts
+  Bit 4: Error alerts
+  Bit 5-7: Reserved
+Byte 1: Reminder lead time (minutes before scheduled)
+Byte 2: Low battery threshold (percentage)
+Byte 3: Quiet hours start (hour, 0-23)
+Byte 4: Quiet hours end (hour, 0-23)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Alert Status Format" dir="auto">Alert Status Format</h3>
+<pre><code>Byte 0: Active alerts bitmap
+  Bit 0: Low battery
+  Bit 1: Empty slot
+  Bit 2: Expired cartridge
+  Bit 3: Motor error
+  Bit 4: Sensor error
+  Bit 5: Missed dose
+  Bit 6-7: Reserved
+Bytes 1-4: Oldest alert timestamp
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Acknowledge Format" dir="auto">Acknowledge Format</h3>
+<pre><code>Byte 0: Alert type to acknowledge (from alert bitmap)
+        0xFF = Acknowledge all
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="10. Offline Sync Service" dir="auto">10. Offline Sync Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x1809</code></p>
+<p dir="auto">Synchronizes offline data (sub drive logs, telemetry).</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sync Control</td>
+<td><code>0x3301</code></td>
+<td>Write, Indicate</td>
+<td>Control sync operations</td>
+</tr>
+<tr>
+<td>Sync Data</td>
+<td><code>0x3302</code></td>
+<td>Notify</td>
+<td>Streamed sync data</td>
+</tr>
+<tr>
+<td>Sync Status</td>
+<td><code>0x3303</code></td>
+<td>Read, Notify</td>
+<td>Sync progress status</td>
+</tr>
+<tr>
+<td>Last Sync Time</td>
+<td><code>0x3304</code></td>
+<td>Read</td>
+<td>Last successful sync timestamp</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Sync Control Commands" dir="auto">Sync Control Commands</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Value</th>
+<th>Parameters</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Start Sync</td>
+<td><code>0x01</code></td>
+<td>Start timestamp (4 bytes)</td>
+<td>Begin sync from timestamp</td>
+</tr>
+<tr>
+<td>Pause Sync</td>
+<td><code>0x02</code></td>
+<td>None</td>
+<td>Pause current sync</td>
+</tr>
+<tr>
+<td>Resume Sync</td>
+<td><code>0x03</code></td>
+<td>None</td>
+<td>Resume paused sync</td>
+</tr>
+<tr>
+<td>Abort Sync</td>
+<td><code>0x04</code></td>
+<td>None</td>
+<td>Cancel sync operation</td>
+</tr>
+<tr>
+<td>Mark Complete</td>
+<td><code>0x05</code></td>
+<td>End timestamp (4 bytes)</td>
+<td>Mark sync complete</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Sync Data Format" dir="auto">Sync Data Format</h3>
+<pre><code>Byte 0: Record type
+  0x01 = Extraction event
+  0x02 = Error event
+  0x03 = Telemetry sample
+  0x04 = State change
+Bytes 1-4: Timestamp (uint32, Unix time)
+Byte 5: Sequence number (for ordering)
+Bytes 6-N: Record payload (varies by type)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Extraction Event Payload" dir="auto">Extraction Event Payload</h3>
+<pre><code>Byte 0: Position
+Byte 1: Result (0x00 = success, other = error)
+Byte 2: Duration (seconds)
+Byte 3: Battery level at time
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Telemetry Sample Payload" dir="auto">Telemetry Sample Payload</h3>
+<pre><code>Bytes 0-1: Temperature (int16, 0.01°C)
+Bytes 2-3: Humidity (uint16, 0.01%)
+Byte 4: Battery level
+Byte 5: Motor status
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Sync Status Format" dir="auto">Sync Status Format</h3>
+<pre><code>Byte 0: Sync state
+  0x00 = Idle
+  0x01 = Syncing
+  0x02 = Paused
+  0x03 = Error
+Bytes 1-2: Records pending (uint16)
+Bytes 3-4: Records synced (uint16)
+Byte 5: Progress percentage (0-100)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="11. Sound File Service" dir="auto">11. Sound File Service</h2>
+<p dir="auto"><strong>Service UUID:</strong> <code>0x180B</code></p>
+<p dir="auto">Manages audio files for alerts and notifications.</p>
+<h3 data-heading="Characteristics" dir="auto">Characteristics</h3>
+<table>
+<thead>
+<tr>
+<th>Characteristic</th>
+<th>UUID</th>
+<th>Properties</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Sound Control</td>
+<td><code>0x3401</code></td>
+<td>Write, Indicate</td>
+<td>Sound playback control</td>
+</tr>
+<tr>
+<td>Sound Upload</td>
+<td><code>0x3402</code></td>
+<td>Write Without Response</td>
+<td>Upload sound data</td>
+</tr>
+<tr>
+<td>Sound List</td>
+<td><code>0x3403</code></td>
+<td>Read</td>
+<td>List available sounds</td>
+</tr>
+<tr>
+<td>Sound Config</td>
+<td><code>0x3404</code></td>
+<td>Read, Write</td>
+<td>Sound configuration</td>
+</tr>
+<tr>
+<td>Volume</td>
+<td><code>0x3405</code></td>
+<td>Read, Write</td>
+<td>Master volume level</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Sound Control Commands" dir="auto">Sound Control Commands</h3>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Value</th>
+<th>Parameters</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Play</td>
+<td><code>0x01</code></td>
+<td>Sound ID (1 byte)</td>
+<td>Play sound by ID</td>
+</tr>
+<tr>
+<td>Stop</td>
+<td><code>0x02</code></td>
+<td>None</td>
+<td>Stop current playback</td>
+</tr>
+<tr>
+<td>Upload Start</td>
+<td><code>0x03</code></td>
+<td>Sound ID, Size (4 bytes)</td>
+<td>Begin upload</td>
+</tr>
+<tr>
+<td>Upload End</td>
+<td><code>0x04</code></td>
+<td>Checksum (4 bytes)</td>
+<td>Complete upload</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td><code>0x05</code></td>
+<td>Sound ID (1 byte)</td>
+<td>Delete sound file</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Sound Upload Format" dir="auto">Sound Upload Format</h3>
+<pre><code>Bytes 0-1: Packet sequence (uint16)
+Bytes 2-N: PCM audio data (8kHz, 8-bit mono, max 244 bytes)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Sound List Format" dir="auto">Sound List Format</h3>
+<pre><code>Each entry (20 bytes):
+  Byte 0: Sound ID
+  Bytes 1-16: Sound name (UTF-8, null-terminated)
+  Bytes 17-18: Duration (uint16, milliseconds)
+  Byte 19: Type
+    0x01 = System
+    0x02 = Alert
+    0x03 = Custom
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Sound Config Format" dir="auto">Sound Config Format</h3>
+<pre><code>Byte 0: Reminder sound ID
+Byte 1: Success sound ID
+Byte 2: Error sound ID
+Byte 3: Low battery sound ID
+Byte 4: Extraction sound ID
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<h3 data-heading="Volume Format" dir="auto">Volume Format</h3>
+<pre><code>Byte 0: Volume level (0-100)
+Byte 1: Mute flag (0x00 = not muted, 0x01 = muted)
+</code><button class="copy-code-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svg-icon lucide-copy"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path><style>
+:root {
+  --default-font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+  --font-monospace: 'Source Code Pro', monospace;
+  --background-primary: #ffffff;
+  --background-modifier-border: #ddd;
+  --text-accent: #705dcf;
+  --text-accent-hover: #7a6ae6;
+  --text-normal: #2e3338;
+  --background-secondary: #f2f3f5;
+  --background-secondary-alt: #e3e5e8;
+  --text-muted: #888888;
+}</style>"<marker id="mermaid_arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker>"</svg></button></pre>
+<hr>
+<h2 data-heading="Error Codes Reference" dir="auto">Error Codes Reference</h2>
+<h3 data-heading="Global Error Codes" dir="auto">Global Error Codes</h3>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>0x00</code></td>
+<td>SUCCESS</td>
+<td>Operation completed successfully</td>
+</tr>
+<tr>
+<td><code>0x01</code></td>
+<td>ERR_INVALID_PARAM</td>
+<td>Invalid parameter value</td>
+</tr>
+<tr>
+<td><code>0x02</code></td>
+<td>ERR_INVALID_STATE</td>
+<td>Operation not valid in current state</td>
+</tr>
+<tr>
+<td><code>0x03</code></td>
+<td>ERR_BUSY</td>
+<td>Device busy with another operation</td>
+</tr>
+<tr>
+<td><code>0x04</code></td>
+<td>ERR_TIMEOUT</td>
+<td>Operation timed out</td>
+</tr>
+<tr>
+<td><code>0x05</code></td>
+<td>ERR_NOT_FOUND</td>
+<td>Requested resource not found</td>
+</tr>
+<tr>
+<td><code>0x06</code></td>
+<td>ERR_NO_MEMORY</td>
+<td>Insufficient memory</td>
+</tr>
+<tr>
+<td><code>0x07</code></td>
+<td>ERR_HARDWARE</td>
+<td>Hardware fault detected</td>
+</tr>
+<tr>
+<td><code>0x08</code></td>
+<td>ERR_COMM</td>
+<td>Communication error</td>
+</tr>
+<tr>
+<td><code>0x09</code></td>
+<td>ERR_AUTH</td>
+<td>Authentication required/failed</td>
+</tr>
+<tr>
+<td><code>0x0A</code></td>
+<td>ERR_NOT_SUPPORTED</td>
+<td>Feature not supported</td>
+</tr>
+<tr>
+<td><code>0xFF</code></td>
+<td>ERR_UNKNOWN</td>
+<td>Unknown error</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 data-heading="Connection Parameters" dir="auto">Connection Parameters</h2>
+<h3 data-heading="Recommended BLE Parameters" dir="auto">Recommended BLE Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connection Interval</td>
+<td>30-50 ms</td>
+<td>Balance between latency and power</td>
+</tr>
+<tr>
+<td>Slave Latency</td>
+<td>0-4</td>
+<td>Allow skipping connection events</td>
+</tr>
+<tr>
+<td>Supervision Timeout</td>
+<td>4000 ms</td>
+<td>Connection timeout</td>
+</tr>
+<tr>
+<td>MTU</td>
+<td>247 bytes</td>
+<td>Maximum transmission unit</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Advertising Parameters" dir="auto">Advertising Parameters</h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Advertising Interval</td>
+<td>100-200 ms (fast), 1000-2000 ms (slow)</td>
+</tr>
+<tr>
+<td>Advertising Type</td>
+<td>Connectable, Scannable</td>
+</tr>
+<tr>
+<td>TX Power</td>
+<td>0 dBm</td>
+</tr>
+</tbody>
+</table>
+<h3 data-heading="Service Discovery" dir="auto">Service Discovery</h3>
+<p dir="auto">The device advertises the following service UUIDs:</p>
+<ul>
+<li dir="auto">Device Information Service (<code>0x180A</code>)</li>
+<li dir="auto">BLE OTA Service (<code>00008018-0000-1000-8000-00805f9b34fb</code>)</li>
+<li dir="auto">Device Control Service (<code>0x1805</code>)</li>
+</ul>
+<p dir="auto">Full service list available after connection via GATT discovery.</p>
+<hr>
+<h2 data-heading="Security" dir="auto">Security</h2>
+<h3 data-heading="Pairing Requirements" dir="auto">Pairing Requirements</h3>
+<ul>
+<li dir="auto"><strong>Bonding:</strong> Required</li>
+<li dir="auto"><strong>MITM Protection:</strong> Required</li>
+<li dir="auto"><strong>Secure Connections:</strong> Supported (LE Secure Connections)</li>
+<li dir="auto"><strong>IO Capability:</strong> Display + Yes/No</li>
+</ul>
+<h3 data-heading="Encryption" dir="auto">Encryption</h3>
+<p dir="auto">All characteristics except Device Information Service (read-only info) require an encrypted connection.</p>
+<h3 data-heading="Authentication" dir="auto">Authentication</h3>
+<p dir="auto">Sensitive operations (FW Update, Factory Reset, Extract) require:</p>
+<ol>
+<li dir="auto">Encrypted connection</li>
+<li dir="auto">Bonded device</li>
+<li dir="auto">Optional: PIN confirmation for critical operations</li>
+</ol>
+<hr>
+<h2 data-heading="Version History" dir="auto">Version History</h2>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Date</th>
+<th>Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>TBD</td>
+<td>Initial specification</td>
+</tr>
+</tbody>
+</table>
+    </body>
+</html>

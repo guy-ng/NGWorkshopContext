@@ -1,0 +1,83 @@
+# BQ Technician App — Figma Screens Batch 1
+
+Mobile app for BQ pill dispenser. Flutter, Material Design 3, 390×844.
+Primary #1B3A5C, Secondary #2E5C8A, Success #2E7D32, Error #C62828, Warning #F57F17.
+Font: Roboto. Mono: JetBrains Mono (hex/UUIDs). Dark mode.
+App bar (56dp): back, title, connection chip (green/red) + battery %. Status strip (32dp): device name, RSSI, MTU. Bottom nav: Dashboard | Sensors | Control | Tools | Settings.
+
+---
+
+## Screen 1: Login (SCR-16)
+
+Full-screen auth, no bottom nav or status bar.
+
+- Top: BQ logo centered (96dp), "BQ Technician" text below
+- Email field (outlined, email icon prefix)
+- Password field (outlined, lock icon, visibility toggle)
+- "Remember Me" checkbox row
+- "Login" primary button (full width, 56dp)
+- "Forgot Password?" text link centered
+- Divider with "OR"
+- "Sign in with Google" button with G icon (outlined, full width)
+- "Sign in with Microsoft" button with MS icon (outlined, full width)
+- Bottom: app version caption (gray, centered)
+
+States: Default (empty form) | Error (red text "Invalid email or password" below password, fields red border) | Loading (spinner on login button, fields disabled) | Biometric return (fingerprint icon centered, "Tap to unlock", "Use Password" link below) | Offline (amber banner "Offline Mode — BLE only", login disabled, "Continue Offline" button)
+
+---
+
+## Screen 2: Scan & Connect (SCR-01)
+
+- **Top sticky (120dp):** Title "Scan for Devices", search field to filter by name, filter chips: All | Bonded | Strong Signal. Circular scan FAB (pulsing animation when active)
+- **Device list (scrollable cards):** Each card: Left=RSSI 4-bar indicator (green>-50, yellow>-70, orange>-85, red), Center=device name (bold) + MAC (mono) + "Bonded"/"New" chip, Right=RSSI dBm value + "Connect" button. Tap expands: service UUIDs, TX power, mfg data (hex)
+- **Connection bottom sheet (on connect):** Vertical stepper: 1.Connecting → 2.Discovering Services → 3.Negotiating MTU → 4.Bonding → 5.Ready. Spinner=active, check=done, X=fail. Cancel button. PIN dialog on bonding step.
+
+States: Idle (empty, large BLE icon, "Tap to Scan") | Scanning (pulsing FAB, cards fade in) | Connecting (bottom sheet stepper) | BLE Off (red BLE icon, "Bluetooth is Off", "Open Settings" button)
+
+---
+
+## Screen 3: Dashboard (SCR-02)
+
+Bottom nav tab 1, primary hub screen.
+
+- **Device Identity Card (top, gradient bg):** Left=dispenser icon 48dp, Center=model name + serial (mono) + FW "v1.2.3 • HW 2.0", Right=battery ring gauge (circle, % center, green>50/amber>20/red<20)
+- **6 Status Cards (2-col grid):**
+  1. Sensors: heart-pulse icon, "5/6 OK", mini sensor icons with check/X
+  2. Motor: gear icon, "Slot 3", state badge (Idle=gray/Moving=blue/Error=red)
+  3. Cartridge: pill icon, status chip (Valid=green/Expired=red), "42/144" + progress bar
+  4. Alerts: bell icon, "3 Active" (red badge), latest alert preview
+  5. Sync: cloud icon, "Last: 2h ago" or "Never synced" (amber)
+  6. Firmware: update icon, "v1.2.3" + "Up to date"(green) or "Update Available"(blue pulse)
+- **Quick Actions (horizontal scroll):** Chips: Extract Pill (filled) | Run Diagnostics | Sync Data | Open Terminal | Cloud Sync
+
+Each card tappable → navigates to detail screen.
+
+---
+
+## Screen 4: Sensors Monitor (SCR-03)
+
+Bottom nav tab 2.
+
+- **Sensor Health Bar (sticky top, 64dp):** 6 icons in circles: Temp, Humidity, Motor, Lid, Pills, Battery. Green=OK, Red=error (pulse). Tappable to scroll.
+- **Environmental (2 side-by-side cards):**
+  - Temperature: semicircular gauge 0–50°C, value center "23.5°C", sparkline chart 30min below, badge Normal/Out of Range
+  - Humidity: same layout, 0–100%, "45.2%"
+- **Motor Status (full card):** 12-dot circular carousel, current=blue filled, target=pulsing outline. Info: position, target, state badge, error code
+- **Lid Status (full card):** Large open/closed icon (amber/green), text, timestamp
+- **Pill Grid (full card):** 12 numbered circles in carousel/grid, green=present, gray=empty. "8/12 pills present"
+- **Raw Data (collapsible):** "Show Raw Data" toggle → table: UUID, hex value, timestamp (mono)
+
+---
+
+## Screen 5: Control Panel (SCR-04)
+
+- **Emergency Stop FAB (fixed bottom-right, 72dp):** Solid red #C62828, white stop icon. Always visible. Sends Stop immediately, no confirmation.
+- **Position Visualizer (top, 240dp):** 12 slots in clock circle. Current=solid blue, target=pulsing outline, home=home icon on slot 0. Tap slot to select target.
+- **Command Buttons (card, 2-col grid):**
+  - Home (outlined, full width, home icon)
+  - Rotate (filled primary, rotate icon, shows selected slot badge)
+  - Extract (filled primary, eject icon, shows selected slot badge)
+  - Calibrate (outlined, tune icon)
+  - Rotate/Extract disabled if no slot selected
+- **Status Panel (bottom card):** State badge (Idle/Executing/Error/Calibrating), last command + result, current position
+- **Response toasts:** Success=green, Error=red, auto-dismiss 3s

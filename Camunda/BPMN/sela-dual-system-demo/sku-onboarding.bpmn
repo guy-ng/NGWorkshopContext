@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_SkuOnboarding" targetNamespace="http://bpmn.io/schema/bpmn" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <bpmn:process id="SkuOnboarding" name="קליטת SKU חדש מיצרן" isExecutable="true">
+    <bpmn:startEvent id="Start_ProductSubmitted" name="טופס קליטת מוצר">
+      <bpmn:extensionElements>
+        <zeebe:formDefinition formId="sku-onboarding-start" bindingType="deployment" />
+      </bpmn:extensionElements>
+      <bpmn:outgoing>Flow_StartToRegistry</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Task_VerifyDrugRegistry" name="אימות מול מאגר התרופות">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="verify-israel-drug-registry" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_StartToRegistry</bpmn:incoming>
+      <bpmn:outgoing>Flow_RegistryToApprovalLoopJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Gateway_ApprovalLoopJoin" name="כניסה לסבב אישורים">
+      <bpmn:incoming>Flow_RegistryToApprovalLoopJoin</bpmn:incoming>
+      <bpmn:incoming>Flow_CorrectionToApprovalLoopJoin</bpmn:incoming>
+      <bpmn:outgoing>Flow_ApprovalLoopJoinToFork</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:parallelGateway id="Gateway_ApprovalFork" name="פתיחת אישורים במקביל">
+      <bpmn:incoming>Flow_ApprovalLoopJoinToFork</bpmn:incoming>
+      <bpmn:outgoing>Flow_ForkToRegulatory</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ForkToStorage</bpmn:outgoing>
+      <bpmn:outgoing>Flow_ForkToPricing</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:userTask id="Task_RegulatoryApproval" name="אישור רגולטורי">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="sku-regulatory-approval" bindingType="deployment" />
+        <zeebe:assignmentDefinition candidateGroups="qa_pharmacy" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ForkToRegulatory</bpmn:incoming>
+      <bpmn:outgoing>Flow_RegulatoryToApprovalJoin</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_DefineStorage" name="קביעת אזור אחסון ומפרט">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="sku-storage-specification" bindingType="deployment" />
+        <zeebe:assignmentDefinition candidateGroups="warehouse_operations" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ForkToStorage</bpmn:incoming>
+      <bpmn:outgoing>Flow_StorageToApprovalJoin</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="Task_ApprovePricing" name="אישור תמחור ומחירון">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="sku-pricing-approval" bindingType="deployment" />
+        <zeebe:assignmentDefinition candidateGroups="commercial" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_ForkToPricing</bpmn:incoming>
+      <bpmn:outgoing>Flow_PricingToApprovalJoin</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:parallelGateway id="Gateway_ApprovalJoin" name="סנכרון שלושת האישורים">
+      <bpmn:incoming>Flow_RegulatoryToApprovalJoin</bpmn:incoming>
+      <bpmn:incoming>Flow_StorageToApprovalJoin</bpmn:incoming>
+      <bpmn:incoming>Flow_PricingToApprovalJoin</bpmn:incoming>
+      <bpmn:outgoing>Flow_ApprovalJoinToCheck</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:exclusiveGateway id="Gateway_AllApproved" name="כל השלושה אישרו?" default="Flow_NeedsCorrection">
+      <bpmn:incoming>Flow_ApprovalJoinToCheck</bpmn:incoming>
+      <bpmn:outgoing>Flow_AllApproved</bpmn:outgoing>
+      <bpmn:outgoing>Flow_NeedsCorrection</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Task_CorrectProductData" name="תיקון נתוני המוצר">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+        <zeebe:formDefinition formId="sku-correction" bindingType="deployment" />
+        <zeebe:assignmentDefinition candidateGroups="product_onboarding" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_NeedsCorrection</bpmn:incoming>
+      <bpmn:outgoing>Flow_CorrectionToApprovalLoopJoin</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:parallelGateway id="Gateway_CreationFork" name="יצירה בשלוש המערכות">
+      <bpmn:incoming>Flow_AllApproved</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreatePriority</bpmn:outgoing>
+      <bpmn:outgoing>Flow_CreateAs400</bpmn:outgoing>
+      <bpmn:outgoing>Flow_CreateWms</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:serviceTask id="Task_CreatePriorityItem" name="יצירת פריט בפריוריטי">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="priority-create-item" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_CreatePriority</bpmn:incoming>
+      <bpmn:outgoing>Flow_PriorityToCreationJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_CreateAs400Item" name="יצירת פריט ב-AS/400">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="as400-create-item" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_CreateAs400</bpmn:incoming>
+      <bpmn:outgoing>Flow_As400ToCreationJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_CreateWmsItem" name="יצירת פריט ומיקום ב-WMS">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="wms-create-item-location" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_CreateWms</bpmn:incoming>
+      <bpmn:outgoing>Flow_WmsToCreationJoin</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:parallelGateway id="Gateway_CreationJoin" name="סנכרון יצירת הפריט">
+      <bpmn:incoming>Flow_PriorityToCreationJoin</bpmn:incoming>
+      <bpmn:incoming>Flow_As400ToCreationJoin</bpmn:incoming>
+      <bpmn:incoming>Flow_WmsToCreationJoin</bpmn:incoming>
+      <bpmn:outgoing>Flow_CreationJoinToVerify</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:serviceTask id="Task_VerifyConsistency" name="אימות עקביות בשלוש המערכות">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="verify-item-consistency" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_CreationJoinToVerify</bpmn:incoming>
+      <bpmn:outgoing>Flow_VerifyToNotify</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="Task_NotifyAvailability" name="הודעה למכירות ולמוקד ועדכון מחירון">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="publish-new-item-availability" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_VerifyToNotify</bpmn:incoming>
+      <bpmn:outgoing>Flow_NotifyToEnd</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_ProductAvailable" name="המוצר זמין למכירה">
+      <bpmn:incoming>Flow_NotifyToEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_StartToRegistry" sourceRef="Start_ProductSubmitted" targetRef="Task_VerifyDrugRegistry" />
+    <bpmn:sequenceFlow id="Flow_RegistryToApprovalLoopJoin" sourceRef="Task_VerifyDrugRegistry" targetRef="Gateway_ApprovalLoopJoin" />
+    <bpmn:sequenceFlow id="Flow_ApprovalLoopJoinToFork" sourceRef="Gateway_ApprovalLoopJoin" targetRef="Gateway_ApprovalFork" />
+    <bpmn:sequenceFlow id="Flow_ForkToRegulatory" sourceRef="Gateway_ApprovalFork" targetRef="Task_RegulatoryApproval" />
+    <bpmn:sequenceFlow id="Flow_ForkToStorage" sourceRef="Gateway_ApprovalFork" targetRef="Task_DefineStorage" />
+    <bpmn:sequenceFlow id="Flow_ForkToPricing" sourceRef="Gateway_ApprovalFork" targetRef="Task_ApprovePricing" />
+    <bpmn:sequenceFlow id="Flow_RegulatoryToApprovalJoin" sourceRef="Task_RegulatoryApproval" targetRef="Gateway_ApprovalJoin" />
+    <bpmn:sequenceFlow id="Flow_StorageToApprovalJoin" sourceRef="Task_DefineStorage" targetRef="Gateway_ApprovalJoin" />
+    <bpmn:sequenceFlow id="Flow_PricingToApprovalJoin" sourceRef="Task_ApprovePricing" targetRef="Gateway_ApprovalJoin" />
+    <bpmn:sequenceFlow id="Flow_ApprovalJoinToCheck" sourceRef="Gateway_ApprovalJoin" targetRef="Gateway_AllApproved" />
+    <bpmn:sequenceFlow id="Flow_AllApproved" name="כן" sourceRef="Gateway_AllApproved" targetRef="Gateway_CreationFork">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">=regulatoryApproved = true and storageApproved = true and pricingApproved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_NeedsCorrection" name="לא" sourceRef="Gateway_AllApproved" targetRef="Task_CorrectProductData" />
+    <bpmn:sequenceFlow id="Flow_CorrectionToApprovalLoopJoin" sourceRef="Task_CorrectProductData" targetRef="Gateway_ApprovalLoopJoin" />
+    <bpmn:sequenceFlow id="Flow_CreatePriority" sourceRef="Gateway_CreationFork" targetRef="Task_CreatePriorityItem" />
+    <bpmn:sequenceFlow id="Flow_CreateAs400" sourceRef="Gateway_CreationFork" targetRef="Task_CreateAs400Item" />
+    <bpmn:sequenceFlow id="Flow_CreateWms" sourceRef="Gateway_CreationFork" targetRef="Task_CreateWmsItem" />
+    <bpmn:sequenceFlow id="Flow_PriorityToCreationJoin" sourceRef="Task_CreatePriorityItem" targetRef="Gateway_CreationJoin" />
+    <bpmn:sequenceFlow id="Flow_As400ToCreationJoin" sourceRef="Task_CreateAs400Item" targetRef="Gateway_CreationJoin" />
+    <bpmn:sequenceFlow id="Flow_WmsToCreationJoin" sourceRef="Task_CreateWmsItem" targetRef="Gateway_CreationJoin" />
+    <bpmn:sequenceFlow id="Flow_CreationJoinToVerify" sourceRef="Gateway_CreationJoin" targetRef="Task_VerifyConsistency" />
+    <bpmn:sequenceFlow id="Flow_VerifyToNotify" sourceRef="Task_VerifyConsistency" targetRef="Task_NotifyAvailability" />
+    <bpmn:sequenceFlow id="Flow_NotifyToEnd" sourceRef="Task_NotifyAvailability" targetRef="End_ProductAvailable" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SkuOnboarding">
+    <bpmndi:BPMNPlane id="BPMNPlane_SkuOnboarding" bpmnElement="SkuOnboarding">
+      <bpmndi:BPMNShape id="Start_ProductSubmitted_di" bpmnElement="Start_ProductSubmitted">
+        <dc:Bounds x="80" y="302" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="58" y="345" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_VerifyDrugRegistry_di" bpmnElement="Task_VerifyDrugRegistry">
+        <dc:Bounds x="170" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ApprovalLoopJoin_di" bpmnElement="Gateway_ApprovalLoopJoin" isMarkerVisible="true">
+        <dc:Bounds x="300" y="295" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="275" y="350" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ApprovalFork_di" bpmnElement="Gateway_ApprovalFork">
+        <dc:Bounds x="390" y="295" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="365" y="265" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_RegulatoryApproval_di" bpmnElement="Task_RegulatoryApproval">
+        <dc:Bounds x="470" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_DefineStorage_di" bpmnElement="Task_DefineStorage">
+        <dc:Bounds x="470" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_ApprovePricing_di" bpmnElement="Task_ApprovePricing">
+        <dc:Bounds x="470" y="480" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_ApprovalJoin_di" bpmnElement="Gateway_ApprovalJoin">
+        <dc:Bounds x="620" y="295" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="595" y="350" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_AllApproved_di" bpmnElement="Gateway_AllApproved" isMarkerVisible="true">
+        <dc:Bounds x="740" y="295" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="720" y="265" width="90" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CorrectProductData_di" bpmnElement="Task_CorrectProductData">
+        <dc:Bounds x="715" y="480" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CreationFork_di" bpmnElement="Gateway_CreationFork">
+        <dc:Bounds x="860" y="295" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="835" y="265" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreatePriorityItem_di" bpmnElement="Task_CreatePriorityItem">
+        <dc:Bounds x="980" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateAs400Item_di" bpmnElement="Task_CreateAs400Item">
+        <dc:Bounds x="980" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_CreateWmsItem_di" bpmnElement="Task_CreateWmsItem">
+        <dc:Bounds x="980" y="480" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_CreationJoin_di" bpmnElement="Gateway_CreationJoin">
+        <dc:Bounds x="1150" y="295" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1125" y="350" width="100" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_VerifyConsistency_di" bpmnElement="Task_VerifyConsistency">
+        <dc:Bounds x="1270" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Task_NotifyAvailability_di" bpmnElement="Task_NotifyAvailability">
+        <dc:Bounds x="1430" y="280" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_ProductAvailable_di" bpmnElement="End_ProductAvailable">
+        <dc:Bounds x="1590" y="302" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1568" y="345" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_StartToRegistry_di" bpmnElement="Flow_StartToRegistry">
+        <di:waypoint x="116" y="320" />
+        <di:waypoint x="170" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RegistryToApprovalLoopJoin_di" bpmnElement="Flow_RegistryToApprovalLoopJoin">
+        <di:waypoint x="270" y="320" />
+        <di:waypoint x="300" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ApprovalLoopJoinToFork_di" bpmnElement="Flow_ApprovalLoopJoinToFork">
+        <di:waypoint x="350" y="320" />
+        <di:waypoint x="390" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ForkToRegulatory_di" bpmnElement="Flow_ForkToRegulatory">
+        <di:waypoint x="415" y="295" />
+        <di:waypoint x="415" y="120" />
+        <di:waypoint x="470" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ForkToStorage_di" bpmnElement="Flow_ForkToStorage">
+        <di:waypoint x="440" y="320" />
+        <di:waypoint x="470" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ForkToPricing_di" bpmnElement="Flow_ForkToPricing">
+        <di:waypoint x="415" y="345" />
+        <di:waypoint x="415" y="520" />
+        <di:waypoint x="470" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_RegulatoryToApprovalJoin_di" bpmnElement="Flow_RegulatoryToApprovalJoin">
+        <di:waypoint x="570" y="120" />
+        <di:waypoint x="645" y="120" />
+        <di:waypoint x="645" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_StorageToApprovalJoin_di" bpmnElement="Flow_StorageToApprovalJoin">
+        <di:waypoint x="570" y="320" />
+        <di:waypoint x="620" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PricingToApprovalJoin_di" bpmnElement="Flow_PricingToApprovalJoin">
+        <di:waypoint x="570" y="520" />
+        <di:waypoint x="645" y="520" />
+        <di:waypoint x="645" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_ApprovalJoinToCheck_di" bpmnElement="Flow_ApprovalJoinToCheck">
+        <di:waypoint x="670" y="320" />
+        <di:waypoint x="740" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_AllApproved_di" bpmnElement="Flow_AllApproved">
+        <di:waypoint x="790" y="320" />
+        <di:waypoint x="860" y="320" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="815" y="300" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NeedsCorrection_di" bpmnElement="Flow_NeedsCorrection">
+        <di:waypoint x="765" y="345" />
+        <di:waypoint x="765" y="480" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="770" y="405" width="20" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CorrectionToApprovalLoopJoin_di" bpmnElement="Flow_CorrectionToApprovalLoopJoin">
+        <di:waypoint x="715" y="520" />
+        <di:waypoint x="325" y="520" />
+        <di:waypoint x="325" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreatePriority_di" bpmnElement="Flow_CreatePriority">
+        <di:waypoint x="885" y="295" />
+        <di:waypoint x="885" y="120" />
+        <di:waypoint x="980" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreateAs400_di" bpmnElement="Flow_CreateAs400">
+        <di:waypoint x="910" y="320" />
+        <di:waypoint x="980" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreateWms_di" bpmnElement="Flow_CreateWms">
+        <di:waypoint x="885" y="345" />
+        <di:waypoint x="885" y="520" />
+        <di:waypoint x="980" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_PriorityToCreationJoin_di" bpmnElement="Flow_PriorityToCreationJoin">
+        <di:waypoint x="1080" y="120" />
+        <di:waypoint x="1175" y="120" />
+        <di:waypoint x="1175" y="295" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_As400ToCreationJoin_di" bpmnElement="Flow_As400ToCreationJoin">
+        <di:waypoint x="1080" y="320" />
+        <di:waypoint x="1150" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_WmsToCreationJoin_di" bpmnElement="Flow_WmsToCreationJoin">
+        <di:waypoint x="1080" y="520" />
+        <di:waypoint x="1175" y="520" />
+        <di:waypoint x="1175" y="345" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_CreationJoinToVerify_di" bpmnElement="Flow_CreationJoinToVerify">
+        <di:waypoint x="1200" y="320" />
+        <di:waypoint x="1270" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_VerifyToNotify_di" bpmnElement="Flow_VerifyToNotify">
+        <di:waypoint x="1370" y="320" />
+        <di:waypoint x="1430" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_NotifyToEnd_di" bpmnElement="Flow_NotifyToEnd">
+        <di:waypoint x="1530" y="320" />
+        <di:waypoint x="1590" y="320" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

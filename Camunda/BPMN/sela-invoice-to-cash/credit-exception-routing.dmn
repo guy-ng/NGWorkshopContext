@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_CreditExceptionRouting" name="ניתוב החלטת אשראי חריגה" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.34.0" modeler:executionPlatform="Camunda Cloud" modeler:executionPlatformVersion="8.8.0">
+  <decision id="credit_exception_routing" name="ניתוב החלטת אשראי חריגה">
+    <decisionTable id="DecisionTable_CreditExceptionRouting" hitPolicy="FIRST">
+      <input id="Input_CreditHold" label="קיימת עצירת אשראי">
+        <inputExpression id="InputExpression_CreditHold" typeRef="boolean">
+          <text>exposure.creditHold</text>
+        </inputExpression>
+      </input>
+      <input id="Input_MaxDaysOverdue" label="הפיגור העמוק ביותר (ימים)">
+        <inputExpression id="InputExpression_MaxDaysOverdue" typeRef="number">
+          <text>exposure.maxDaysOverdue</text>
+        </inputExpression>
+      </input>
+      <input id="Input_Utilization" label="ניצול המסגרת (1.0 = 100%)">
+        <inputExpression id="InputExpression_Utilization" typeRef="number">
+          <text>exposure.utilization</text>
+        </inputExpression>
+      </input>
+      <input id="Input_OrderAmount" label="סכום ההזמנה (₪)">
+        <inputExpression id="InputExpression_OrderAmount" typeRef="number">
+          <text>orderAmount</text>
+        </inputExpression>
+      </input>
+      <input id="Input_Segment" label="סוג לקוח">
+        <inputExpression id="InputExpression_Segment" typeRef="string">
+          <text>customerSegment</text>
+        </inputExpression>
+      </input>
+      <output id="Output_Decision" label="מסלול" name="decision" typeRef="string" />
+      <output id="Output_ApproverGroup" label="קבוצת מאשרים" name="approverGroup" typeRef="string" />
+      <output id="Output_Sla" label="זמן תגובה מחייב" name="slaDuration" typeRef="string" />
+      <rule id="Rule_HoldAndDeepOverdue">
+        <description>אשראי עצור וחוב עמוק — אין שחרור</description>
+        <inputEntry id="CUT_1_1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="CUT_1_2">
+          <text>&gt;= 60</text>
+        </inputEntry>
+        <inputEntry id="CUT_1_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_1_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_1_5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="COE_1_1">
+          <text>"AUTO_REJECT"</text>
+        </outputEntry>
+        <outputEntry id="COE_1_2">
+          <text>"none"</text>
+        </outputEntry>
+        <outputEntry id="COE_1_3">
+          <text>"PT0S"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_HoldActive">
+        <description>אשראי עצור — רק סמנכ&quot;ל הכספים משחרר</description>
+        <inputEntry id="CUT_2_1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="CUT_2_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_2_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_2_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_2_5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="COE_2_1">
+          <text>"MANUAL"</text>
+        </outputEntry>
+        <outputEntry id="COE_2_2">
+          <text>"cfo"</text>
+        </outputEntry>
+        <outputEntry id="COE_2_3">
+          <text>"PT4H"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_DeepOverdue">
+        <description>פיגור מעל 30 יום — הסלמה מיידית</description>
+        <inputEntry id="CUT_3_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_3_2">
+          <text>&gt;= 30</text>
+        </inputEntry>
+        <inputEntry id="CUT_3_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_3_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_3_5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="COE_3_1">
+          <text>"MANUAL"</text>
+        </outputEntry>
+        <outputEntry id="COE_3_2">
+          <text>"cfo"</text>
+        </outputEntry>
+        <outputEntry id="COE_3_3">
+          <text>"PT4H"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_MinorOverrun">
+        <description>חריגה זניחה בהזמנה קטנה — אין טעם להעיר אף אחד</description>
+        <inputEntry id="CUT_4_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_4_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_4_3">
+          <text>&lt;= 1.05</text>
+        </inputEntry>
+        <inputEntry id="CUT_4_4">
+          <text>&lt; 20000</text>
+        </inputEntry>
+        <inputEntry id="CUT_4_5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="COE_4_1">
+          <text>"AUTO_APPROVE"</text>
+        </outputEntry>
+        <outputEntry id="COE_4_2">
+          <text>"system"</text>
+        </outputEntry>
+        <outputEntry id="COE_4_3">
+          <text>"PT0S"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_CreditControl">
+        <description>חריגה מתונה — בקרת אשראי</description>
+        <inputEntry id="CUT_5_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_5_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_5_3">
+          <text>&lt;= 1.2</text>
+        </inputEntry>
+        <inputEntry id="CUT_5_4">
+          <text>&lt; 50000</text>
+        </inputEntry>
+        <inputEntry id="CUT_5_5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="COE_5_1">
+          <text>"MANUAL"</text>
+        </outputEntry>
+        <outputEntry id="COE_5_2">
+          <text>"credit_control"</text>
+        </outputEntry>
+        <outputEntry id="COE_5_3">
+          <text>"PT4H"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_PublicPayers">
+        <description>קופות ובתי חולים — סיכון גבייה נמוך</description>
+        <inputEntry id="CUT_6_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_6_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_6_3">
+          <text>&lt;= 1.5</text>
+        </inputEntry>
+        <inputEntry id="CUT_6_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_6_5">
+          <text>"hospital", "hmo"</text>
+        </inputEntry>
+        <outputEntry id="COE_6_1">
+          <text>"MANUAL"</text>
+        </outputEntry>
+        <outputEntry id="COE_6_2">
+          <text>"credit_control"</text>
+        </outputEntry>
+        <outputEntry id="COE_6_3">
+          <text>"PT8H"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_FinanceManager">
+        <description>חריגה משמעותית — מנהל כספים</description>
+        <inputEntry id="CUT_7_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_7_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_7_3">
+          <text>&lt;= 1.5</text>
+        </inputEntry>
+        <inputEntry id="CUT_7_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_7_5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="COE_7_1">
+          <text>"MANUAL"</text>
+        </outputEntry>
+        <outputEntry id="COE_7_2">
+          <text>"finance_managers"</text>
+        </outputEntry>
+        <outputEntry id="COE_7_3">
+          <text>"PT8H"</text>
+        </outputEntry>
+      </rule>
+      <rule id="Rule_Cfo">
+        <description>כל השאר — סמנכ&quot;ל כספים</description>
+        <inputEntry id="CUT_8_1">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_8_2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_8_3">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_8_4">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="CUT_8_5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="COE_8_1">
+          <text>"MANUAL"</text>
+        </outputEntry>
+        <outputEntry id="COE_8_2">
+          <text>"cfo"</text>
+        </outputEntry>
+        <outputEntry id="COE_8_3">
+          <text>"PT12H"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram id="DMNDiagram_CreditExceptionRouting">
+      <dmndi:DMNShape id="DMNShape_CreditExceptionRouting" dmnElementRef="credit_exception_routing">
+        <dc:Bounds height="80" width="180" x="160" y="100" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

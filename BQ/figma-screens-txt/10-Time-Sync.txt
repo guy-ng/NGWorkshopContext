@@ -1,0 +1,31 @@
+SCR-09: Time Sync — BQ Technician App
+
+390×844, Material Design 3. Compact utility screen.
+
+Purpose
+Synchronize device clock with phone, configure timezone and DST, monitor drift.
+
+Layout
+
+Clock Comparison Card (top, prominent)
+Two side-by-side digital clocks: "Phone Time" (left) and "Device Time" (right)
+Large time display (HH:MM:SS) in each
+Drift badge between them: "+3.2s ahead" or "-1.5s behind"
+Drift color: green (<1s), amber (1–10s), red (>10s)
+
+Sync Action
+Large primary button: "Sync Now"
+Last sync: relative timestamp ("5 minutes ago") below button
+On success: green checkmark animation, drift recalculates to ~0s
+
+Timezone & DST Section (card)
+Timezone picker: dropdown showing UTC offsets in 15-min increments
+Current: "UTC+02:00 (Israel Standard Time)"
+DST toggle switch On/Off, offset display in minutes
+"Auto-Detect" button: reads phone timezone, writes both to device
+
+States
+Synced: drift <1s, green badge, "Sync Now" secondary priority
+Drifted: drift visible, amber/red badge, "Sync Now" prominent
+Syncing: button shows spinner, "Synchronizing..."
+Disconnected: standard disconnected overlay

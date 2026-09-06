@@ -1,9 +1,0 @@
-############# Hebrew navigation ##############
-
-# main menu
-[[main]]
-name = "בלוג"
-url = "/he/blog/"
-weight = 1
-
-# footer menu

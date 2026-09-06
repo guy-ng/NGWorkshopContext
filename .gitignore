@@ -1,0 +1,15 @@
+# Local Netlify folder
+.netlify
+
+# Large media / binary assets (GitHub rejects files >100MB) - keep locally, not in git
+marketing/VideoSeries2026/Videos/
+marketing/VideoSeries2026/templates/
+*.mbtiles
+*.MP4
+*.mp4
+*.mov
+*.MOV
+
+# Build output
+build/
+node_modules/
